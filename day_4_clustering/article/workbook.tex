@@ -1,0 +1,202 @@
+% Companion workbook for the IAA-SO School on AI/ML in Astronomy 2026
+%   Unsupervised Learning pillar — chemical tagging of star clusters.
+%
+% Built on the Annual Reviews ar-1col class (vendored, unmodified) with the
+% publisher's yoke replaced by the school's own information; see README.md.
+%
+% Build:  make            (vendors the deck figures, then latexmk)
+%         make pdf        (LaTeX only)
+\documentclass{ar-1col}
+
+\setcounter{secnumdepth}{3}
+
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage[T1]{fontenc}
+\usepackage[authoryear,round]{natbib}
+\bibpunct{(}{)}{;}{a}{}{,}
+
+% ------------------------------------------------------------------ metadata
+\jname{IAA-SO School on AI/ML in Astronomy 2026 · companion workbook}
+\jvol{Unsupervised Learning}
+\jyear{2026}
+\doi{}
+
+% The Annual Reviews yoke (journal, volume, doi, copyright line) is replaced
+% by the school's own information, per the brief.
+\makeatletter
+\def\@deckurl{garciadias.github.io/\#/presentations/\allowbreak iaa-so-chemical-tagging-2026}
+\def\@repourl{github.com/\allowbreak garciadias/\allowbreak iaa-advanced-neural-networks-2026-draft}
+\def\@schoolurl{granadacongresos.com/ai-ml}
+\def\journalinfo{{\jinfofont
+  Companion workbook for the IAA-SO School on AI/ML in Astronomy 2026
+  (Unsupervised Learning pillar)\endgraf
+  \vskip4\p@ School programme: \texttt{\@schoolurl}\endgraf
+  \vskip4\p@ Live deck (animated figures): \texttt{\@deckurl}\endgraf
+  \vskip4\p@ Code, data, results: \texttt{\@repourl}\endgraf
+  \vskip4\p@ \copyright\ \@jyear\ Rafael Garcia-Dias. Prepared for teaching use.\endgraf}}
+% The class sets the Annual Reviews offprint trim (7.375 x 9.125 in), but its
+% own title-page block is 533 pt wide, so the offprint page clips it under
+% pdfTeX. Set the page to letter, which the layout was cut for (456 pt text
+% block plus margin-note gutter), and pin the PDF page size to match.
+\setlength{\paperwidth}{8.5in}
+\setlength{\paperheight}{11in}
+\setlength{\pdfpagewidth}{\paperwidth}
+\setlength{\pdfpageheight}{\paperheight}
+% the class prints www.annualreviews.org in the running footer; replace it with
+% the school's own line. NB the class already called \pagestyle{headings} while
+% loading, which *executed* its footer definition -- so the redefinition below
+% must be followed by another \pagestyle{headings} to take effect.
+\def\ps@headings{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddfoot{\hbox to\textwidth{\rhfont IAA-SO 2026 · chemical tagging\hfill\foliofont\thepage}}%
+  \def\@evenfoot{\hbox to\textwidth{\foliofont\thepage\hfill\rhfont Companion workbook: chemical tagging}}%
+  \def\@evenhead{}%
+  \def\@oddhead{}%
+  \def\sectionmark##1{}%
+  \def\subsectionmark##1{}}%
+\makeatother
+
+\pagestyle{headings}
+
+% The class typesets the contents as a single unbreakable shaded \vbox, 36pc
+% wide and shifted 3.75pc sideways -- designed for a journal's handful of
+% sections. A 17-chapter workbook overflows it by 490pt and bleeds off the
+% left edge of the page, so the contents is re-set here as ordinary,
+% page-breakable material.
+\makeatletter
+\renewcommand\tableofcontents{%
+  \section*{\contentsname}%
+  \@starttoc{toc}}
+% ...and its contents-line number boxes are 1.2em wide, which two-digit
+% chapter numbers fill completely, welding "10.3." to the title. Widen them.
+\renewcommand*\l@section{\@dottedtocline{1}{0em}{2.4em}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{2.4em}{3.4em}}
+\makeatother
+
+% ------------------------------------------------------------------- helpers
+% The ar-1col class recomputes every figure at its *natural* size: its
+% \Gin@setfile hook rebuilds the box at \Gin@req@width and merely centres it,
+% so the width= key is ignored and a 1456-px PNG lands 372 pt wide whatever
+% you ask for. Everything is therefore wrapped in \resizebox, which acts on the
+% box after the class has had its way.
+%   \fig[<fraction of \textwidth>]{<file in figures/>}
+\newcommand{\fig}[2][0.94]{\resizebox{#1\textwidth}{!}{\includegraphics{figures/#2}}}
+% One figure, captioned, from figures/<file>.
+\newcommand{\wbfig}[4][0.86]{%
+  \begin{figure}[htbp]\centering
+    \includegraphics[width=#1\textwidth]{figures/#2}
+    \caption{#3}\label{#4}
+  \end{figure}}
+% Two panels side by side.
+\newcommand{\wbtwo}[4]{%
+  \begin{figure}[htbp]\centering
+    \begin{tabular}{@{}c@{\hskip4pt}c@{}}
+      \fig[0.46]{#1} &
+      \fig[0.46]{#2}
+    \end{tabular}
+    \caption{#3}\label{#4}
+  \end{figure}}
+% Three panels in a row (small steps).
+\newcommand{\wbthree}[5]{%
+  \begin{figure}[htbp]\centering
+    \begin{tabular}{@{}c@{\hskip3pt}c@{\hskip3pt}c@{}}
+      \fig[0.30]{#1} &
+      \fig[0.30]{#2} &
+      \fig[0.30]{#3}
+    \end{tabular}
+    \caption{#4}\label{#5}
+  \end{figure}}
+% Four panels in a 2x2 grid.
+\newcommand{\wbfour}[6]{%
+  \begin{figure}[htbp]\centering
+    \begin{tabular}{@{}c@{\hskip4pt}c@{}}
+      \fig[0.44]{#1} &
+      \fig[0.44]{#2} \\[2pt]
+      \fig[0.44]{#3} &
+      \fig[0.44]{#4}
+    \end{tabular}
+    \caption{#5}\label{#6}
+  \end{figure}}
+% A wide figure (benchmark grid etc.)
+\newcommand{\wbwide}[3]{%
+  \begin{figure}[htbp]\centering
+    \includegraphics[width=\textwidth]{figures/#1}
+    \caption{#2}\label{#3}
+  \end{figure}}
+% Pointer from the prose back to the live deck.
+\newcommand{\deckslides}[1]{{\sffamily\footnotesize\textbf{Deck:} #1}}
+% Inline code / command names.
+\newcommand{\code}[1]{\texttt{\small #1}}
+% A small "which files back this up" pointer.
+\newcommand{\sources}[1]{{\footnotesize\textit{Sources:} #1}}
+% Figure-panel label used inside captions.
+\newcommand{\panel}[1]{\textbf{(#1)}}
+
+\begin{document}
+
+\markboth{Garcia-Dias}{Companion workbook: chemical tagging}
+
+\title{Unsupervised Learning: High-dimensional embeddings (t-SNE, UMAP,
+EVoC) and clustering algorithms applied to chemical tagging of star clusters}
+
+\author{Rafael Garcia-Dias\affil{King's College London;
+\texttt{rafaelagd@gmail.com}}}
+
+\begin{abstract}
+Stars born in the same cluster share a chemical fingerprint, and that
+fingerprint outlives the cluster: the stars disperse, their element ratios do
+not. Recovering dispersed siblings from abundances alone --- \emph{chemical
+tagging} --- is a clustering problem in a noisy, high-dimensional space, and
+this workbook is the long-form companion to the IAA-SO 2026 lecture on it. It
+builds the toolbox one algorithm at a time, each chosen to repair the failure
+mode of the previous one: K-means, the $k$-nearest-neighbour primitive,
+DBSCAN, HDBSCAN$^*$, PLSCAN, t-SNE, UMAP and EVoC, with the mathematics
+written out, the hyperparameters interpreted, and the assumptions of each
+method stated rather than hidden. The second half applies the toolbox to
+25 open and globular clusters in APOGEE DR19, Gaia DR3 and GALAH DR4, scoring
+every method against kinematic membership, and reports the result the project
+actually found: abundances narrow the candidate list, kinematics decide, and a
+masked spectral autoencoder trained with no abundance labels at all separates
+clusters better than the ASPCAP abundances do. Every number is reproducible
+from the accompanying repository, and the failures --- including one of our
+own, withdrawn --- are reported next to the successes.
+\end{abstract}
+
+\begin{keywords}
+chemical tagging, clustering, dimensionality reduction, t-SNE, UMAP, EVoC,
+stellar abundances, APOGEE, Gaia, unsupervised learning
+\end{keywords}
+
+\maketitle
+
+\tableofcontents
+
+\input{chapters/01_introduction}
+\input{chapters/02_data}
+\input{chapters/03_fundamentals}
+\input{chapters/04_kmeans}
+\input{chapters/05_knn}
+\input{chapters/06_dbscan}
+\input{chapters/07_hdbscan}
+\input{chapters/08_plscan}
+\input{chapters/09_validation}
+\input{chapters/10_tsne}
+\input{chapters/11_umap}
+\input{chapters/12_evoc}
+\input{chapters/13_benchmark}
+\input{chapters/14_spectral}
+\input{chapters/15_physics}
+\input{chapters/16_assignment}
+\input{chapters/17_conclusions}
+
+\bibliographystyle{ar-style2}
+\bibliography{references}
+
+\end{document}

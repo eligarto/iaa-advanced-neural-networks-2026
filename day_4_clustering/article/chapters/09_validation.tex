@@ -1,0 +1,269 @@
+% 09 · Validation — how to know whether any of this is real
+\section{VALIDATION: KNOWING WHEN A SCORE LIES}
+\label{sec:validation}
+
+\deckslides{slides 19--20 (internal and external validation) and slide 3.}
+
+In a supervised problem, validation is arithmetic: hold out labels, count
+mistakes. In clustering there is nothing to hold out, and the score you report
+is chosen by you. This chapter is therefore the most important one in the
+workbook, and the one in which we report the most unflattering numbers ---
+including two of our own that forced us to withdraw a published claim.
+
+\subsection{Internal indices: is the partition tidy?}
+
+Three classical measures, all computed from the data and the partition alone.
+
+\begin{itemize}
+\item \textbf{Sum of squared errors.} The K-means objective of
+  \textbf{Equation~\ref{eq:sse}} (\S\ref{sec:kmeans}).
+  Monotone in the number of groups, so it is only useful as a curve against
+  $K$, never as a score.
+\item \textbf{Silhouette} \citep{Rousseeuw:87}. For a point $i$, let $a(i)$ be
+  its mean distance to the other members of its own group and $b(i)$ its mean
+  distance to the members of the nearest other group. Then
+  $s(i) = (b(i)-a(i))/\max\{a(i),b(i)\} \in [-1,1]$, and the silhouette is the
+  mean over points. It rewards compact, well-separated groups --- which is a
+  statement about geometry, not about truth.
+\item \textbf{Dip test} \citep{Hartigan:85}. A significance test for
+  unimodality of a one-dimensional distribution. Its role here is upstream of
+  clustering: it answers whether a variable (or a projection) shows any
+  multipeaked structure at all. If nothing is multimodal, the clusters an
+  algorithm returns are imposed by the algorithm.
+\end{itemize}
+
+All three share one weakness, and it is fatal if forgotten: \emph{a tidy
+partition of unstructured data is easy to produce}. The silhouette of a
+$K$-means solution on uniform noise is not zero, and the dip test is one
+significance test among many you could run. Internal indices are for
+diagnosing the behaviour of an algorithm, not for certifying a discovery.
+
+\begin{marginnote}[]
+\entry{Homogeneity}{How pure each predicted group is: 1 when every cluster an
+algorithm reports contains a single true cluster, even if that true cluster is
+split across several predictions.}
+\entry{Completeness}{How intact each true cluster is: 1 when every true
+cluster ends up in one predicted group, even if that group contains several
+true clusters. Homogeneity and completeness trade off.}
+\end{marginnote}
+
+\subsection{External indices: comparison with something the algorithm never saw}
+
+Here the labels come from outside the algorithm. Two families are used in this
+workbook, and we use them for different tasks.
+
+\textbf{Cluster-only separation} follows \citet{GarciaDias:19}. Take only the
+known members, cluster them, and compare the predicted grouping with the true
+one using an information-theoretic pair plus an assignment score:
+
+\begin{align}
+h &= 1 - \frac{H(C \mid K)}{H(C)}, &
+c &= 1 - \frac{H(K \mid C)}{H(K)}, &
+v &= \frac{2hc}{h+c},
+\label{eq:merits}
+\end{align}
+
+where $C$ are the true cluster labels, $K$ the predicted ones, and $H$ the
+Shannon entropy; accuracy is the fraction of correctly assigned stars after
+matching predicted to true labels with the Hungarian algorithm (maximising the
+diagonal of the confusion matrix). The pairing is not cosmetic. A method that
+merges every cluster into one group has $c = 1$ and $h \approx 0$; a method
+that shatters them has $h = 1$ and low $c$. Quoting one without the other is
+how a broken result reads as a good one, and we do it ourselves in
+\textbf{Table~\ref{tab:honest}} for exactly that reason.
+
+\textbf{Field retrieval} follows the operational question: for each cluster,
+take the predicted group that overlaps its true members most, and measure
+
+\begin{equation}
+\text{recall} = \frac{\text{true members recovered}}{\text{all true members}},
+\qquad
+\text{precision} = \frac{\text{true members in the group}}{\text{stars in the group}} .
+\label{eq:rp}
+\end{equation}
+
+\textbf{Recovery fraction} \citep{Casamiquela:21} answers the question a
+per-cluster study actually asks: how many of the known clusters came back? For
+each true cluster, take the predicted group that holds most of its stars (the
+best-overlap rule above). The cluster counts as \emph{recovered} at a threshold
+$\theta$ when that group holds at least $\theta$ of the cluster \emph{and} at
+least $\theta$ of the group is the cluster --- their per-cluster completeness and
+homogeneity, our recall and precision, both at once:
+
+\begin{equation}
+\mathrm{RF}_{\theta} = \frac{\#\{\text{clusters recovered at } \theta\}}{\#\{\text{clusters}\}},
+\qquad \theta = 0.40 \text{ or } 0.70 .
+\label{eq:rf}
+\end{equation}
+
+Its companion is the \emph{statistical fraction}: the share of predicted groups
+that recover no cluster at all, which is how the other paper measures the amount
+of decoration in its own solution. We adopt this pair for the same reason we
+adopt their task: of all the scores in this chapter it is the one whose chance
+level is near zero whatever the sizes and number of clusters, so it survives
+comparison between different samples. The implementation is
+\texttt{cluster.baseline.recovery\_fraction}, and it reproduces their Table~2
+exactly, which is the only external check on it available.
+
+Two complements to \textbf{Equation~\ref{eq:rp}} appear in the results.
+\emph{kNN purity} (\S\ref{sec:knn}) is parameter-free cohesion, immune to the
+best-overlap protocol below. \emph{AUROC} answers a refusal question rather
+than a discovery one: given a true member and a contaminant, how often does
+the method rank the member as more plausible? It is used in
+\S\ref{sec:benchmark} to show that the rejection power of spectra grows with
+cluster age.
+
+\begin{issues}[THE ``BEST OVERLAP'' IS A BEST CASE]
+The protocol above scores a method by its single best-matching predicted
+group per cluster. That is deliberately generous --- it is the only fair way to
+compare algorithms that return different numbers of groups --- but it means a
+method can look good by returning many groups, only one of which overlaps each
+cluster. It also cannot be gamed into positive precision: the denominator is
+the size of the predicted group, so a group with 3 true members in it and 300
+field stars scores 0.01 however well it ``recovered'' those three.
+\end{issues}
+
+\subsection{Five ways a score lies}
+
+Each of these is a case we hit. They are ordered from the oldest to the most
+recent, and the fourth is the reason the validation chapter is in the middle
+of the workbook rather than at the end.
+
+\paragraph{1 · The degenerate partition.} A clustering that returns two groups
+with two thirds of the stars in one of them produces a homogeneity of
+$0.269$ --- a floor set by the collapse, not a measurement of the method. Two
+of our PCA rows sat on that floor, and a first draft of this work described
+the spectral latent as ``three times better than PCA''. It was three times
+better than a crash. The check that catches it is a column nobody prints by
+default: the fraction of stars in the largest predicted group. We now print
+it, and \texttt{cluster head-to-head} flags degenerate rows automatically.
+
+\paragraph{2 · Comparing different populations.} The abundance arm of our
+first head-to-head was scored on 25 clusters and 1\,215 stars, while every
+other arm was scored on 5 clusters and 55 stars. The abundance row therefore
+looked worse than the others for a reason that had nothing to do with
+abundances: it was being asked a harder question. The fix is structural, not
+statistical --- intersect the sets of stars before scoring, so every row of
+the table describes the same 982 stars and the same 25 clusters. Two tables in
+this workbook have been rebuilt that way, and the rebuilt numbers are the ones
+quoted.
+
+\paragraph{3 · Row order, and duplicate stars.} Two checks on the same member
+matrix, both of which should have been run before any of it was published.
+
+\emph{Row order.} Permuting the rows of the abundance matrix --- a
+transformation that leaves every pairwise distance exactly unchanged --- moves
+the t-SNE homogeneity between $0.218$ and $0.560$, and the number of predicted
+groups between 2 and 22. The sorted order gives $0.560$; the mean over eight
+random orders is $0.268 \pm 0.100$. The geometry is identical in all nine
+runs; what changes is the optimiser's path, which depends on initialisation
+and on the order in which the Barnes--Hut approximation accumulates
+interactions. Every other arm is stable to a few hundredths: UMAP on the same
+abundances $0.579 \pm 0.009$, and the masked-AE latent $0.740 \pm 0.003$ under
+t-SNE. The lesson is not ``t-SNE is broken'' but ``report the row-order spread
+of any embedding with a stochastic initialisation'', because on small samples
+it can exceed the effect you are claiming.
+
+\emph{Duplicates.} An audit of the same matrix found that it contains repeat
+entries for the same star: of 1\,002 member rows, 807 carry distinct
+\texttt{APOGEE\_ID}s and 34 carry none, so 332 rows share an identifier with
+another row (\texttt{scripts/population\_counts.py}). The copies are not identical --- the median spread between two
+rows of the same star is $0.04$ dex per element, comparable to the abundance
+differences we are trying to measure --- and they are concentrated: M~3
+contributes 102 duplicate rows, M~67 ninety. This inflates the member counts
+of \textbf{Table~\ref{tab:clusters}} (they are row counts, not star counts),
+double-weights those clusters in every macro average, and is the most likely
+explanation for the fragility of the abundances-only t-SNE row above. The
+clean fix is to collapse each star's rows before clustering.
+
+\paragraph{4 · Tuning on the score.} The lever sweep of
+\S\ref{sec:benchmark} chose element weights by maximising the very metric it
+then reported, on a single cluster at a single seed. That is a legitimate way
+to \emph{find} a lever and an illegitimate way to \emph{quantify} it, and the
+current run exposed the difference: the same switch that lifted t-SNE recall
+on the DR17 data ($0.09 \rightarrow 0.44$) lowers precision on the DR19 data
+($0.83 \rightarrow 0.24$). A lever is a hypothesis; only a re-run on the
+current data, quoted with both recall and precision, turns it into a result.
+
+\paragraph{5 \textperiodcentered\ The chance level of a mutual-information score moves
+with the sample.} Small groups inflate $h$, $c$ and $V$. Shuffle
+\citet{Casamiquela:21}'s 175 stars at random into groups with the sizes they
+observe --- 31 clusters, most of them tiny --- and the V-measure is $0.51$; do the
+same on our 982 stars in 25 clusters and it is $0.06$--$0.12$. Their published
+$V = 0.55$ therefore sits $0.04$ above its null, and our $V = 0.58$ sits about
+$0.47$ above ours. The two numbers are not comparable, and a table that prints
+them side by side without their nulls asserts a comparison that does not exist.
+\textbf{Equation~\ref{eq:rf}} does not have this problem: chance level $0.04$
+for their sample shape and $\le 0.001$ for ours. This is the reason
+\S\ref{sec:literature} is written in recovery fractions.
+
+\subsection{The protocol this workbook follows}
+
+Out of all that, six rules, which the numbers in
+\S\ref{sec:benchmark}--\S\ref{sec:physics} obey:
+
+\begin{enumerate}
+\item \textbf{Same population or no comparison.} Arms are intersected on the
+  stars they share before any score is computed.
+\item \textbf{Mean $\pm$ standard deviation over seeds.} Seven seeds
+  ($42, 0, 1, 2, 7, 13, 99$), never a single run, and never a best-of.
+\item \textbf{Kinematics are the ceiling, not a competitor.} They define the
+  labels; the interesting question is always how close chemistry or spectra
+  get to that ceiling.
+\item \textbf{Parameter-free scores alongside tuned ones.} kNN purity and
+  AUROC cannot be improved by tuning, which makes them the sanity check on
+  everything else.
+\item \textbf{Report the degenerate rows.} Largest-group fraction and number
+  of predicted groups are printed next to every score, so a collapse is
+  visible without recomputation.
+\item \textbf{Recompute the chance level before comparing with a published
+  score.} A score quoted without its null is a number without units, and the
+  null moves when the sample does (rule 5 above).
+\end{enumerate}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip8pt}c@{}}
+    \fig[0.44]{confusion_tsne_chem.png} &
+    \fig[0.44]{confusion_tsne_kin.png}
+  \end{tabular}
+  \caption{The confusion matrix of a t-SNE clustering of the members, with the
+  true cluster on one axis and the predicted group on the other
+  (\textbf{Equation~\ref{eq:merits}} visualised). Left: abundances only --- one
+  predicted group absorbs most of the true clusters, which is the
+  completeness-rich, homogeneity-poor blob described above. Right: adding
+  kinematics. The blocks along the diagonal are what ``the clusters are
+  separated'' looks like in a matrix, and the difference between the two panels
+  is the central result of \S\ref{sec:benchmark}.}
+  \label{fig:confusion}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \fig[0.78]{proper_motions.png}
+  \caption{Why kinematics can referee. Each panel shows proper motion in right
+  ascension and declination for the stars around one cluster; the tight group
+  sharing a velocity is the cluster, the surrounding cloud is the field. These
+  are the observables that define the labels, so they can never be an input to
+  a method that is scored against them.}
+  \label{fig:propermotions}
+\end{figure}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Show that a clustering that puts every star in a single group has
+  $h = 0$ and $c = 1$, and that a clustering that gives every star its own
+  group has $h = 1$ and $c \approx 0$. Where does accuracy sit in each limit?
+\item Reproduce the row-order check: cluster the DR19 member matrix with
+  t-SNE$\,+\,$HDBSCAN nine times, once sorted and eight times with a random
+  row order, fixing the seed. Report the spread of homogeneity and of the
+  number of predicted groups. Now do the same with the masked-AE latent. Why
+  is one stable and the other not?
+\item Collapse the duplicate rows of the member matrix (for example by taking
+  the median abundance vector per \texttt{APOGEE\_ID}) and re-run the
+  cluster-only table. Which rows of \textbf{Table~\ref{tab:honest}} move, and
+  does M~3's share of the sample change the conclusion of the ablation?
+\item Design a $\sigma$-clipped chemical membership and use it to score a
+  kinematic clustering. Based on \S\ref{sec:data}, explain in three sentences
+  why the resulting number would be meaningless --- and what the equivalent
+  mistake would look like in your own field.
+\end{enumerate}
+\end{issues}

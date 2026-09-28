@@ -1,0 +1,144 @@
+% 06 · DBSCAN — density, and the trouble with one threshold
+\section{DBSCAN: FOLLOWING THE DENSITY}
+\label{sec:dbscan}
+
+\deckslides{slides 13--17, with slide 21 for the single-threshold problem.}
+
+K-means asks how far a star is from a centre. DBSCAN --- density-based
+spatial clustering of applications with noise \citep{Ester:96} --- asks a
+different question: how many neighbours does a star have within a fixed
+radius? That single change buys three things K-means cannot offer: clusters of
+arbitrary shape, an explicit notion of noise, and no need to know $K$ in
+advance.
+
+\subsection{Definitions}
+
+Fix two parameters: a radius $\varepsilon$ and a minimum count
+\texttt{minPts}. Let $N_\varepsilon(\mathbf{x})$ be the set of points within
+distance $\varepsilon$ of $\mathbf{x}$ (its $\varepsilon$-neighbourhood).
+
+\begin{itemize}
+\item \textbf{Core point.} $\mathbf{x}$ is a core point if
+  $|N_\varepsilon(\mathbf{x})| \geq \texttt{minPts}$. Only core points can
+  extend a cluster.
+\item \textbf{Border point.} A non-core point that lies inside the
+  $\varepsilon$-neighbourhood of a core point. It joins that cluster, but
+  cannot recruit further points.
+\item \textbf{Noise.} Everything else: not core, and not within $\varepsilon$
+  of a core point. It is labelled $-1$ and never counted as a member of
+  anything.
+\item \textbf{Directly density-reachable.} $\mathbf{y}$ is directly
+  density-reachable from $\mathbf{x}$ if $\mathbf{y} \in
+  N_\varepsilon(\mathbf{x})$ and $\mathbf{x}$ is a core point. Note the
+  asymmetry: a border point is reachable \emph{from} its core neighbour but
+  not the other way round.
+\item \textbf{Density-connected.} Two points are density-connected if there is
+  a chain of core points, each directly reachable from the previous, touching
+  both. Density-connectivity \emph{is} symmetric, and a DBSCAN cluster is a
+  maximal set of density-connected points.
+\end{itemize}
+
+\begin{marginnote}[]
+\entry{$\varepsilon$ (epsilon)}{The neighbourhood radius. It sets the density
+threshold: a point is dense if it has \texttt{minPts} neighbours within
+$\varepsilon$ of itself.}
+\entry{minPts}{Minimum number of points (including the point itself) required
+inside the $\varepsilon$-ball for a point to be a core point. Typical defaults
+are $d+1$ for $d$ dimensions, or $\ln n$.}
+\end{marginnote}
+
+\begin{figure}[htbp]\centering
+  \fig[0.94]{dbscan_film.png}
+  \caption{DBSCAN growing a cluster, sampled at four points in the animation:
+  core points are identified, a seed point starts a cluster, connected core
+  points chain it along the crescent, and border points attach to the chain.
+  The points that never enter a core's ball stay noise, permanently.}
+  \label{fig:dbscanfim}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip6pt}c@{}}
+    \fig[0.44]{dbscan_step1.png} &
+    \fig[0.44]{dbscan_step2.png} \\[3pt]
+    \fig[0.44]{dbscan_step3.png} &
+    \fig[0.44]{dbscan_step4.png}
+  \end{tabular}
+  \caption{The algorithm in four panels: \panel{a} the two knobs, drawn as
+  circles of radius $\varepsilon$ with a count of neighbours --- one point
+  passes the \texttt{minPts} test, the other does not; \panel{b} every point
+  classified as core (circles), border (triangles) or noise (crosses);
+  \panel{c} core points within $\varepsilon$ of each other are chained
+  (double-headed arrows), border points hang off the chain (single-headed);
+  \panel{d} the result on two interleaved half-moons with uniform noise ---
+  both crescents recovered whole, the scattered points discarded.}
+  \label{fig:dbscansteps}
+\end{figure}
+
+\subsection{The algorithm}
+
+The plain version is short enough to write out. For each point not yet
+visited: if it is not a core point, mark it noise for now and move on; if it
+is, start a new cluster and grow it by breadth-first search --- every core
+point inside the current frontier's $\varepsilon$-neighbourhood joins the
+cluster and becomes part of the frontier, and border points are attached as
+they are met. The growth stops when the frontier is exhausted. The result does
+not depend on the order in which points are visited, except for the assignment
+of border points that are within $\varepsilon$ of two different clusters --- an
+ambiguity the original paper leaves to the implementation, and a real
+reproducibility hazard when comparing libraries.
+
+Cost: with a spatial index, $O(n \log n)$ on average; without one, $O(n^2)$.
+The clustering itself is single-pass and cheap; the work is in the
+neighbourhood queries, which is the $k$NN machinery of \S\ref{sec:knn} again.
+
+\subsection{Choosing the two knobs}
+
+\texttt{minPts} is the easier of the two. It sets the order of the smallest
+structure you are willing to call a cluster, and a common rule of thumb is
+\texttt{minPts} $\approx d+1$ for $d$-dimensional data (here 17) or
+$\ln n$ for large samples. Our pipeline uses \texttt{minPts} $=5$, which is
+deliberately permissive: it keeps small clusters such as the Pleiades
+candidates in play, at the cost of admitting noise-driven groups.
+
+$\varepsilon$ is the harder one, and the standard data-driven recipe is a
+$k$-distance plot: sort every point's distance to its $k$-th nearest
+neighbour, plot the sorted values, and look for the knee --- the point where
+the curve leaves the bulk of the data and starts to climb. The knee is where
+the density threshold should sit. It is a heuristic, and it is exactly the
+step that fails in this project:
+
+\begin{issues}[THE SINGLE-THRESHOLD PROBLEM]
+DBSCAN has one density threshold for the whole dataset. Our data have two
+populations at very different densities: 357\,056 field stars forming a broad,
+dense, chemically smooth background, and 25 clusters of 6--230 members each
+sitting inside it. Set $\varepsilon$ for the clusters and the field becomes one
+enormous cluster containing everything; set it for the field and the clusters
+fragment into noise. There is no middle value that works, and the failure is
+not a tuning problem --- it is the assumption of \textbf{Table~\ref{tab:assumptions}}
+being false. The next two chapters exist because of it.
+\end{issues}
+
+The scale of the effect is visible in the results: on our DR19 run, an
+un-normalised abundance space lets HDBSCAN merge the entire field into a
+single group (recall $\approx 1.0$ with precision $\approx 0.001$), which is
+the signature of a threshold set too high for the background. Row
+normalisation (\S\ref{sec:data}) breaks that blob and is the single most
+effective precision lever in the pipeline.
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Draw the $\varepsilon$-ball classification by hand for the 2-D dataset
+  in \textbf{Figure~\ref{fig:dbscansteps}} with $\varepsilon = 0.35$ and
+  \texttt{minPts} $=4$, and mark every point core, border or noise. Then
+  change \texttt{minPts} to 6 and say precisely which points change status.
+\item Produce the $k$-distance plot for the DR19 member-plus-field matrix at
+  $k=5$ and locate the knee. Repeat for $k=2$ and $k=20$. How does the knee
+  move, and what does that say about whether a single $\varepsilon$ exists for
+  these data?
+\item Border points within $\varepsilon$ of two core points of different
+  clusters are assigned by visit order in the reference implementation. Find
+  two such points in a small synthetic example, and construct two visit orders
+  that produce different partitions. Why does this matter when comparing
+  scikit-learn with a GPU implementation?
+\end{enumerate}
+\end{issues}

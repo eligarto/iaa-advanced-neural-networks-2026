@@ -1,0 +1,208 @@
+% 03 · Clustering fundamentals — what a cluster is, and what breaks
+\section{CLUSTERING FUNDAMENTALS}
+\label{sec:fundamentals}
+
+\deckslides{slides 3 (the clustering problem), 18 (no free lunch) and 19--20 (validation).}
+
+Before any algorithm, two questions deserve a straight answer: what do we
+mean by ``a cluster'', and what does a distance in 16 dimensions actually
+measure? The answers are not academic. Most of the failures in
+\textbf{Section~\ref{sec:benchmark}} are failures of an assumption about one
+of those two things, not failures of an implementation.
+
+\subsection{Four definitions of ``cluster''}
+
+A clustering algorithm does not discover the clusters that are in the data;
+it discovers the clusters that its own definition of ``cluster'' implies. The
+definitions in play in this workbook are:
+
+\begin{itemize}
+\item \textbf{Centroid.} A cluster is a set of points closer to one centre
+  than to any other. This is K-means (\S\ref{sec:kmeans}), and it implies
+  convex, roughly equal-sized groups.
+\item \textbf{Density.} A cluster is a connected region where the local point
+  density exceeds a threshold. This is DBSCAN and its descendants
+  (\S\ref{sec:dbscan}--\S\ref{sec:plscan}), and it implies that clusters and
+  noise are distinguishable by density alone.
+\item \textbf{Connectivity.} A cluster is a connected component of a graph
+  built from nearest neighbours, with edges weighted by similarity. This is
+  the graph view that t-SNE, UMAP and EVoC share
+  (\S\ref{sec:tsne}--\S\ref{sec:evoc}).
+\item \textbf{Statistical.} A cluster is a component of a mixture model whose
+  parameters are inferred by maximum likelihood (the EM algorithm,
+  \citealp{Dempster:77}). The cluster boundaries are then soft: a star has a
+  probability of belonging to each group.
+\end{itemize}
+
+The reference chapter behind the lecture's framing --- \citet{GarciaDias:20},
+a methods chapter written for a psychiatry audience --- makes the same point
+from the other direction: clustering is worth attempting when the joint
+distribution of the variables is \emph{multipeaked}, and the first decision is
+whether the data are multimodal at all. If a distribution is unimodal, every
+algorithm will return groups anyway, and every one of them will be an
+artefact.
+
+\begin{marginnote}[]
+\entry{Multimodality}{A distribution with more than one peak. Clustering is
+only meaningful if the peaks are physical --- here, if stars of different
+birth sites occupy different regions of C-space.}
+\entry{No free lunch}{No algorithm is best on every problem: each encodes
+assumptions about shape, scale, density and metric. Choosing a method is
+choosing which assumptions are safe for your data.}
+\end{marginnote}
+
+\subsection{Distance in C-space}
+
+Every algorithm in this workbook reduces to a similarity judgement, and all of
+them use either Euclidean or cosine distance. Two transformations in
+\textbf{Section~\ref{sec:data}} make those two compatible, and one
+transformation is a genuine modelling choice:
+
+\[
+d_{\rm Euclid}(\mathbf{x},\mathbf{y}) = \left\| \mathbf{x} - \mathbf{y}
+\right\|_2, \qquad
+d_{\rm cos}(\mathbf{x},\mathbf{y}) = 1 - \frac{\mathbf{x}\cdot\mathbf{y}}
+{\|\mathbf{x}\|_2\,\|\mathbf{y}\|_2}.
+\]
+
+After per-element standardisation and per-star $L_2$ normalisation, all stars
+lie on the unit sphere in 16 dimensions and $d_{\rm Euclid}$ is a monotone
+function of $d_{\rm cos}$ --- so t-SNE and UMAP (Euclidean internally) and
+EVoC (cosine) are looking at the same geometry, and comparing them is fair.
+The Euclidean alternative without normalisation is not wrong, but it inherits
+a scale from the standardisation: elements with a long tail of outliers become
+the elements that decide every distance.
+
+High dimension does the rest. Two effects matter here.
+
+\begin{enumerate}
+\item \textbf{Concentration.} In $d$ dimensions, the ratio between the
+  furthest and nearest neighbour distance shrinks as $d$ grows: distances
+  \emph{concentrate} around a common value. A density threshold that worked in
+  2-D has to be re-tuned, and the contrast between ``near'' and ``far''
+  degrades. This is the everyday experience of the curse of dimensionality in
+  clustering: the kNN graph of 16-D abundances has edges that are only
+  slightly shorter than the edges you would get by chance.
+\item \textbf{Dilution by concatenation.} Adding dimensions that carry no
+  cluster information can only reduce the relative contribution of the
+  dimensions that do. The consequence in this project is concrete. On the same
+  982 member stars, in the same pipeline
+  (\textbf{Section~\ref{sec:benchmark}}), the cluster-only homogeneity is
+  $0.56$ from 16 abundances, $0.94$ from 4 kinematic coordinates, and
+  $0.75$ from the 20-dimensional concatenation of the two. The blend is
+  \emph{worse} than the kinematics alone: the chemistry did not add
+  information, it added dimensions.
+\end{enumerate}
+
+That last result deserves emphasis because the intuitive fix --- ``if both
+signals are useful, feed both'' --- is the one most people try first:
+
+\begin{issues}[THE TRAP OF CONCATENATION]
+Fusing two signals of very different dimensionality into one Euclidean space
+is not a fusion of information; it is a weighted sum in which the weight of
+each channel is set by how many coordinates it happens to contribute. A
+256-dimensional spectral latent next to 4 kinematic coordinates gives the
+spectrum 98\% of the vote, whatever the physics says. The two ways out are to
+reduce the high-dimensional channel before concatenating it, or to combine the
+two at the level of the \emph{decisions} rather than the features --- the
+two-stage pipeline of \S\ref{sec:benchmark}, which uses kinematics for
+recall and a spectral distance for precision.
+\end{issues}
+
+\subsection{Four tasks that are easily confused}
+
+The literature --- and our own first drafts --- mixes up four different
+questions that all get called ``clustering''. Keeping them separate is the
+single most useful discipline in this project.
+
+\begin{enumerate}
+\item \textbf{Membership determination.} For a given cluster, label each star
+  in a field \emph{member} or \emph{field}. This is the operationally useful
+  task, and it is what a survey pipeline actually needs.
+\item \textbf{Discovery.} Blind search: find groups without knowing in advance
+  where to look or what they should look like. This is what chemical tagging
+  means in the ``strong'' sense of \S\ref{sec:intro}, and it is much harder:
+  the algorithm must invent the groups as well as find their members.
+\item \textbf{Refinement.} Clean an existing candidate list --- remove field
+  contaminants from a known cluster's sample. This is the task our two-stage
+  pipeline performs, and it is measurably easier than discovery.
+\item \textbf{Cluster-only separation.} Take the members of several clusters,
+  with no field stars present, and ask whether the clusters are
+  distinguishable from one another. This is the experiment of
+  \citet{GarciaDias:19}, recreated in \S\ref{sec:benchmark} as the
+  \emph{baseline}. Its score is an upper bound on what any field-level search
+  could do: if clusters cannot be told apart when nothing else is present,
+  they cannot be recovered from a field either.
+\end{enumerate}
+
+\begin{table}[htbp]
+\tabcolsep6pt
+\caption{The assumptions each method in this workbook makes explicit. Read it
+as a checklist: when a method fails on our data, one of these entries is
+usually the reason, and the next chapter takes over because of it.}
+\label{tab:assumptions}
+\begin{center}
+\begin{tabular}{@{}p{4.6pc}p{8.2pc}p{9.6pc}@{}}
+\hline
+Method & Assumes & Fails when\\
+\hline
+K-means & clusters are convex, similar in size, separable by a centre;
+  $K$ known & shapes are elongated or nested; outliers pull centres\\
+$k$NN & a metric is meaningful and local density is informative &
+  dimensionality is high; the $k$ is chosen without looking at the data\\
+DBSCAN & one density threshold separates cluster from noise &
+  clusters and noise share a density; densities vary between clusters\\
+HDBSCAN$^*$ & density varies, but a single minimum cluster size applies &
+  clusters are smaller than the floor; the metric is misleading\\
+PLSCAN & persistence, not size, identifies a cluster &
+  clusters are genuinely short-lived in scale-space (rare)\\
+t-SNE & local neighbourhoods are what matter &
+  inter-cluster distances are being interpreted\\
+UMAP & the manifold is locally uniform &
+  global geometry is treated as metric information\\
+EVoC & a cosine-style graph and one internal embedding serve all scales &
+  the metric is wrong for the data\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Validation, in outline}
+
+Because there are no labels, validation is a design decision, not a
+calculation. The toolbox has two halves, developed in
+\textbf{Section~\ref{sec:validation}}:
+
+\begin{itemize}
+\item \textbf{Internal} indices --- sum of squared errors, silhouette, the dip
+  test --- measure how \emph{tidy} a partition is. They are computed from the
+  data alone, they are cheap, and they cannot tell you whether the partition
+  is real.
+\item \textbf{External} indices compare the partition with something the
+  algorithm never saw. In this project that something is kinematic membership;
+  in general it is any independent measurement.
+\end{itemize}
+
+The dangerous middle is a number that looks external but is not: a metric that
+uses the quantity you are trying to predict, or a baseline that has collapsed
+to two groups and scores well for the wrong reason. Both appear in our own
+results and are flagged there.
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item The concentration of distances can be demonstrated in five lines:
+  sample $n=1000$ points uniformly in $\mathbb{R}^d$, compute for each point
+  the ratio of the distance to its nearest and to its furthest neighbour, and
+  plot the mean ratio against $d$ for $d = 1,\dots,50$. At what $d$ does the
+  nearest neighbour stop being meaningfully nearer than the furthest one?
+\item Standardise the 16-D matrix, then row-normalise it. A star with an
+  unusually low $[$Fe/H$]$ and a star with an unusually high one now have the
+  same norm. What did normalisation do to the information about overall
+  metallicity, and why is that mostly a feature here rather than a bug?
+\item Pick three clusters from \textbf{Table~\ref{tab:clusters}} --- one with
+  more than 60 members, one with about 20, one with fewer than 10 --- and
+  write down what ``$K$ is known'' would even mean for a field of 25 clusters
+  with these counts. Which of the four tasks of \S 3.3 does a fixed $K$
+  violate?
+\end{enumerate}
+\end{issues}

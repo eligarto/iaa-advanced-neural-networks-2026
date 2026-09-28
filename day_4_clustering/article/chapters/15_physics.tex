@@ -1,0 +1,213 @@
+% 15 · Physics — what membership is actually for
+\section{WHAT MEMBERSHIP IS FOR}
+\label{sec:physics}
+
+\deckslides{slide 47, the isochrone and two-survey blocks.}
+
+Every number so far has been a score against labels. This chapter closes the
+loop: membership lists are not the product, they are the input to a measurement
+of what the cluster \emph{is} --- its age, its distance, its chemistry --- and
+those measurements are what chemical tagging has to deliver if it is to matter
+for Galactic archaeology \citep{Freeman:02, BlandHawthorn:16}.
+
+\begin{marginnote}[]
+\entry{Isochrone}{A theoretical curve in the colour--magnitude diagram giving
+the luminosity and colour of every mass of a single-age, single-metallicity
+population. Fitting it to a cluster's stars returns age, distance and
+reddening.}
+\entry{Distance modulus}{$m - M = 5\log_{10} d - 5$, the difference between
+apparent and absolute magnitude. It is the fitted distance in a CMD; a
+0.1 mag error is a 5\% error in distance.}
+\end{marginnote}
+
+\subsection{The measurement problem}
+\label{sec:measurement}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip6pt}c@{}}
+    \fig[0.44]{sky_ngc188.png} & \fig[0.44]{sky_ic166.png}
+  \end{tabular}
+  \caption{The two ends of the sample, which is why the same pipeline behaves
+  differently on different clusters. Left: NGC~188 --- old ($7.6$ Gyr), well
+  populated, chemically distinct from the field. Right: IC~166 --- sparse and
+  contaminated, with several member rows whose \texttt{APOGEE\_ID} is blank
+  (\S\ref{sec:validation}). In the first, the isochrone fit has hundreds of
+  stars on a clean sequence; in the second, every contaminant moves the fit.}
+  \label{fig:skies}
+\end{figure}
+
+Fitting an isochrone grid to a cluster means searching a three-dimensional
+parameter space (age, metallicity, distance modulus) for the combination that
+best reproduces the observed colour--magnitude diagram, with the reddening as a
+fourth, partly degenerate axis. We do it with the PARSEC grids through
+\texttt{ASteCA} \citep{Perren:15}, sampling the posterior with \texttt{emcee}
+\citep{ForemanMackey:13}. Two properties of that fit dominate everything that
+follows.
+
+\textbf{Age, metallicity and reddening are partially degenerate.} In the
+regions of the CMD our clusters occupy, an older, more metal-rich population
+at larger reddening can mimic a younger, metal-poor one at smaller reddening.
+The degeneracy is a property of the isochrone geometry, not of the data or the
+sampler: the posterior stays broad in the degenerate direction even when every
+star in the cluster is a perfect member. In the two-survey fit below, the
+age posterior width is $\sigma_{\log a} \approx 0.97$ --- nearly a factor
+of ten in age --- for a cluster whose distance is pinned to 0.01 mag.
+
+\textbf{Contaminants bias the parameters in a specific direction.} Field stars
+in a cluster's colour--magnitude diagram occupy the same locus as the cluster's
+own stars in some mass ranges and a different one in others, and the bias they
+introduce is not random. Adding field stars to a metal-poor globular cluster
+lowers the inferred age; adding them to a young cluster raises it. Membership
+quality is therefore a parameter-estimation problem, not a bookkeeping one.
+
+\subsection{Distances from red clump giants}
+
+The most robust single measurement available to us is the distance, because
+red clump giants have nearly constant absolute magnitude: the median $K$-band
+magnitude of the members that fall in the $J-K$ clump slice is a standard
+candle with a known calibration. For the clusters where our membership is
+deep enough to have red clump members, the distances agree with the
+literature:
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep6pt
+\begin{tabular}{@{}lccc@{}}
+\toprule
+cluster & $dm$ (clump) & $dm$ (literature) & residual \\
+\midrule
+NGC~6819 & 11.92 & 11.90 & $+0.01$ \\
+NGC~2243 & 13.08 & 13.25 & $-0.16$ \\
+NGC~7789 & 11.68 & 11.27 & $+0.41$ \\
+\bottomrule
+\end{tabular}
+\caption{Red-clump distance moduli from member giants, against literature
+values. Two of the three agree to better than 0.2 mag, which for a membership
+list of a few dozen giants assembled from a survey without any prior
+membership information is the strongest validation in this chapter: the
+members we find are located where the clusters are.}
+\label{tab:dm}
+\end{table}
+
+\subsection{The case that decided us: NGC~2243 from two surveys}
+
+NGC~2243 is the demonstration that chemical tagging is a two-survey problem.
+APOGEE, being a near-infrared survey of the Galactic disc, observes a
+cluster's \emph{giants}: bright, plentiful, and excellent for distances and
+chemistry. GALAH observes at visible wavelengths and reaches the
+\emph{main sequence and turnoff}, which is where age sensitivity lives. Neither
+survey alone constrains both.
+
+The sequence we ran is the one a workshop should reproduce:
+
+\begin{enumerate}
+\item Take the APOGEE member giants and fit an isochrone. The fit returns an
+  age of 1.59 Gyr against a literature value of 1.07 Gyr --- wrong by half ---
+  with a broad distance posterior ($\sigma_{dm} = 0.111$).
+\item Use the red-clump distance (13.08 mag, agreeing with the literature
+  value of 13.25 to within 0.17) as a tight prior, and select GALAH stars
+  kinematically around the resulting centroid. At 4.7 kpc the parallax error
+  rivals the parallax itself, so a relaxed parallax cut is required --- a
+  detail that took a re-run to get right.
+\item Fit the combined main-sequence-plus-giants sample: age $0.98$ Gyr
+  (residual $0.09$), $\sigma_{dm} = 0.086$.
+\end{enumerate}
+
+A factor of six improvement in the age residual, from the same cluster and the
+same survey data, by adding the stars that are sensitive to age and prior-ing
+the distance with a measurement that is not. The age posterior remains broad
+($\sigma_{\log a} \approx 0.97$), which is the degeneracy of \S 15.1 making
+itself felt --- but the mode is right, and the distance is a fifth as
+uncertain.
+
+\subsection{The finale: better membership, better parameters}
+
+The clearest scientific payoff of the whole project is a single cluster. Fit
+an isochrone to three different membership lists for M~67 --- the literature
+values are age $2.82$ Gyr, $dm = 9.54$, $[{\rm Fe/H}] = 0.03$:
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep6pt
+\begin{tabular}{@{}lccc@{}}
+\toprule
+membership & $n$ & age (Gyr) & residual \\
+\midrule
+stage 1 (kinematic candidates, contaminated) & 259 & 1.89 & 0.93 \\
+kinematic truth                              & 219 & 2.45 & 0.37 \\
+two-stage (spectral rejection)               & 237 & \textbf{2.65} & \textbf{0.17} \\
+\bottomrule
+\end{tabular}
+\caption{Isochrone ages for M~67 from three membership lists, against the
+literature age of 2.82 Gyr. The two-stage pipeline --- kinematic candidates,
+then rejection of spectral outliers --- recovers the age better than the raw
+kinematic membership does.}
+\label{tab:m67}
+\end{table}
+
+Read the middle row carefully, because it is the surprising one. The kinematic
+membership is the \emph{truth} for every benchmark in this workbook, and it
+still gets the age wrong by 0.37 Gyr. The two-stage list, which throws away 22
+stars that kinematics accepted, gets it wrong by 0.17. The contaminants that
+the spectral stage removed were not random: they were young field stars with
+the right position and velocity, dragging the fitted age down.
+
+Two honest qualifications. This is one cluster, so it is an existence proof
+that membership quality propagates into parameters, not a calibration of the
+size of the effect. And the effect is measured in the same direction as the
+known bias of contamination on a young cluster's age --- which is reassuring,
+and also means the mechanism is understood rather than merely observed.
+
+\subsection{What this does and does not establish}
+
+The Galactic-archaeology promise of chemical tagging is large: if the chemical
+fingerprint of a birth cluster survives dispersal into the field, then the
+field's stars can be assigned to birth sites, and the disc's star-formation
+history can be reconstructed from the field alone, without the kinematic
+luck that today's analyses depend on. This workbook measures where that
+programme stands at our precision, and the honest summary is:
+
+\begin{itemize}
+\item \textbf{Established here.} Spectra contain cluster information that
+  element-ratio summaries do not fully capture (\S\ref{sec:spectral}); that
+  information is enough to improve membership lists well beyond kinematic
+  selection in the specific case we tested (\textbf{Table~\ref{tab:m67}}), and
+  it improves a physical parameter as a result; and distances from member
+  giants agree with the literature for the clusters where we can measure them.
+\item \textbf{Not established.} That the improvement generalises. One cluster,
+  one pipeline, and a sample with duplicate rows and a dominant globular
+  cluster. A referee will ask for the same experiment on the 25-cluster set
+  with five independent membership definitions, and they will be right to.
+\item \textbf{Not attempted here.} Recovering a dispersed cluster from the
+  field with no kinematic prior. \textbf{Table~\ref{tab:field}} is our best
+  attempt and it reaches precision $\approx 0.62$ at recall $0.42$ --- good
+  enough to sharpen a membership list, not good enough to find a cluster from
+  scratch. Strong chemical tagging remains an open problem in the sense that
+  \citet{Casamiquela:21} define it: their best-case sample, with differential
+  abundances and no field stars, recovers 9 of 31 clusters at the 40\,\%
+  threshold and one at 70\,\%, and their clustering step recovers less than that
+  on our stars (\S\ref{sec:literature}).
+\end{itemize}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Reproduce the two-survey fit for one of the other clusters in the
+  combined sample. Report age, distance and their posterior widths, with and
+  without the red-clump prior. How much of the age improvement comes from the
+  main sequence and how much from the prior?
+\item The age--metallicity degeneracy means the posterior stays broad even
+  with perfect membership. Choose a cluster in the sample and quantify the
+  degeneracy directly: plot the posterior in the age--metallicity plane and
+  measure its correlation coefficient. What extra observable would break it?
+\item Contamination bias has a sign. Construct a synthetic cluster with 10%
+  young field stars added, fit it with the same machinery, and compare the
+  recovered age with the truth. Repeat with old contaminants. Which is the
+  larger effect, and why?
+\item \textbf{Table~\ref{tab:m67}} removes 22 stars from the kinematic list
+  and improves the age. Inspect those 22 stars: what are their abundances,
+  their kinematics and their position relative to M~67? Write the three-sentence
+  case for and against calling them contaminants.
+\end{enumerate}
+\end{issues}

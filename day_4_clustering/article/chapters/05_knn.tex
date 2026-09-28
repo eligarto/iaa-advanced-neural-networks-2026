@@ -1,0 +1,124 @@
+% 05 · KNN — the nearest-neighbour primitive
+\section{THE kNN PRIMITIVE}
+\label{sec:knn}
+
+\deckslides{slide 12, with slide 23 for the core distance $\kappa(x)$.}
+
+Before density-based clustering and before graph embeddings, there is one
+operation that all of them depend on: find a point's $k$ nearest neighbours.
+It is the oldest idea in the toolbox \citep{Cover:67}, it is simple enough to
+be taken for granted, and in this project it turns out to be both a
+clustering ingredient and a validation metric in its own right.
+
+\subsection{Neighbours as a classifier}
+
+The classical $k$-nearest-neighbour rule is a supervised method: to classify a
+point, find its $k$ nearest labelled neighbours and take a vote. Its appeal
+here is diagnostic rather than predictive. A $k$NN vote hides no assumptions
+about the shape of a decision boundary, so an error rate measured with $k$NN
+approximates the best you can do with a local rule in that space. When we ask
+whether 16 abundances carry cluster information at all
+(\S\ref{sec:benchmark}), a nearest-neighbour view answers the question
+directly: do members share their neighbourhood with other members?
+
+\begin{marginnote}[]
+\entry{Core distance}{$\kappa_k(\mathbf{x})$, the distance from a point to its
+$k$-th nearest neighbour. Large $\kappa$ means an isolated point; small
+$\kappa$ means a dense neighbourhood.}
+\entry{kNN graph}{The directed graph in which every point is joined to its $k$
+nearest neighbours. Its nodes are stars, its edges similarity, and it is the
+substrate that HDBSCAN$^*$, UMAP and EVoC all build on.}
+\end{marginnote}
+
+\subsection{The k-th neighbour distance is a density estimate}
+
+Distances and densities are two descriptions of the same local geometry. The
+volume of the ball containing exactly a fraction $k/n$ of the data is
+$V \propto \kappa_k(\mathbf{x})^d$ in $d$ dimensions, so a local density
+estimate follows from the measured distance alone:
+
+\begin{equation}
+\hat{\rho}(\mathbf{x}) \;\propto\; \frac{k}{n\,\kappa_k(\mathbf{x})^{d}}.
+\end{equation}
+
+Two consequences are used repeatedly in the chapters that follow. First,
+$\kappa$ converts a distance into a density, which is the operation DBSCAN
+performs with its global $\varepsilon$ and HDBSCAN$^*$ performs locally. Second,
+the conversion involves $d$, the dimension: in 16 dimensions a factor of two
+in density is a mere 4\% change in $\kappa$, which is why density-based
+methods on abundance data are so sensitive to the metric and to the
+normalisation chosen in \S\ref{sec:data}.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip6pt}c@{}}
+    \fig[0.42]{knn_step1.png} &
+    \fig[0.42]{knn_step2.png} \\[3pt]
+    \fig[0.42]{knn_step3.png} &
+    \fig[0.42]{knn_step4.png}
+  \end{tabular}
+  \caption{The primitive, in four steps (deck figures): \panel{a} measure every
+  pairwise distance from the query point (black); \panel{b} keep the $k$
+  smallest --- the neighbourhood; \panel{c} the $k$-th distance is the core
+  distance $\kappa_k$, a density estimate read off the data; \panel{d} keep
+  the edges and you have a graph, which is all the rest of the toolbox needs.}
+  \label{fig:knnsteps}
+\end{figure}
+
+\subsection{Cost, and the choice of $k$}
+
+Exact $k$NN costs $O(n^2 d)$ for $n$ points in $d$ dimensions when computed
+brute force, which for $3.6\times10^5$ field stars and $d = 16$ is about
+$10^{12}$ distance evaluations --- feasible on a cluster, painful on a laptop.
+The practical answers are spatial indices (KD-trees, ball trees, which degrade
+badly above roughly 20 dimensions) and approximate graphs (NN-descent, the
+algorithm UMAP uses, which is what makes it fast). This distinction matters
+when reading performance claims: ``UMAP is fast'' is a statement about its
+graph construction, not about exact $k$NN.
+
+The choice of $k$ is the usual bias--variance trade: small $k$ gives a
+high-variance density estimate that fragments clusters; large $k$ smooths away
+small ones. Our pipeline uses $k = 15$ for both the UMAP graph and EVoC's
+internal graph, and $k = 10$ for the purity score below --- all three are
+conventional defaults, and all three are knobs a careful user should vary to
+see whether the conclusion moves. \textbf{Section~\ref{sec:benchmark}} reports
+one such variation: UMAP at $n_{\rm neighbours} = 5$ performs measurably worse
+than at the default 15.
+
+\subsection{Our use of it: kNN purity}
+
+The one place where $k$NN enters our results directly is validation. For each
+star that is a known member of a cluster, count the fraction of its 10 nearest
+neighbours in the embedding that belong to the same cluster; average over
+members. The result --- \emph{kNN purity} --- is a cohesion score with no
+hyperparameters beyond $k$, no clustering step, and no way to tune yourself a
+good answer:
+
+\begin{equation}
+\text{purity} = \frac{1}{|\mathcal{M}|}\sum_{i \in \mathcal{M}}
+\frac{\left| \left\{ j \in \mathrm{kNN}_{10}(i) : \mathrm{cluster}(j) =
+\mathrm{cluster}(i) \right\} \right|}{10},
+\end{equation}
+
+where $\mathcal{M}$ is the set of known members. It is the automated version
+of the manual test in \citet{Kos:17} --- draw a polygon around the visual group
+in the embedding and see whether the members are inside it --- and it is
+reported for every method in \S\ref{sec:benchmark}. A purity near 1 means the
+members of a cluster genuinely occupy a neighbourhood of the space; a purity
+near the field fraction means the embedding knows nothing about them.
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Derive the density estimate of \S 5.2 from the volume of a ball
+  containing $k$ points. Then compute, for the DR19 abundance matrix, the
+  spread of $\kappa_{15}$ across members and field stars. Is the cluster
+  signal visible in the core distance alone, before any clustering?
+\item Build the 15-NN graph of the member matrix and compute the purity of the
+  known members in the \emph{raw} C-space. Compare with the purity after
+  t-SNE, UMAP and EVoC. Which method moves the number most, and does it move
+  it by separating members or by compressing the field?
+\item ANN libraries advertise large speedups over exact $k$NN. Measure the
+  disagreement rate between an approximate graph (UMAP's NN-descent) and an
+  exact one on a random 5\,000-star subsample of the DR19 matrix. Is the
+  approximation good enough that the clustering result is unchanged?
+\end{enumerate}
+\end{issues}

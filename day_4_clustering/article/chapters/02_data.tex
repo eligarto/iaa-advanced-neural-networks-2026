@@ -1,0 +1,279 @@
+% 02 · The data — surveys, abundance space, kinematic truth, the cluster set
+\section{THE DATA}
+\label{sec:data}
+
+\deckslides{slides 2 (the data) and 21 (the scale problem).}
+
+Three surveys supply everything this workbook measures. APOGEE provides the
+chemistry, Gaia the astrometry and radial velocities, and GALAH the southern
+main sequence that appears in \S\ref{sec:physics}. The samples are built from
+public data releases, and the whole pipeline --- download, quality cuts,
+membership, matrices --- is reproducible with three commands
+(\S\ref{sec:howtorun}).
+
+\subsection{APOGEE: abundances for giants}
+
+The Apache Point Observatory Galactic Evolution Experiment
+\citep{Majewski:17} is a near-infrared
+($H$-band, $1.51$--$1.70$ $\mu$m) spectroscopic survey of $\sim\!10^5$ stars
+per data release, obtained with the 2.5-m Sloan Foundation Telescope in the
+north and the du Pont Telescope in the south. The infrared window matters for
+this project: it sees through the dust that hides the inner disc, and it
+targets cool giants, which are bright enough to be observed across the whole
+Galaxy.
+
+Until recently the abundances came from the ASPCAP pipeline. The SDSS-V
+release used here --- DR19 \texttt{astraAllStarASPCAP} \citep{Almeida:23},
+$1.17$ GB, $1\,095\,480$ targets --- is produced by its successor, the
+\emph{Astra} framework. The transfer is not cosmetic; two schema changes are
+worth knowing about because they bite silently rather than loudly:
+
+\begin{itemize}
+\item abundances are published as \emph{$[$X/H$]$}, not $[$X/Fe$]$ under a
+  different name, so element ratios must be formed explicitly as
+  $[$X/Fe$] = [$X/H$] - [$Fe/H$]$;
+\item the quality flags were renamed --- \texttt{ASPCAPFLAG} became
+  \texttt{flag\_bad}, \texttt{STARFLAG} became \texttt{spectrum\_flags}.
+\end{itemize}
+
+DR19 also reanalyses rather than replaces DR17: 717\,689 of its rows carry
+\texttt{release='dr17'}, all reprocessed by a single version of the pipeline.
+That detail becomes important in \textbf{Section~\ref{sec:spectral}}, where an
+earlier version of our benchmark was nearly derailed by mixing data
+\emph{products} from the two.
+
+\begin{marginnote}[]
+\entry{ASPCAP / Astra}{The abundance pipelines: ASPCAP up to SDSS-IV DR17,
+Astra from SDSS-V DR19 onwards. Same philosophy --- fit synthetic spectra
+to the observation --- different catalogues and column names.}
+\entry{Abundance precision}{The per-element statistical error on $[$X/H$]$,
+typically $0.02$--$0.1$ dex for APOGEE giants, depending on the element and
+the signal-to-noise ratio. It sets the ceiling on what chemistry can tag.}
+\end{marginnote}
+
+\subsection{Gaia and GALAH: the referee and the main sequence}
+
+Gaia DR3 \citep{Gaia:23} supplies parallaxes, proper motions and the
+cross-matched photometry for every star in the sample, all of it carried
+inside the APOGEE catalogue for convenience. These are the quantities that
+define membership (\S\ref{sec:kinematics}); we never feed them to a
+tagging method, and \textbf{Section~\ref{sec:validation}} explains why that
+asymmetry is the whole point.
+
+GALAH DR4 \citep{DeSilva:15, Buder:21} covers declination $\lesssim +25^\circ$
+with a high-resolution optical spectrograph, which means it sees the
+\emph{main sequence} where APOGEE sees giants. It enters only in
+\S\ref{sec:physics}, where the two surveys are combined to recover a cluster
+age and distance at the same time.
+
+\subsection{The abundance space}
+
+Everything is standardised into one matrix: 16 numbers per star, one column
+per element, built from the survey catalogue by a fixed sequence of steps.
+Each step is a modelling choice, not housekeeping, and each has a failure mode
+we have hit.
+
+\begin{enumerate}
+\item \textbf{Quality cuts.} Signal-to-noise ratio $\geq 100$, ASPCAP flag
+  zero, stellar flag zero. Cuts this aggressive remove the noisy tail at the
+  cost of sample size; loosening them changes the answer
+  (\S\ref{sec:benchmark}, the levers).
+\item \textbf{The element set.} C, N, O, Na, Mg, Al, Si, S, K, Ca, Ti, V,
+  Cr, Mn, Ni --- the $\alpha$ and iron-peak elements --- plus $[$Fe/H$]$ as
+  the sixteenth coordinate. This is the set used by the reference papers, so
+  results are comparable with them.
+\item \textbf{Missing values.} Weak lines go undetected in metal-poor stars
+  and their abundances come back as NaN. Dropping every star with a NaN
+  deletes the metal-poor globulars \emph{entirely} --- M~15 and M~92 vanish
+  from the sample, and with them the cleanest tagging cases in the whole
+  project. We therefore keep stars with at least 8 of 16 finite elements and
+  fill the remaining gaps with the column median. This single choice is the
+  difference between a sample that contains the interesting objects and one
+  that does not.
+\item \textbf{Standardisation.} Each element is shifted to zero median and
+  scaled to unit standard deviation, so that no element dominates the distance
+  metric by virtue of its units. (An early bug in this project applied
+  inverse-variance weights \emph{before} this step, which silently cancelled
+  them; see \S\ref{sec:benchmark}.)
+\item \textbf{Row normalisation.} Each star's 16-vector is scaled to unit
+  $L_2$ norm. The reason is metric compatibility: after this step, Euclidean
+  distance is a monotone function of cosine distance, so t-SNE and UMAP (which
+  use Euclidean) and EVoC (whose native metric is cosine) all see the same
+  geometry, and the comparison between them is fair. It is also the single
+  most effective precision lever in the pipeline: without it, density-based
+  clustering merges the whole field into one blob.
+\end{enumerate}
+
+\begin{figure}[htbp]\centering
+  \fig[0.62]{cspace.png}
+  \caption{The shape of the problem, in two of the sixteen dimensions (from
+  the deck). Field stars in grey; the members of one cluster in red. The
+  cluster is a tight, slightly elongated clump embedded in a cloud several
+  orders of magnitude larger --- a small overdensity in a big, structured
+  background. Everything in
+  \S\ref{sec:fundamentals}--\S\ref{sec:evoc} is a strategy for finding
+  objects like this one.}
+  \label{fig:cspace}
+\end{figure}
+
+\subsection{Kinematic membership is the referee, not a feature}
+\label{sec:kinematics}
+
+To score anything we need labels, and this is where chemical tagging is
+unusually lucky: a cluster is also a kinematic object. Its members currently
+share a position on the sky, a parallax, a proper motion and a radial
+velocity, because they were born at the same place with almost the same
+velocity. We use those four observables, $\sigma$-clipped around the cluster
+centre, to label each star \emph{member} or \emph{field}.
+
+The circularity risk is obvious: if kinematics are used to build the labels,
+then a method that receives kinematics as an input is being scored on its own
+input. We therefore treat kinematics as a \emph{ceiling}, not a competing
+signal --- the number that says how well \emph{any} chemistry-based method
+could possibly do on this sample. Published cluster catalogues provide an
+independent cross-check: scoring against Simbad memberships gives numbers
+within a few percent of the kinematic ones, and both are reported in the
+benchmark \citep{Dias:02, Harris:96}.
+
+\subsection{The cluster set}
+\label{sec:clusters}
+
+The target list is the 23 clusters of \citet{GarciaDias:19} plus the Pleiades
+of \citet{Kos:17} --- and, for the two-survey work, the southern open clusters
+NGC~2243 and Collinder~261. Twenty-five objects in total: seven globular and
+eighteen open. They span two orders of magnitude in age, from the Pleiades at
+$\sim\!100$ Myr to NGC~188 at $7.6$ Gyr, and two orders of magnitude in mass.
+The counts below come from the full DR19 run (357\,056 field stars). They are
+\emph{row counts}, not star counts: the sample contains repeat entries for the
+same star, a defect quantified in \S\ref{sec:validation} and one we flag here
+rather than at the end because it affects how every macro average in this
+workbook should be read.
+
+\begin{table}[htbp]
+\tabcolsep5pt
+\caption{The 25 target clusters and the number of kinematic members each
+contributes in the DR19 sample. Globulars are marked with a $\dagger$. The
+asymmetry in the counts is real and consequential: M~67 alone supplies
+$23\%$ of all members, while three clusters supply fewer than ten.}
+\label{tab:clusters}
+\begin{center}
+\begin{tabular}{@{}lrlr@{}}
+\hline
+Cluster & $n_{\rm mem}$ & Cluster & $n_{\rm mem}$\\
+\hline
+Berkeley 17 & 7 & M 3$^{\dagger}$ & 154\\
+Berkeley 66 & 12 & M 5$^{\dagger}$ & 67\\
+Berkeley 71 & 14 & M 13$^{\dagger}$ & 34\\
+Collinder 261 & 22 & M 15$^{\dagger}$ & 31\\
+IC 166 & 35 & M 71$^{\dagger}$ & 39\\
+King 5 & 12 & M 92$^{\dagger}$ & 25\\
+King 7 & 8 & NGC 1245 & 21\\
+M 67 & 230 & NGC 1798 & 13\\
+Pleiades & 23 & NGC 188 & 25\\
+& & NGC 2158 & 6\\
+& & NGC 2243 & 36\\
+& & NGC 2420 & 19\\
+& & NGC 6791 & 45\\
+& & NGC 6819 & 62\\
+& & NGC 7789 & 47\\
+\hline
+\multicolumn{4}{@{}l}{M 107$^{\dagger}$ contributes 15 members.\quad
+Total: 1\,002 members in 25 clusters.}\\
+\hline
+\end{tabular}
+\end{center}
+\begin{tabnote}
+Counts from the full-sky DR19 run (\texttt{cluster run}), field star cap
+disabled, on the member frame the DR19 baseline scores --- every member row
+with at least nine finite abundances out of sixteen. Reproduce with
+\texttt{python scripts/population\_counts.py --baseline-min-finite 9};
+the counts are identical for any floor between nine and fifteen. Member counts
+differ slightly between runs because the clustering must first find a group
+before its overlap with the truth can be measured; these are the truth-side
+counts.
+\end{tabnote}
+\end{table}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip8pt}c@{}}
+    \fig[0.42]{sky_m67.png} &
+    \fig[0.42]{sky_m3.png}
+  \end{tabular}
+  \caption{Two of the targets, in the optical (DSS2 colour composites centred
+  on the cluster): M~67 (left), an old solar-metallicity open cluster, and
+  M~3 (right), a metal-poor globular. The two objects illustrate the range of
+  the sample and, in the results, the range of difficulty: the globular is
+  chemically distinct from the field around it, the open cluster is not.}
+  \label{fig:skysamples}
+\end{figure}
+
+\subsection{How to reproduce the sample}
+\label{sec:howtorun}
+
+The pipeline is one package with a single configuration file, so every number
+in this workbook can be regenerated from a fresh checkout. It is written on
+\texttt{numpy} \citep{Harris:20}, \texttt{pandas} \citep{McKinney:10},
+\texttt{scikit-learn} \citep{Pedregosa:11}, \texttt{astropy}
+\citep{Astropy:22} and \texttt{matplotlib} \citep{Hunter:07}, with the
+clusterers taken from their reference implementations. The commands below
+are all you need to rebuild the sample and the benchmark.
+
+\begin{summary}[HOW WE RAN IT]
+\begin{quote}\small
+\begin{verbatim}
+git clone github.com/garciadias/iaa-advanced-neural-networks-2026-draft
+cd iaa-advanced-neural-networks-2026-draft
+uv sync                       # Python 3.13 environment
+uv run cluster download       # 1.17 GB, SDSS-V DR19 Astra ASPCAP
+uv run cluster run --fast     # ~1 min on a laptop, capped field
+CLUSTER_FAST=0 uv run cluster run   # full all-sky run, 10-20 min
+\end{verbatim}
+\end{quote}
+Every flag lives in \texttt{src/cluster/config.py} and every flag also has an
+environment override with the \texttt{CLUSTER\_} prefix, which is how the
+variants in \S\ref{sec:benchmark} were produced. The Docker path
+(\texttt{docs/docker.md}) exists for machines without \texttt{uv}.
+\end{summary}
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep4pt
+\begin{tabular}{@{}ll@{}}
+\toprule
+setting & value used throughout \\
+\midrule
+\texttt{SNR\_MIN} & $100$ \\
+dwarf cut (\texttt{DWARF\_ONLY}) & off \\
+elements & 16: \texttt{[C/Fe]} \dots\ \texttt{[Ni/Fe]} (15 ratios) $+$ \texttt{[Fe/H]} \\
+imputation & median, requiring $\geq\!8$ finite elements \\
+standardisation & on (zero median, unit s.d.) \\
+row normalisation & on \\
+element weights & off \\
+\texttt{HDBSCAN.min\_cluster\_size} & $5$ \\
+\texttt{TSNE.perplexity} / \texttt{UMAP.n\_neighbors} & $30$ / $15$ \\
+\texttt{random\_state} & $42$ \\
+\bottomrule
+\end{tabular}
+\caption{The pipeline's settings for every number in this workbook, unless a
+variant is named. Overrides are environment variables with the
+\texttt{CLUSTER\_} prefix --- \texttt{CLUSTER\_NORMALIZE\_ROWS=0} is the one
+that most changes the answer.}
+\label{tab:config}
+\end{table}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Take the 16-element vector for one star in the sample. Standardise it
+  and then row-normalise it. Show algebraically that after row normalisation
+  the Euclidean distance between two stars is a strictly monotone function of
+  the cosine distance between them. Why does EVoC care?
+\item \texttt{MIN\_FINITE\_ELEMENTS} defaults to 8 of 16. Set it to 16 (strict
+  complete-case) and count how many of the 25 clusters survive with at least
+  five members. Which clusters are lost, and what does that do to any
+  conclusion about the surviving ones?
+\item M~67 contributes 230 of 1\,002 members. Recompute a macro-average
+  metric over clusters with and without M~67 in the pool. How much of the
+  published summary depends on one cluster?
+\end{enumerate}
+\end{issues}

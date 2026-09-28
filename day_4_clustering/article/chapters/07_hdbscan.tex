@@ -1,0 +1,174 @@
+% 07 · HDBSCAN* — density at every scale
+\section{HDBSCAN$^*$: A HIERARCHY OVER EVERY DENSITY}
+\label{sec:hdbscan}
+
+\deckslides{slides 22--26 --- mutual reachability, the tree, and the long-lived branches.}
+
+If the problem with DBSCAN is one global density threshold, the obvious repair
+is to use all of them at once and let the data choose. That is what
+HDBSCAN$^*$ does \citep{Campello:13, McInnes:17}: it builds a single
+hierarchy of density levels, scores each candidate cluster by how long it
+survives as the threshold moves, and returns the candidates that persist.
+It is the clusterer attached to t-SNE and UMAP in our pipeline, and --- in a
+different guise --- it is inside EVoC.
+
+\subsection{From points to a density-aware metric}
+
+The construction starts by making the metric itself density-aware. For each
+point, compute the core distance $\kappa_k(\mathbf{x})$ of \S\ref{sec:knn}:
+the distance to its $k$-th nearest neighbour. Then replace the original
+distance between two points with the \emph{mutual reachability distance},
+
+\begin{equation}
+d_{\rm mreach}(\mathbf{a},\mathbf{b}) = \max\left\{\kappa_k(\mathbf{a}),\
+\kappa_k(\mathbf{b}),\ d(\mathbf{a},\mathbf{b})\right\}.
+\label{eq:mreach}
+\end{equation}
+
+Read it as a floor: two points in a dense region are pushed apart to at least
+the local density scale, so a sparse point can never be ``close'' to anything.
+Under this metric, a dense region becomes a compact object even when its
+members are far apart in the original geometry --- which is exactly the
+property DBSCAN lacked.
+
+\begin{marginnote}[]
+\entry{Mutual reachability}{The distance used by HDBSCAN$^*$: the maximum of
+the two core distances and the true distance \textbf{(Equation~\ref{eq:mreach})}.
+It makes dense regions self-similar across scales.}
+\entry{Condensed tree}{The hierarchy after small clusters have been
+progressively collapsed into their parents as the density threshold rises. Its
+branches are the candidate clusters, weighted by lifetime (persistence).}
+\end{marginnote}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip8pt}c@{}}
+    \fig[0.40]{mutual_reachability.png} &
+    \fig[0.50]{knn_core_distance.png}
+  \end{tabular}
+  \caption{The ingredients of \textbf{Equation~\ref{eq:mreach}}, drawn in the
+  deck. Left: two points, each ringed by its own core distance, with the
+  straight-line distance between them; the mutual reachability distance is the
+  largest of the three quantities. Right: the core distance itself --- the
+  radius that contains exactly $k$ neighbours --- which is the local density
+  estimate of \S\ref{sec:knn} written as a length.}
+  \label{fig:mreach}
+\end{figure}
+
+\subsection{Building the hierarchy}
+
+With the metric fixed, the rest is single-linkage clustering at every
+threshold simultaneously, computed efficiently:
+
+\begin{enumerate}
+\item Build the minimum spanning tree (MST) of the mutual-reachability graph.
+  One tree contains every single-linkage merge at every density level: the
+  largest edge weight on the path between two points is the density at which
+  they merge.
+\item Sort the tree's edges by weight and cut them in that order, producing a
+  dendrogram of nested partitions --- the density hierarchy
+  (\textbf{Figure~\ref{fig:hdbscantree}}).
+\item Condense: a cluster that splits into pieces, one of which is smaller
+  than \texttt{min\_cluster\_size} and short-lived, is treated as noise rather
+  than as a new cluster. This is what makes the tree robust against
+  single-linkage's notorious chaining.
+\item Score every remaining branch by \emph{stability}: the sum, over its
+  members, of the difference between the density at which the member leaves
+  the cluster and the density at which the cluster was born
+  (\textbf{Equation~\ref{eq:stability}}). Selecting the set of branches with
+  the largest total stability --- choosing a parent over its children when the
+  parent scores higher --- gives the final labels.
+\end{enumerate}
+
+\begin{equation}
+S(C_j) = \sum_{\mathbf{x} \in C_j} \left( \lambda_{\mathbf{x}} -
+\lambda_{\rm birth}(C_j) \right),
+\qquad \lambda = 1/d_{\rm mreach} .
+\label{eq:stability}
+\end{equation}
+
+\begin{figure}[htbp]\centering
+  \fig[0.72]{hdbscan_tree.png}
+  \caption{The density hierarchy as a single-linkage dendrogram with a
+  horizontal density cut. Everything above the line is one cluster; everything
+  below it has split. HDBSCAN$^*$ does not commit to the line --- it scores
+  every branch by how far it survives above its own birth level and keeps the
+  branches with the best scores.}
+  \label{fig:hdbscantree}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \fig[0.94]{hdbscan_film.png}
+  \caption{The same data at four density levels, from the deck's animation:
+  clusters appear as the threshold drops, some grow, and some merge into each
+  other. HDBSCAN$^*$ sees the whole sequence at once and keeps the objects that
+  live long enough to be structure rather than coincidence.}
+  \label{fig:hdbscanfim}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \fig[0.62]{hdbscan_sweep.png}
+  \caption{One density level of the sweep. Density-based clustering is not a
+  fixed partition of the data but a family of partitions indexed by scale; the
+  algorithm's job is to pick from the family without being told the scale in
+  advance.}
+  \label{fig:hdbscansweep}
+\end{figure}
+
+\subsection{What the knobs mean}
+
+HDBSCAN$^*$ replaces DBSCAN's two knobs with two different ones, and both are
+easier to reason about:
+
+\begin{itemize}
+\item \texttt{min\_cluster\_size} is a persistence floor, not a density
+  threshold. It says: a structure smaller than this many points is not
+  evidence of a cluster, so collapse it into its parent rather than report it.
+  Our default is 5 --- deliberately low, because several of our real clusters
+  are small --- and \S\ref{sec:benchmark} reports the effect of raising it to
+  10, which on the DR17 data was the single largest improvement in recall.
+\item \texttt{min\_samples} sets the $k$ inside the core distance of
+  \textbf{Equation~\ref{eq:mreach}}: how many neighbours define the local
+  density scale. Larger values give a smoother, more conservative density
+  estimate --- the usual bias--variance trade of \S\ref{sec:knn}.
+\item The metric is a third, silent knob: the whole construction presumes that
+  a distance is meaningful. Cosine and Euclidean give different hierarchies;
+  that is why \S\ref{sec:data} normalises rows, and why the fairness argument
+  for comparing methods rests on the metric being shared.
+\end{itemize}
+
+\subsection{Why it fits our problem, and where it still fails}
+
+The hierarchy is a natural fit for a field of 25 clusters of very different
+sizes: it can, in principle, keep a 6-member cluster at one density and a
+230-member cluster at another. In practice two things still bite.
+
+First, \texttt{min\_cluster\_size} is a \emph{single} size floor. It cannot be
+right for the Pleiades with 23 candidates and for M~67 with 230 members at the
+same time --- one of them will be over-merged or the other fragmented. The
+next chapter removes this knob entirely.
+
+Second, and more fundamentally, the algorithm inherits the geometry it is
+given. On our real abundances the residual failure is not the hierarchy but
+the space: the field is a single dense blob that contains the clusters, and no
+choice of \texttt{min\_cluster\_size} separates an object from its own
+background. That is what motivates the embeddings of
+\S\ref{sec:tsne}--\S\ref{sec:evoc}: change the geometry, then let HDBSCAN$^*$
+work as designed.
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item For the four points $\mathbf{a},\mathbf{b},\mathbf{c},\mathbf{d}$ of a
+  square grid, compute $d_{\rm mreach}$ with $k=2$ and verify that it is a
+  valid metric. Which of the metric axioms does it break if you omit the
+  $\kappa$ terms and use $\max\{d(\mathbf{a},\mathbf{b}),\ \text{const}\}$?
+\item Compute the stability score of \textbf{Equation~\ref{eq:stability}} for
+  a two-branch tree in which one branch contains 100 points that survive two
+  decades of $\lambda$ and the other contains 10 points that survive five.
+  Which does the algorithm prefer, and does that match your intuition about
+  which is a better cluster?
+\item Run HDBSCAN$^*$ on the DR19 member-plus-field matrix with row
+  normalisation on and off. Record the number of clusters and the largest
+  cluster fraction in each case, and identify which setting produces the
+  ``one blob'' failure of \S\ref{sec:dbscan}.
+\end{enumerate}
+\end{issues}

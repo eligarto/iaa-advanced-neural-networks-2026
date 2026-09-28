@@ -1,0 +1,153 @@
+% 12 · EVoC — embedding, density, and persistence in one object
+\section{EVoC: ONE FIT, THREE STAGES}
+\label{sec:evoc}
+
+\deckslides{slides 43--45 --- the fusion, the pipeline, and why C-space.}
+
+The three methods so far are composed by hand: t-SNE or UMAP produces an
+embedding, then HDBSCAN$^*$ (or a persistence-driven variant of it) produces
+labels, then the user decides how the two are coupled. EVoC
+\citep{EVoC} removes the seam. It takes the graph, embeds it, clusters it, and
+chooses the clustering itself, in a single fit, and it is the method our
+pipeline uses for its production runs.
+
+Read the deck's pipeline figure first: the point of the method is that the
+three stages share one objective rather than being tuned against each other.
+
+\begin{figure}[htbp]\centering
+  \fig[0.92]{evoc_pipeline.png}
+  \caption{The EVoC pipeline. From left to right: a nearest-neighbour graph is
+  built from the raw data with a native metric, the graph is embedded into a
+  low-dimensional space by a graph-embedding objective, and the embedded points
+  are clustered with a density-based method whose candidate clusterings are
+  scored by persistence. The output is labels --- not a picture.}
+  \label{fig:evocpipeline}
+\end{figure}
+
+\subsection{Stage 1: the graph, built on the metric you meant}
+
+EVoC's first stage is a $k$-nearest-neighbour graph (\S\ref{sec:knn})
+constructed directly from the input representation, with a configurable
+metric. This matters in our setting for a specific reason: it is the one arm
+that can use the \emph{raw} L2-normalised abundance matrix and its native
+cosine geometry, without an intervening Euclidean-only embedding. Since
+\S\ref{sec:data} normalises every row to unit length, Euclidean and cosine
+distances are monotonically related on our matrix, and EVoC's use of cosine is
+a deliberate choice rather than an accident: in a compositional space, only
+the ratios between elements are meaningful, and a vector's length is an
+artefact of the abundance sum.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip6pt}c@{}}
+    \fig[0.44]{evoc_step1.png} &
+    \fig[0.44]{evoc_step2.png} \\[3pt]
+    \fig[0.44]{evoc_step3.png} &
+    \fig[0.44]{evoc_step4.png}
+  \end{tabular}
+  \caption{The four stages as the lecture builds them: \panel{a} the
+  $k$-nearest-neighbour graph of the data; \panel{b} an embedding of the graph
+  nodes (the graph's structure is preserved, not its geometry); \panel{c}
+  density-based clustering of the embedded points; \panel{d} the persistence
+  score used to pick which clustering layer to return.}
+  \label{fig:evocsteps}
+\end{figure}
+
+\subsection{Stage 2: an embedding for clustering, not for looking at}
+
+The embedding stage optimises a graph-embedding objective --- adjacent nodes
+close, non-adjacent nodes apart, with the dimension chosen by the algorithm
+rather than by the user. It is worth being explicit about what this is
+\emph{not}. It is not a visualisation; there is no meaningful scatter plot at
+the end of it, and we never draw one. Its purpose is to place the graph in a
+space where a density-based clusterer can separate its communities, which is a
+different objective from t-SNE's or UMAP's two-dimensional layout problem.
+
+This is also where the most common confusion in the literature arises. When a
+paper says ``UMAP followed by HDBSCAN$^*$'', there are two algorithms and
+therefore two independent sources of error; when a paper says ``EVoC'', the
+cluster structure is chosen inside the fit, by persistence, from the same
+graph that the embedding was built on. The distinction is not about quality
+but about where the arbitrary decisions live --- and it is why our benchmark
+reports all three, since each one answers a different question about the same
+data.
+
+\subsection{Stage 3: layers, persistence, and no \texttt{min\_cluster\_size}}
+
+The clustering stage produces not one answer but a family of them, indexed by
+scale. Each candidate layer is scored by the total persistence of the clusters
+it contains --- the PLSCAN criterion of \S\ref{sec:plscan} --- and the
+best-scoring layer's labels are returned. Consequences that matter in
+practice:
+
+\begin{itemize}
+\item \textbf{No size floor to set.} The user is never asked for
+  \texttt{min\_cluster\_size}, which is the single knob that most changed
+  results in our DR17 sweeps (\S\ref{sec:benchmark}: raising it from 5 to 10
+  moved t-SNE recall from $0.087$ to $0.404$). EVoC replaces it with an
+  internal persistence criterion, which is more stable across datasets but
+  less inspectable: you cannot see which layers were considered.
+\item \textbf{The number of clusters is an output.} On the field runs, EVoC
+  returns a few dozen groups on average, none of them large --- one of the
+  reasons its recall is high and its precision catastrophic
+  (\textbf{Table~\ref{tab:field}}).
+\item \textbf{The returned layer is a model-selection decision.} Persistence
+  is a principled criterion, not a guarantee: if the field and the clusters
+  are not separated in the graph's geometry, the best-scoring layer is the one
+  that splits the field most persistently.
+\end{itemize}
+
+\subsection{What EVoC does for us, and what it does not}
+
+Positive first. EVoC is the only arm that needs no post-hoc clustering choice,
+it works directly on the cosine geometry that our data actually have, it is
+the cheapest of the three to run on large samples, and on cluster-only
+separation it is competitive: homogeneity $0.420 \pm 0.043$ on abundances,
+$0.733 \pm 0.008$ on the 64-dimensional PCA latent, both measured over seven
+seeds on the same 982 stars as the other arms.
+
+Now the part that took us a while to accept. Two results in the literature
+around this method, and two of ours, all point the same way:
+
+\begin{issues}[WHAT WE HAVE TO SAY AGAINST OUR OWN FAVOURITE]
+\textbf{The seed spread is larger than several of the gaps.} EVoC's
+homogeneity on abundances is $0.420 \pm 0.043$ over seven seeds --- a spread
+that overlaps with the t-SNE and UMAP arms. In the five-cluster head-to-head
+the spread is $\pm0.08$--$0.11$. Any ranking that depends on differences of
+that size is not a ranking.
+
+\textbf{The self-supervision claim is a t-SNE/UMAP result, not an EVoC
+result.} On the corrected same-population table, the masked autoencoder scores
+$0.70 \pm 0.08$ against $0.64 \pm 0.08$ for abundances on EVoC ---
+overlapping within errors --- while the \emph{supervised} CNN wins EVoC
+outright at $0.80 \pm 0.03$ on the four-cluster sample. We withdrew the
+sentence that said the abundance-free latent wins everywhere.
+
+\textbf{High recall at near-zero precision.} On the all-sky field-retrieval
+task, EVoC recovers $0.557$ of the true members at a precision of $0.0033$:
+the groups it returns are mostly field stars, by two orders of magnitude. It
+is the same failure that UMAP shows in that table, and it is the reason the
+pipeline's field work runs a rejection stage after the clustering rather than
+trusting the labels.
+\end{issues}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item EVoC clusters an embedding built from the graph, and HDBSCAN$^*$
+  clusters the embedding built by t-SNE or UMAP. Explain, in three sentences
+  each, why the first is more self-consistent and why the second is easier to
+  diagnose when it fails.
+\item On the member matrix, run EVoC with the seed varied over the same seven
+  values used in this workbook, and report homogeneity as mean $\pm$ standard
+  deviation. Now do the same for t-SNE with a fixed seed but nine row orders
+  (\S\ref{sec:validation}). Which source of variability is larger, and what
+  does that say about which number belongs in a paper?
+\item Take the EVoC labels on the all-sky field run and compute, for each
+  returned group, the fraction of its members that are known field stars.
+  Plot that distribution. How many groups would you have to ignore before the
+  remaining ones have precision above 0.5?
+\item The persistence criterion selects a clustering layer without user
+  input. Construct a two-dimensional dataset with a dense uniform background
+  and one small dense cluster, and report which layer EVoC selects. Does the
+  criterion find the cluster, the background, or something else?
+\end{enumerate}
+\end{issues}
