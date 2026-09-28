@@ -1,0 +1,74 @@
+# Docker Compose for the workbook exercise decks.
+#
+#   docker compose up            -> JupyterLab on http://localhost:9999
+#   docker compose up -d         -> same, detached
+#   docker compose down          -> stop it
+#
+# The CLI steps (downloading the data, the sweeps) run in the same image:
+#
+#   docker compose run --rm jupyter uv run cluster download --all
+#   docker compose run --rm jupyter uv run python scripts/run_all_exercises.py
+#
+# Nothing needs installing on the host: uv, Python, jupyterlab and every
+# exercise dependency come from the repository's own Dockerfile, which is the
+# same `pyproject.toml` + `uv.lock` a native checkout would use.
+#
+# The mounts are the point of this file. The image ships the code, but the
+# 1.17 GB catalogue, the embeddings and the caches are far too big to bake in,
+# so they live in three folders next to this file:
+
+name: day4-exercises
+
+services:
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: day4-exercises:local
+
+    # jupyterlab is a dependency of the project itself (pyproject.toml), so
+    # `uv run` resolves it from the pinned environment in /app/.venv.
+    command:
+      - uv
+      - run
+      - jupyter
+      - lab
+      - --ip=0.0.0.0          # inside the container; compose publishes the port
+      - --port=9999
+      - --no-browser
+      - --allow-root          # only matters under DAY4_KEEP_ROOT=1
+      - --ServerApp.token=    # see the port note below
+      - --ServerApp.password=
+
+    ports:
+      # Bound to localhost because the server has no token: reachable from this
+      # machine only, which is the same trust level as running it natively.
+      # To serve a classroom or a remote box, set a token as well:
+      #   JUPYTER_BIND=0.0.0.0 docker compose up        # and add
+      #   --ServerApp.token=ask  (or --IdentityProvider.token=<secret>) above
+      - "${JUPYTER_BIND:-127.0.0.1}:${JUPYTER_PORT:-9999}:9999"
+
+    volumes:
+      # ./data      the SDSS DR19 catalogue + the Hugging Face bundle (~2.2 GB)
+      # ./results   the parquet cache, figures, mlruns/
+      # ./notebooks your decks, so the cells you edit are saved in your checkout
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./notebooks:/app/notebooks
+
+    working_dir: /app
+
+    # Ctrl-C stops the server instead of the shell wrapper, and the entrypoint
+    # can drop to your uid (it reads it from the mounted folders, so the files
+    # this writes are yours and need no sudo to delete).
+    init: true
+    stdin_open: true
+    tty: true
+
+# Create the mount folders first, as yourself:
+#
+#   mkdir -p data results notebooks
+#
+# Docker creates a missing bind-mount folder as root, and the entrypoint then
+# has no non-root owner to drop to, which is how you end up with root-owned
+# results. `docs/docker.md` covers the fix if it has already happened.

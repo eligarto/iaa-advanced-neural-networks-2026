@@ -256,6 +256,45 @@ control, and repeated configurations come back from the notebook's own memo.
 `cluster download --all` fetches everything the notebooks read: the catalogue and
 the embeddings/checkpoints bundle.
 
+### The workbook exercise decks
+
+Alongside the two demo notebooks, every exercise in the clustering workbook
+(`article/workbook.tex`) ships as a runnable answer — 56 exercises over 16
+chapters:
+
+```bash
+docker compose up            # JupyterLab on http://localhost:9999
+```
+
+Compose mounts `./data`, `./results` and `./notebooks` into the container, so
+the catalogue stays on the host and the cells you edit are saved in your
+checkout. Create the three folders first (`mkdir -p data results notebooks`) —
+Docker would otherwise create them as root. Any other command runs in the same
+image:
+
+```bash
+docker compose run --rm jupyter uv run cluster download --all
+```
+
+Open `notebooks/workbook_exercises.ipynb` for the whole set, or a single chapter
+from `notebooks/exercises/chapter_NN_*.ipynb`.
+
+The notebooks **present**; they never compute. Every number comes from
+`src/exercises/exercise_<chapter>_<n>.py`, so a figure quoted in a deck and the
+same figure in the workbook cannot drift apart. Theory answers cite the
+literature through `article/references.bib` — an unknown key raises rather than
+printing a dead reference.
+
+```bash
+uv run python scripts/make_exercise_notebooks.py --check   # decks match the modules
+uv run python scripts/run_all_exercises.py                 # execute all 56 modules
+uv run python scripts/run_notebooks.py                     # execute all 17 decks
+```
+
+`run_notebooks.py` executes *copies* under `results/notebook_runs/`, so the
+shipped `.ipynb` files stay byte-identical. Full deck run: ~29 min (the master
+deck 824 s, the 16 chapter decks 934 s), timings in `report.json`.
+
 ## Development
 
 ```bash
@@ -402,6 +441,10 @@ src/cluster/
   plots.py       # embedding scatter
   cli.py         # `cluster download` / `run` / `baseline` / `head-to-head` / …
 notebooks/       # the JupyterLab notebooks (chemical_tagging, tuning_template)
+  exercises/     # one deck per workbook chapter (chapter_NN_*.ipynb)
+  workbook_exercises.ipynb   # all 56 exercises in one deck
+src/exercises/   # the runnable workbook answers + citations.py (the decks only present these)
+article/         # the clustering workbook: workbook.tex, chapters, figures, references.bib
 hf/              # asset-bundle manifest, dataset card, publisher
 .github/         # (in the repo root) multi-arch docker image + test workflows
 ```
