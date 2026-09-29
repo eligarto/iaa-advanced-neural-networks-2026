@@ -29,6 +29,54 @@ git remote add upstream https://github.com/iaa-so-training/iaa-advanced-neural-n
 git fetch upstream
 ```
 
+### Already cloned the original? Don't clone again — repoint it
+
+Most people at the school cloned `iaa-so-training/…` directly before anyone
+mentioned forking. **You do not need a second clone.** A clone is not bound to
+the repository it came from; the remote is just a URL in `.git/config`, and
+renaming it costs nothing.
+
+Re-cloning, on the other hand, is genuinely expensive here: the checkout pulls
+a 1.3 GB Git-LFS archive belonging to Day 1, and you would then re-download the
+~2.2 GB of DR19 data under `day_4_clustering/data/` (gitignored, so a fresh
+clone does not carry it) and rebuild the virtual environment. That is several
+gigabytes and a long wait to arrive exactly where you already are.
+
+Fork it on GitHub first, then, **from inside your existing clone**:
+
+```bash
+git remote rename origin upstream                 # the original becomes 'upstream'
+git remote add origin https://github.com/<your-username>/iaa-advanced-neural-networks-2026.git
+git fetch origin
+git remote -v                                     # origin = your fork, upstream = the original
+```
+
+Nothing in your working tree is touched — uncommitted edits, notebooks, the
+downloaded data and `.venv` all stay exactly where they are. Afterwards
+`git push` goes to *your fork* and `git fetch upstream` still brings in the
+maintainers' work, which is precisely the arrangement you want.
+
+> **One wrinkle worth knowing.** `git remote rename` also rewrites the tracking
+> configuration, so your local `main` now tracks `upstream/main`. That is the
+> right default — `git pull` on `main` keeps you current with the original
+> repository — but it means `main` is *not* tracking your fork. Always work on
+> a branch (below) and this never comes up.
+
+**If you have already committed to `main`**, syncing will refuse:
+
+```
+fatal: Not possible to fast-forward, aborting.
+```
+
+Your commits are not lost; `main` has simply diverged. Move them onto a branch
+where they belong, then reset `main` to match upstream:
+
+```bash
+git branch my-work            # keep the commits, on a branch named for them
+git reset --hard upstream/main   # main now matches the original again
+git switch my-work
+```
+
 **2. Branch.** Never work on `main` — it makes your fork painful to sync and
 your PR impossible to review cleanly.
 
