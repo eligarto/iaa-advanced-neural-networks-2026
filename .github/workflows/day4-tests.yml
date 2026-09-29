@@ -7,8 +7,9 @@ name: day4 tests
 # (module contracts, the citation keys resolving against article/references.bib,
 # and every shipped notebook cell compiling) runs dataless.
 #
-# The optional torch extra and the PARSEC grid are skipped here. Measured on a
-# clean environment with no catalogue: 884 passed, 3 skipped, ~5 min.
+# The optional torch extra, the DR19 catalogue and the PARSEC grid are all
+# absent on a runner, so five tests skip. Measured here: 882 passed, 5 skipped,
+# 1m43s for the test step and 2m40s for the whole job.
 
 on:
   workflow_dispatch:
@@ -39,9 +40,9 @@ jobs:
       run:
         working-directory: day_4_clustering
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
 
