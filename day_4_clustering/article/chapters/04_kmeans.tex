@@ -1,0 +1,230 @@
+% 04 · K-means — the default tool, and its assumptions
+\section{K-MEANS: THE DEFAULT TOOL}
+\label{sec:kmeans}
+
+\deckslides{slides 4--11 --- the K-means tour, ending on its limits.}
+
+K-means is where every clustering analysis starts, and it is worth
+understanding precisely, because its failure modes are the ones the rest of
+the toolbox was invented to repair. The method was proposed by
+\citet{MacQueen:67} and its modern formulation --- the one everyone implements
+--- is due to \citet{Lloyd:82}.
+
+\subsection{The objective}
+
+Given $n$ points $\mathbf{x}_1,\dots,\mathbf{x}_n$ in $\mathbb{R}^d$ and a
+fixed number of groups $K$, K-means looks for $K$ centres
+$\boldsymbol{\mu}_1,\dots,\boldsymbol{\mu}_K$ and an assignment of every point
+to one centre that minimises the \emph{sum of squared errors} (SSE), also
+called the within-cluster sum of squares:
+
+\begin{equation}
+J = \sum_{k=1}^{K} \sum_{\mathbf{x} \in C_k}
+\left\| \mathbf{x} - \boldsymbol{\mu}_k \right\|_2^2 ,
+\qquad
+\boldsymbol{\mu}_k = \frac{1}{|C_k|}\sum_{\mathbf{x} \in C_k} \mathbf{x}.
+\label{eq:sse}
+\end{equation}
+
+The second half of the equation is not a separate model choice but a
+consequence of the first: for a fixed assignment, the centre that minimises
+the sum of squared distances to the members is the arithmetic mean. Two
+properties follow immediately and both are assumptions in disguise.
+
+\begin{itemize}
+\item Because $J$ penalises distance \emph{squared}, the objective is
+  dominated by the points furthest from their centre. A single outlier can
+  drag a centre across the field. K-means is not robust; medians (K-medians)
+  or medoids are the standard remedy when outliers are expected.
+\item Because every point is assigned to its nearest centre, the partition is
+  a \emph{Voronoi tessellation}: cells are convex and their boundaries are
+  hyperplanes. A cluster with a crescent or dumbbell shape cannot be
+  represented, however obvious it looks to the eye
+  (\textbf{Figure~\ref{fig:kmeansfail}}).
+\end{itemize}
+
+\begin{marginnote}[]
+\entry{SSE / inertia}{The sum of squared distances from each point to its
+assigned centre: the quantity K-means minimises. Also called inertia in
+scikit-learn and within-cluster sum of squares (WCSS).}
+\entry{Voronoi cell}{The region of space closer to one centre than to any
+other. K-means partitions the plane into Voronoi cells by construction.}
+\end{marginnote}
+
+\subsection{The algorithm, and why it always stops}
+
+Lloyd's algorithm is a two-move loop. \emph{Assign} every point to its nearest
+centre; \emph{update} every centre to the mean of its members; repeat. Each
+move can only reduce $J$: the assignment step is optimal for fixed centres,
+and the update step is optimal for fixed assignment. $J$ is bounded below by
+zero and takes finitely many values (there are finitely many partitions of
+$n$ points into $K$ groups), so the loop must terminate --- in practice after
+a few dozen iterations. It terminates at a \emph{local} minimum, and the
+distinction matters: K-means is a coordinate-descent algorithm on a
+non-convex objective, so different starting centres end in different answers.
+
+\begin{figure}[htbp]\centering
+  \fig[0.94]{kmeans_film.png}
+  \caption{The K-means loop on a synthetic 2-D dataset, sampled at four
+  points in the animation: initial centres, first assignment, first update,
+  converged. The workbook prints the key frames; the deck plays the full
+  sequence (\textbf{Figure~\ref{fig:qrcodes}}).}
+  \label{fig:kmeansfilm}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip6pt}c@{}}
+    \fig[0.44]{kmeans_step1.png} &
+    \fig[0.44]{kmeans_step2.png} \\[3pt]
+    \fig[0.44]{kmeans_step3.png} &
+    \fig[0.44]{kmeans_step4.png}
+  \end{tabular}
+  \caption{The same four states, in the deck's step figures. Stars are the
+  centres, dots the data: \panel{a} all points unassigned with $K$ centres
+  dropped at random; \panel{b} assignment to the nearest centre; \panel{c}
+  centres moved to the mean of their members; \panel{d} the fixed point of the
+  iteration --- no point changes hands, so the loop stops.}
+  \label{fig:kmeanssteps}
+\end{figure}
+
+\subsection{Choosing $K$, and choosing where to start}
+
+$K$ is an input, which is uncomfortable in a problem where the number of
+clusters is exactly what we are trying to learn. Three standard answers, and a
+warning:
+
+\begin{enumerate}
+\item \textbf{Elbow.} Plot $J$ against $K$; $J$ decreases monotonically
+  (more centres always fit better), and the curve is expected to bend where
+  extra groups stop buying real structure. It is a heuristic: on smooth data
+  there is no elbow, and on clustered data with a broad size distribution the
+  bend is shallow.
+\item \textbf{Silhouette.} For each point, compare its mean distance to its own
+  cluster with its mean distance to the nearest other cluster; average over
+  points and pick the $K$ that maximises the score \citep{Rousseeuw:87}. It is
+  a ratio of within- to between-cluster distance, so it also penalises
+  non-convex clusters.
+\item \textbf{Model selection.} Compare $K$ by held-out likelihood under a
+  Gaussian mixture fitted by EM \citep{Dempster:77}. K-means is the hard
+  assignment limit of that model with spherical, equal-variance components ---
+  which is precisely the assumption list of \textbf{Table~\ref{tab:assumptions}}.
+\end{enumerate}
+
+The warning is that in this project we \emph{cheat}, deliberately. The
+catalogue tells us there are 25 clusters, so the benchmarking arms are handed
+the true number of groups. That makes the comparison between methods clean,
+and it flatters all of them relative to a blind search --- which is why
+\S\ref{sec:benchmark} reports field retrieval (a discovery-like task) and
+cluster-only separation (a $K$-known task) separately.
+
+Initialisation has the same status: a modelling decision that changes the
+answer. The classical approach is to run the loop from several random starts
+and keep the best $J$; the modern default is \emph{k-means++}
+\citep{Arthur:07}, which samples the first centre uniformly and each
+subsequent centre with probability proportional to $D(\mathbf{x})^2$, the
+squared distance to the nearest centre already chosen. The effect is to spread
+the initial centres out, which typically reaches a better local optimum in
+fewer restarts.
+
+\begin{figure}[htbp]\centering
+  \fig[0.58]{kmeans_init.png}
+  \caption{Initialisation sensitivity (from the deck): the same data, two
+  random starts, two different final partitions --- and one of them splits a
+  real group. Nothing about the algorithm changed; only the seed did. In a
+  clustering paper this is the first thing a referee will ask about, and it is
+  why every number in this workbook is reported as a mean over seeds (seven,
+  in the head-to-head of \S\ref{sec:spectral}).}
+  \label{fig:kmeansinit}
+\end{figure}
+
+\subsection{What it assumes, and when it breaks}
+
+\begin{issues}[THE ASSUMPTION LIST]
+K-means assumes that clusters are (i) separable by a centre, (ii) roughly
+convex, (iii) of comparable size and variance, (iv) all present in equal
+proportion, and (v) that $K$ is known. It additionally assumes that the metric
+is meaningful --- that the dimensions have been standardised, or that the
+scales carry physical meaning. When it fails, it fails in a characteristic
+way: it splits large or elongated groups and merges neighbouring small ones,
+and it never returns ``noise''.
+\end{issues}
+
+\begin{figure}[htbp]\centering
+  \fig[0.50]{kmeans_fail.png}
+  \caption{K-means on two elongated, interleaved structures. The natural
+  groups are obvious to the eye and unavailable to a partition by nearest
+  centre: the objective can only be reduced by cutting across the arms. This
+  is the failure that motivates every method in the rest of the workbook.}
+  \label{fig:kmeansfail}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \fig[0.90]{kmeans_storyboard.png}
+  \caption{The full K-means story in one grid, as used in the lecture: the
+  loop, an initialisation that goes wrong, the failure on non-convex shapes,
+  and the diagnostic that the objective can be lowered without the answer
+  getting better.}
+  \label{fig:kmeansstory}
+\end{figure}
+
+\subsection{Is K-means useful for chemical tagging?}
+
+Yes --- with the right expectations, and in the literature it has been used
+twice in ways that matter here.
+
+\citet{Hogg:16} clustered $\sim\!10^5$ APOGEE stars in a 15-dimensional
+abundance space with K-means, with no positional information, and recovered
+groups that are genuinely phase-space structures. That result defines what
+abundance-space overdensities can be at $\sim\!0.04$ dex precision. And
+\citet{GarciaDias:18} applied K-means to $153\,847$ normalised APOGEE
+spectra for spectral classification rather than for tagging, and the classes it
+returns do track the stellar parameters --- dwarfs separate from giants, bulge
+from halo. But the same paper's conclusion is the opposite of tidy: flux space
+has no obvious groups, a discrete classification does not organise parameter
+space neatly, and the solution moves with the initialisation. That is the same
+warning as the row-order result of \S\ref{sec:validation}, in a different space.
+K-means is useful when the groups are blobs; the spectra are not blobs, and the
+abundance space of \S\ref{sec:benchmark} is only partly one.
+
+In \textbf{Section~\ref{sec:benchmark}} the same algorithm is run on the same
+member matrix as the other arms --- the 1\,002-row matrix of
+\textbf{Table~\ref{tab:clusters}} in this chapter's summary box, and the
+982-star deduplicated population of \textbf{Table~\ref{tab:honest}} and
+\textbf{Table~\ref{tab:literature}} --- so that the comparison between ``the
+classical tool'' and the newer ones is measured rather than asserted.
+
+\begin{summary}[K-MEANS ON OUR MEMBER MATRIX]
+\texttt{article/scripts/kmeans\_baseline.py} loads the DR19 sample, takes the
+same member-only matrix the other benchmark arms use ($1\,002$ stars, 16
+abundances, 25 clusters, $\geq\!5$ members), runs K-means with $n_{\rm
+init}=10$ and reports the paper's merit functions alongside the SSE curve. The
+measured result is worth stating plainly, because it is not the one the gospel
+predicts: at $K=25$, K-means reaches \textbf{homogeneity 0.449}
+(completeness 0.493, v-measure 0.470, accuracy 0.296) --- higher than t-SNE's
+0.292 and EVoC's 0.409 on the same stars, and within reach of UMAP's 0.547.
+Two caveats travel with it. At $K=2$ the same matrix gives homogeneity 0.228
+with completeness 0.954: the ``families'' reading, in which almost everything
+lands in one group. And raising $K$ to 40 lifts homogeneity to 0.505 while
+completeness falls to 0.474 --- over-splitting buys homogeneity, which is why
+the paper's metric pair must always be quoted together.
+\end{summary}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Show that the assignment and update steps each cannot increase $J$, and
+  conclude that the algorithm terminates. Then construct a one-dimensional
+  example (three points, two centres) where the global optimum and Lloyd's
+  fixed point differ, and draw the two partitions.
+\item Implement k-means++ seeding in ten lines of NumPy and compare the final
+  $J$ over 50 random datasets against a uniform-random initialisation. How
+  much of the improvement comes from the seeding rule, and how much from the
+  multiple restarts?
+\item K-means with $K=2$ on our member matrix asks a different question from
+  $K=25$: not ``which cluster is this star in'' but ``which family''. Run
+  both and compare the homogeneity. Which of the two numbers would you quote
+  to support strong chemical tagging, and why is that the wrong number?
+\item Replace the Euclidean distance in the assignment step with cosine
+  distance, keeping the mean update. What happens to the objective's
+  guarantee of monotone decrease, and does the algorithm still terminate?
+\end{enumerate}
+\end{issues}

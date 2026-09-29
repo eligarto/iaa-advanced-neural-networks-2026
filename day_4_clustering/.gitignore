@@ -29,3 +29,17 @@ htmlcov/
 
 # Ralph loop state
 .ralph/
+
+# LaTeX build artifacts — article/workbook.pdf is the deliverable, these are not.
+article/*.aux
+article/*.log
+article/*.blg
+article/*.bbl
+article/*.out
+article/*.toc
+article/*.fls
+article/*.fdb_latexmk
+article/*.synctex.gz
+
+# Notebook execution artifacts (scripts/run_notebooks.py writes copies here)
+results/notebook_runs/

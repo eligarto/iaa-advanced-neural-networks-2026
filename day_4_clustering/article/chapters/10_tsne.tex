@@ -1,0 +1,207 @@
+% 10 · t-SNE — neighbour probabilities and the crowding problem
+\section{t-SNE: A MAP OF NEIGHBOURHOODS}
+\label{sec:tsne}
+
+\deckslides{slides 32--38 --- the two probability models and the descent between them.}
+
+Everything so far has treated the 16-dimensional abundance vector as a space
+in which distance means something. That assumption is weaker than it looks. In
+high dimensions, distances concentrate: the ratio of the farthest to the
+nearest neighbour of a point tends to 1, so ``close'' and ``far'' describe
+almost the same thing and a density-based method loses contrast. t-SNE
+\citep{vanderMaaten:08}, building on stochastic neighbour embedding
+\citep{Hinton:02}, answers this by giving up on preserving distances at all
+and preserving \emph{neighbourhoods} instead --- then drawing the result in two
+dimensions.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip5pt}c@{\hskip5pt}c@{}}
+    \fig[0.30]{tsne_step1.png} &
+    \fig[0.30]{tsne_step2.png} &
+    \fig[0.30]{tsne_step3.png}
+  \end{tabular}
+  \caption{The three moves of t-SNE, from the deck: \panel{a} in the high-D
+  space, convert distances to neighbour probabilities (here the point's
+  neighbourhoods are drawn as spheres of decreasing probability); \panel{b} in
+  the 2-D map, do the same conversion with a heavy-tailed kernel; \panel{c}
+  move the points downhill on the Kullback--Leibler divergence until the two
+  sets of probabilities agree as closely as they can.}
+  \label{fig:tsnesteps}
+\end{figure}
+
+\subsection{From distances to probabilities}
+
+For each point $i$, t-SNE defines the probability that $j$ is its neighbour in
+the high-dimensional space as a Gaussian in the distance,
+
+\begin{equation}
+p_{j \mid i} = \frac{\exp\!\left(-\|\mathbf{x}_i -
+\mathbf{x}_j\|^2 / 2\sigma_i^2\right)}
+{\sum_{k \neq i} \exp\!\left(-\|\mathbf{x}_i - \mathbf{x}_k\|^2 /
+2\sigma_i^2\right)} ,
+\label{eq:phigh}
+\end{equation}
+
+and symmetrises, $p_{ij} = (p_{j|i} + p_{i|j})/2n$. The novelty is $\sigma_i$:
+each point gets its \emph{own} bandwidth, chosen so that the neighbourhood
+distribution has a fixed entropy. The user-facing parameter is that entropy,
+expressed as \emph{perplexity},
+
+\begin{equation}
+\mathrm{Perp}(P_i) = 2^{H(P_i)}, \qquad
+H(P_i) = -\sum_j p_{j|i} \log_2 p_{j|i},
+\label{eq:perplexity}
+\end{equation}
+
+found by binary search on $\sigma_i$. Perplexity is the effective number of
+neighbours each point is required to have, and it is the parameter you must
+justify. \citet{vanderMaaten:08} suggest 5--50; a widely used default is
+$\sqrt{n}$ or $n/100$; our pipeline's default is 30, and the swap to 50
+measurably improved the layout for our $\sim\!5\,000$-star samples.
+
+\begin{marginnote}[]
+\entry{Perplexity}{The effective number of neighbours each point is given in
+t-SNE's high-dimensional probability distribution
+(\textbf{Equation~\ref{eq:perplexity}}). It is the only required
+hyperparameter, and it is a statement about the scale of structure you are
+looking for.}
+\entry{Crowding problem}{In a low-dimensional map there is not enough room to
+place moderately distant points at moderate distances. t-SNE's heavy-tailed
+low-dimensional kernel fixes it by making the map's tail fat.}
+\end{marginnote}
+
+\subsection{The low-dimensional half, and the crowding problem}
+
+The map is a set of 2-D positions $\mathbf{y}_i$. Their neighbour
+probabilities use a Student-$t$ kernel with one degree of freedom,
+
+\begin{equation}
+q_{ij} = \frac{\left(1 + \|\mathbf{y}_i - \mathbf{y}_j\|^2\right)^{-1}}
+{\sum_{k \neq l} \left(1 + \|\mathbf{y}_k - \mathbf{y}_l\|^2\right)^{-1}} ,
+\label{eq:qlow}
+\end{equation}
+
+and the layout is found by minimising the Kullback--Leibler divergence
+$D_{\mathrm{KL}}(P \,\|\, Q)$ by gradient descent. The heavy tail in
+\textbf{Equation~\ref{eq:qlow}} is the whole point. With a Gaussian map
+kernel, the volume available at radius $r$ in two dimensions grows only as
+$r$, while the volume of a shell in 16 dimensions grows as $r^{15}$: a point
+that should be moderately distant from its neighbours has nowhere to go, and
+the optimiser either piles dissimilar points on top of each other or flings
+them arbitrarily far away. This is the crowding problem, and the $t_1$ kernel
+solves it by allowing large distances to be cheap: $q_{ij} \sim
+1/\|\mathbf{y}_i - \mathbf{y}_j\|^2$, so a point can sit far from another at
+almost no cost in divergence. The resulting gradient has an intuitive form ---
+each point is pulled towards its high-D neighbours and pushed away from the
+others, with the repulsion weak at long range --- and it is what
+\textbf{Figure~\ref{fig:tsnefilm}} animates.
+
+\begin{figure}[htbp]\centering
+  \fig[0.94]{tsne_film.png}
+  \caption{The descent, four frames of the deck's animation: from the initial
+  (PCA) layout, through the early exaggeration phase in which clusters
+  coalesce while empty space opens up between them, to the settled map. The
+  exaggeration phase is a device, not physics: it deliberately over-states
+  attraction at the start to escape a poor initial arrangement.}
+  \label{fig:tsnefilm}
+\end{figure}
+
+\begin{issues}[HOW TO READ A t-SNE MAP]
+The picture is a map of neighbour probabilities, and the following are all
+\emph{not} readable from it. (i) Distances between clusters: only the relative
+order of neighbourhoods is preserved, so a gap can appear between two groups
+whose members are mutual neighbours. (ii) Cluster sizes and densities: t-SNE
+normalises local density away, so a tight blob and a loose one can have the
+same number of members. (iii) Global geometry: rotation, reflection and the
+arrangement of clusters are arbitrary. (iv) The absence of a gap: a method
+that must place every point somewhere will place well-separated points on the
+same island if the perplexity is wrong.
+\end{issues}
+
+\subsection{What t-SNE does not do}
+
+It does not cluster. The output is a 2-D embedding, and the visual groupings
+are an artefact of a continuous optimisation. The workflow that has become
+standard --- and that our pipeline uses --- is to treat the embedding as a
+feature space and cluster \emph{that} with a density-based method, normally
+HDBSCAN$^*$ (\S\ref{sec:hdbscan}) or EVoC (\S\ref{sec:evoc}). The
+distinction matters when quoting results: a t-SNE row in our tables is
+really ``t-SNE followed by HDBSCAN$^*$'', and both steps contribute to the
+score.
+
+Three further practical facts, each of which we have hit:
+
+\begin{itemize}
+\item \textbf{Initialisation changes the answer.} The original implementation
+  started from a random layout; the modern default starts from a PCA of the
+  input. Both are stochastic in practice, and on our abundance matrix the
+  difference is not subtle: see the row-order audit of \S\ref{sec:validation},
+  where the same data gave homogeneity between 0.218 and 0.560 depending on
+  the order of the input rows.
+\item \textbf{The distance metric is fixed to Euclidean.} t-SNE has no
+  metric parameter, which is why \S\ref{sec:data}'s decision to make
+  Euclidean distance and cosine similarity equivalent on our matrix is not a
+  detail: it is the only reason the t-SNE, UMAP and EVoC arms are comparable
+  at all.
+\item \textbf{Cost grows faster than linearly.} The original $O(n^2)$
+  formulation is unusable past a few thousand stars; the Barnes--Hut
+  approximation \citep{vanderMaaten:14} brings it to
+  $O(n \log n)$ per iteration, at the cost of the order dependence noted
+  above. Our field runs embed 30\,107 stars in this regime.
+\end{itemize}
+
+\subsection{t-SNE on real clusters}
+
+The published anchor for this section is \citet{Kos:17}, who applied t-SNE to
+GALAH abundances --- 13 elements, calibrated with The Cannon --- and recovered 7
+of the 9 clusters in their sample, the Pleiades among them, as coherent groups in
+a two-dimensional map. \textbf{Figure~\ref{fig:kostse}} reproduces their figure,
+and it is worth being precise about what it shows: a known cluster, its members
+in red, sitting inside a map built from the surrounding field. It is a positive
+result, and it is also a reminder of the asymmetry in this literature: the
+clusters were selected because they were already known, and the method is judged
+on whether it finds them again.
+
+Our own cluster-only results for the abundance matrix illustrate the failure
+mode the caveats above predict, and they do it in two registers. The single run
+of \textbf{Table~\ref{tab:baseline}} gives the t-SNE arm the highest completeness
+of the three methods ($0.879$) and the lowest homogeneity ($0.292$), the
+signature of a map in which most clusters have been drawn into one region. The
+seven-seed average of \textbf{Table~\ref{tab:honest}} looks better ($0.560$
+homogeneity, $0.601$ completeness) --- and \S\ref{sec:validation} shows that the
+same matrix moves between $0.218$ and $0.560$ on homogeneity, and between 2 and
+22 groups, when only the order of the input rows changes. The neighbourhoods are
+preserved, and the neighbourhoods were not separated to begin with.
+
+\begin{figure}[htbp]\centering
+  \fig[0.62]{kos_pleiades_tsne.png}
+  \caption{t-SNE of GALAH abundances around the Pleiades, as published by
+  \citet{Kos:17} and used in the lecture: the red points are stars known to be
+  cluster members, and the inset zooms in on where they concentrate, marking the
+  two groups the method finds (A, B) and the two member candidates it adds
+  (1, 2). A known cluster, recovered from field data --- the benchmark that
+  strong chemical tagging has to beat.}
+  \label{fig:kostse}
+\end{figure}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Implement the binary search for $\sigma_i$ in
+  \textbf{Equation~\ref{eq:perplexity}} that fixes perplexity at a target
+  value for every point. Plot the resulting $\sigma_i$ against local density
+  on the DR19 matrix. Does the adaptive bandwidth do what it is supposed to
+  do?
+\item Embed the member matrix with perplexities 5, 30 and 100, and for each
+  compute the kNN purity of \S\ref{sec:knn} plus the cluster-only homogeneity.
+  Which perplexity would you choose, on which evidence, and does the choice
+  change the paper's conclusion?
+\item Take the t-SNE embedding of the abundances and run HDBSCAN$^*$ with
+  \texttt{min\_cluster\_size} = 5, 15 and 50. Report the number of groups and
+  the largest group fraction each time. Identify which run is degenerate and
+  say what the degeneracy looks like in the map.
+\item The low-dimensional kernel is $q_{ij} \propto (1 +
+  \|\mathbf{y}_i-\mathbf{y}_j\|^2)^{-1}$. Replace it with a Student-$t$ kernel
+  of $\nu = 5$ degrees of freedom, re-derive the gradient, and explain what
+  you expect to change in the map's long-range behaviour.
+\end{enumerate}
+\end{issues}

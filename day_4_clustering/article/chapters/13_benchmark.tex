@@ -1,0 +1,525 @@
+% 13 · The benchmark — what we measured, and what it does not support
+\section{THE BENCHMARK: WHAT WE MEASURED}
+\label{sec:benchmark}
+
+\deckslides{slides 46--47 for the benchmark and slide 48 for the lessons in short form.}
+
+This chapter is the case study: the methods of
+\S\ref{sec:kmeans}--\S\ref{sec:evoc} run on the data of \S\ref{sec:data},
+scored by the protocol of \S\ref{sec:validation}. The order of business is the
+benchmark grid, then the two tasks separately, then the levers, and finally the
+list of things this benchmark cannot tell you.
+
+\subsection{The design}
+
+Three things vary, and nothing else:
+
+\begin{itemize}
+\item \textbf{Signal.} The 16 standardised abundances of \S\ref{sec:data};
+  a 64- or 256-dimensional PCA projection of the APOGEE spectra
+  (\S\ref{sec:spectral}); a 256-dimensional masked-autoencoder latent of the
+  same spectra; the four kinematic observables
+  (parallax, two proper motions, radial velocity); and concatenations of
+  chemistry with kinematics.
+\item \textbf{Method.} t-SNE, UMAP and EVoC, each followed by
+  HDBSCAN$^*$ clustering where the method needs one, with the defaults of
+  \textbf{Table~\ref{tab:config}}.
+\item \textbf{Task.} \emph{Cluster-only separation}: cluster the known members
+  among themselves and ask whether the clusters come out distinct, scored with
+  \textbf{Equation~\ref{eq:merits}}. \emph{Field retrieval}: search the full
+  sample for members and score with \textbf{Equation~\ref{eq:rp}}.
+\end{itemize}
+
+Three conventions keep the comparison honest, and all three are choices a
+reader should check before believing any row:
+
+\begin{enumerate}
+\item \textbf{Same population.} Every arm in \textbf{Table~\ref{tab:honest}}
+  is scored on the same 982 stars and the same 25 clusters. An earlier version
+  of this table compared arms scored on 25 clusters against arms scored on 5,
+  which is the mistake of \S\ref{sec:validation}.
+\item \textbf{Seven seeds, reported as mean $\pm$ s.d.} The kinematics-only
+  t-SNE row is deterministic, several other rows are not, and the difference
+  is information rather than noise to be hidden.
+\item \textbf{Two referees.} Field retrieval is scored against two independent
+  definitions of ``member'': the kinematic selection of
+  \S\ref{sec:data}, and the Simbad cluster memberships of the literature.
+  Every conclusion below holds under both; the Simbad referee moves precision
+  by $-0.01$ to $-0.08$ (the largest shifts are in the 64-dimensional PCA arms)
+  and changes no ranking.
+\end{enumerate}
+
+\subsection{Task 1: separating the clusters from each other}
+
+\textbf{Table~\ref{tab:honest}} is the central result of the workbook. Read it
+by column first: the columns are methods, the rows are the signal the method
+was given.
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep4pt
+\begin{tabular}{@{}llccc@{}}
+\toprule
+signal & dim & t-SNE & UMAP & EVoC \\
+\midrule
+abundances                & 16  & $0.560 \pm 0.000$ & $0.578 \pm 0.011$ & $0.420 \pm 0.043$ \\
+PCA of spectra            & 64  & $0.741 \pm 0.000$ & $0.754 \pm 0.007$ & $0.733 \pm 0.008$ \\
+PCA of spectra            & 256 & $0.688 \pm 0.003$ & $0.685 \pm 0.014$ & $0.653 \pm 0.020$ \\
+masked AE latent          & 256 & $0.740 \pm 0.002$ & $0.760 \pm 0.011$ & $0.714 \pm 0.036$ \\
+kinematics only           & 4   & $0.942 \pm 0.000$ & $0.940 \pm 0.005$ & $0.876 \pm 0.012$ \\
+\midrule
+abundances, K-means ($K$ known) & 16 & \multicolumn{3}{c}{$0.449$ (single run)} \\
+\bottomrule
+\end{tabular}
+\caption{Cluster-only homogeneity on the same 982 stars in 25 clusters, mean
+$\pm$ standard deviation over seven seeds. Higher is better. The K-means row
+is the classical baseline of \S\ref{sec:kmeans}, run on the 1\,002-row
+member matrix with $K=25$ and $n_{\rm init}=10$ by
+\texttt{article/scripts/kmeans\_baseline.py}: it is not an embedding, so it
+has no column to sit in, and it is quoted for scale rather than for ranking.
+The recovery fractions of the same arms, and the comparison with the published
+result, are in \textbf{Table~\ref{tab:literature}}.}
+\label{tab:honest}
+\end{table}
+
+Four things in that table are worth stating out loud.
+
+\textbf{Chemistry is not nothing.} All three methods reach homogeneity well
+above the trivial floor of $1/25 = 0.04$: the 16 abundances carry real cluster
+information, and the embedding methods extract some of it. This is the
+optimistic half of the chemical-tagging programme, reproduced on data that
+post-date the paper that reported it.
+
+\textbf{Chemistry is not enough.} The same methods on four kinematic
+observables --- a quarter of the dimensions --- reach $0.94$. Nothing about
+the abundance arms is competitive with kinematics, and no amount of embedding
+repairs it: the four-dimensional signal is simply more informative about
+which cluster a star belongs to.
+
+\textbf{Dimension helps, up to a point.} Going from 16 abundances to the
+64-dimensional PCA latent raises EVoC's homogeneity from $0.42$ to $0.73$ and
+t-SNE's from $0.56$ to $0.74$. Going on to 256 principal components \emph{lower}
+it --- $0.69$ for t-SNE, $0.65$ for EVoC --- which is the bias--variance trade
+of \S\ref{sec:fundamentals} in its least forgiving form: the extra 192
+directions carry variance, not signal, and every one of them is a direction in
+which the field can become an apparent neighbour.
+
+\textbf{One row of that table is not a measurement.} The abundances-only
+t-SNE row is unstable under row order, as the audit of \S\ref{sec:validation}
+showed: the same matrix gives $0.218$--$0.560$ depending on how the rows are
+ordered, and the single-run baseline of \textbf{Table~\ref{tab:baseline}}
+gives $0.292$ for what is nominally the same experiment. Any claim that rests
+on the difference between $0.29$ and $0.56$ for t-SNE on raw abundances is
+built on the input ordering.
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep5pt
+\begin{tabular}{@{}lccc@{}}
+\toprule
+features & t-SNE & UMAP & EVoC \\
+\midrule
+abundances (16-d)          & 0.292 & 0.547 & 0.409 \\
+abundances + kinematics    & \textbf{0.767} & 0.748 & 0.680 \\
+\bottomrule
+\end{tabular}
+\caption{The single-run baseline of the DR19 re-run
+(\texttt{cluster baseline}, no seed averaging, the full 1\,002-row member
+matrix). It is included because it is the number our own documentation quotes,
+and because comparing it with \textbf{Table~\ref{tab:honest}} is instructive:
+concatenating kinematics lifts every method by $0.25$--$0.48$, and the
+abundances-only t-SNE row differs between the two tables by more than the seed
+spread of any other row.}
+\label{tab:baseline}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep5pt
+\begin{tabular}{@{}llccc@{}}
+\toprule
+signal (excluding M~3) & t-SNE & UMAP & EVoC \\
+\midrule
+abundances (884 stars)              & $0.199$ (degenerate) & $0.581$ & $0.499$ \\
+masked AE latent (884 stars)        & $0.711$ & $0.742$ & $0.658$ \\
+\bottomrule
+\end{tabular}
+\caption{Ablation on the 982-star population: the globular cluster M~3
+contributes $98$ of the stars ($884$ remain) --- or $154$ of the
+1\,002 member rows of \textbf{Table~\ref{tab:clusters}} --- and it is the
+largest globular in the sample, though not the largest cluster: M~67 supplies
+$218$ stars and the Pleiades $113$. Remove M~3 and the abundances-only t-SNE arm does not
+merely change, it collapses: two groups with $75\%$ of the stars in the
+largest, zero stars labelled noise. The spectral latent is unaffected by the
+same ablation. A result that depends on one cluster being present is not a
+measurement of the method. The per-cluster counts of both populations are in
+\texttt{results/population\_counts.csv}
+(\texttt{python scripts/population\_counts.py --baseline-min-finite 9}).}
+\label{tab:ablation}
+\end{table}
+
+\begin{figure}[htbp]\centering
+  \fig[0.98]{benchmark_grid.png}
+  \caption{The whole grid in one figure: method (rows) against signal
+  (columns), for the two tasks. Read the left block for cluster-only
+  separation and the right block for field retrieval, and notice that the
+  two blocks do not agree on a winner --- no single row is best at both. This
+  is the figure the lecture ends the benchmark on, and it is the reason
+  \S\ref{sec:benchmark} refuses to name a best method.}
+  \label{fig:benchgrid}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \fig[0.86]{headtohead_pca.png}
+  \caption{The head-to-head on $64$-dimensional PCA spectra, cluster-only
+  separation, seven seeds. The error bars are the seed spread: the masked-AE
+  and PCA-64 arms overlap, which is the tie reported in
+  \S\ref{sec:spectral} and the reason the spectral result is stated as
+  ``spectra beat abundances, and do not beat PCA''.}
+  \label{fig:headtohead}
+\end{figure}
+
+\subsection{Task 2: finding members in the field}
+
+Now the operational question. Take 30\,107 stars (the 25 clusters plus a
+stratified sample of the field), cluster them, and ask how many of the known
+members were recovered and how much of what was returned was real.
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep4pt
+\begin{tabular}{@{}llccc@{}}
+\toprule
+signal & method & recall & precision & kNN purity \\
+\midrule
+abundances (16-d) & t-SNE & 0.201 & 0.240 & 0.124 \\
+abundances (16-d) & UMAP  & 1.000 & 0.001 & 0.075 \\
+abundances (16-d) & EVoC  & 0.557 & 0.003 & --- \\
+\midrule
+PCA 64-d & t-SNE & 0.417 & 0.631 & 0.528 \\
+PCA 64-d & UMAP  & 0.374 & 0.592 & 0.434 \\
+PCA 64-d & EVoC  & 0.585 & 0.003 & --- \\
+\midrule
+masked AE 256-d & t-SNE & 0.418 & 0.619 & 0.504 \\
+masked AE 256-d & UMAP  & 0.385 & 0.513 & 0.419 \\
+masked AE 256-d & EVoC  & 0.255 & 0.005 & --- \\
+\bottomrule
+\end{tabular}
+\caption{Field retrieval, all-sky, on the same 30\,107 stars and the same 25
+clusters, scored against the kinematic membership (978 members). Recall and
+precision are the best-overlap definition of \textbf{Equation~\ref{eq:rp}};
+kNN purity is the parameter-free cohesion score of \S\ref{sec:knn}, and it is
+undefined for EVoC because that arm returns no embedding to measure it in.
+Scoring against the Simbad referee instead shifts every precision by
+$-0.01$ to $-0.08$ and changes no ranking.}
+\label{tab:field}
+\end{table}
+
+The three lessons here organise most of what the rest of this workbook says
+about chemical tagging in practice.
+
+\textbf{Recall without precision is a statement about the field, not about
+the clusters.} UMAP on raw abundances recovers \emph{every} true member ---
+at a precision of $0.001$. It has not found the clusters; it has labelled a
+large part of the field as cluster, and the best-overlap protocol dutifully
+reports that the members are inside the resulting group. EVoC does the same
+thing more politely ($0.557$ recall, $0.003$ precision). This is the trap that
+the literature's habit of quoting a single number walks into, and it is why
+\textbf{Table~\ref{tab:field}} prints three.
+
+\textbf{Spectra read directly beat element ratios, and it took a chemical
+ablation to be sure.} The 64-dimensional PCA latent and the 256-dimensional
+masked-AE latent both reach recall $\approx 0.42$ at precision
+$\approx 0.62$ from the abundances' $0.20$/$0.24$. Two independent
+representations of the same spectra agree with each other to within
+$0.002$ in recall and $0.012$ in precision --- which is the honest way to say
+that the improvement is real while the difference between the $64$- and
+$256$-dimensional spectral rows is not.
+
+\textbf{The gap to the ceiling is the story.} Kinematics alone recover $0.93$
+of the members at a precision limited by velocity doppelg\"angers rather than
+by the method (\S\ref{sec:fundamentals}). Chemistry, read as well as we can
+read it today, gets to $0.42$ recall. Strong chemical tagging --- recovering a
+dispersed cluster with no kinematic help --- is not what these numbers
+demonstrate; what they demonstrate is that modern self-supervised spectral
+representations find \emph{something} real about a cluster in a spectrum, and
+that the something is diluted by a factor of two relative to parallaxes and
+proper motions.
+
+\subsection{The curse of dimensionality, measured}
+
+Concatenating a high-dimensional, weakly informative signal onto a
+low-dimensional, strongly informative one does not add their information. It
+dilutes the strong signal, because distance is shared across dimensions. The
+DR17 study measured this on 878 members in region mode with the kinematic
+labels held out of the ground truth:
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep5pt
+\begin{tabular}{@{}lccc@{}}
+\toprule
+signal (dims) & cluster homogeneity & field recall & field precision \\
+\midrule
+abundances (16)          & 0.25 / 0.51 / 0.51 & 0.73 & 0.47 \\
+spectral latent (256)    & 0.40 / 0.69 / 0.64 & 0.72 & 0.51 \\
++ kinematics (20 / 260)  & 0.62 / 0.74 / 0.72 & 0.83 / 0.80 & 0.63 / 0.61 \\
+kinematics only (4)      & \textbf{0.97 / 0.96 / 0.92} & \textbf{0.93} & 0.63--0.67 \\
+\bottomrule
+\end{tabular}
+\caption{Signal comparison on the DR17 data (three numbers per cell are the
+t-SNE / UMAP / EVoC homogeneity). Kinematics alone near-solve the cluster-only
+task and set the field-recall ceiling; adding chemistry on top improves the
+cluster-only score slightly and never improves recall beyond what kinematics
+already achieved. The DR19 re-run reproduces the pattern with different
+absolute values (kinematics $0.94$, abundances $0.56$,
+abundances$\,+\,$kinematics $0.77$ over the same 982 stars).}
+\label{tab:curse}
+\end{table}
+
+The mechanism is worth stating precisely, because it is the reason this
+workbook spends three chapters on geometry rather than one on algorithms. A
+distance in a 20-dimensional space is an average over 20 coordinate
+differences. If 16 of those coordinates are chemistry and carry weak
+information about cluster identity, while 4 are kinematics and carry strong
+information, then the strong coordinates are outvoted$\,$--- not mis-weighted,
+outvoted, because no reweighting recovers information that the metric has
+already blurred. Rescaling chemistry \emph{up} to compensate costs precision
+in the field, as \S\ref{sec:benchmark}'s lever table shows. The correct
+response is architectural, not numerical: cluster on the strong signal, then
+apply the weak signal as a rejection test. That is the two-stage pipeline, and
+it is the single most successful idea in this project.
+
+\subsection{Levers, and a lesson about bug fixes}
+
+The DR17 study swept the pipeline's knobs on one cluster (M~67) inside a
+$30^\circ$ region, with $5\,000$ stars and 183 referee members. Every run
+logged its full configuration. The table is worth reading as a list of
+\emph{hypotheses}, not results, and the section that follows explains why.
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep4pt
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+lever & recall & prec. & UMAP recall & verdict \\
+\midrule
+baseline                                   & 0.087 & 0.117 & 0.415 & --- \\
+\texttt{min\_cluster\_size} $5\!\to\!10$   & 0.404 & 0.129 & 0.525 & best single \\
+perplexity $30\!\to\!50$                   & 0.383 & 0.124 & 0.415 & free win \\
+perplexity $30\!\to\!10$                   & 0.033 & 0.353 & 0.415 & precision for recall \\
+\texttt{SNR\_MIN} $100\!\to\!150$          & 0.296 & 0.089 & 0.310 & recall up, precision down \\
+dwarf-only sample                          & 0.149 & 0.165 & 0.158 & best purity \\
+drop S, K, V, Mn                           & 0.055 & 0.256 & 0.038 & hurts recall \\
+UMAP \texttt{metric=cosine}                & 0.087 & 0.117 & 0.044 & hurts UMAP \\
+UMAP \texttt{n\_neighbors} $=5$            & 0.087 & 0.117 & 0.071 & worse \\
+UMAP \texttt{n\_neighbors} $=30$           & 0.087 & 0.117 & 0.410 & $=$ baseline \\
+element weights (after a bug fix)          & \textbf{0.437} & \textbf{0.158} & 0.339 & best lever \\
+weights $+$ size floor                     & 0.432 & 0.160 & 0.525 & not additive \\
+\bottomrule
+\end{tabular}
+\caption{DR17 lever sweep (M~67, $30^\circ$ region, $5\,000$ stars, 183
+referee members, seed 42). The recall and precision columns are t-SNE; the
+last two rows exist because of a bug: the element-weighting switch was
+originally a no-op, since the weights were applied and then undone by the
+standardisation step that followed. Reordering the two operations turned the
+largest apparent non-effect into the largest effect in the table. Two rules of
+thumb survive from this sweep --- the size floor of $5$ fragments the field,
+and a perplexity below $N/100$ starves the embedding --- and one warning: the
+best levers do not compose.}
+\label{tab:levers}
+\end{table}
+
+The lesson is not that hyperparameters matter, which is known, but that the
+\emph{largest single effect in a sweep can be a bug}. A configuration flag that
+does nothing is worse than a missing flag, because it produces a negative
+result that looks like an experiment. The DR17 re-check of the same lever on
+DR19 data did not reproduce the recall gain, which is exactly what the protocol
+of \S\ref{sec:validation} predicts for a lever that was selected on one
+cluster at one seed: selecting on a metric and reporting the same metric is
+not validation. The DR19 region sweep of the same switch confirms the warning
+from the other direction --- a recall that climbs to $0.96$ while precision
+falls to $0.05$ is a cluster that has grown to swallow the field.
+
+\subsection{Where this sits in the literature: Casamiquela et al. (2021)}
+\label{sec:literature}
+
+Every number so far in this chapter has been scored against our own baselines.
+The closest published measurement is \citet{Casamiquela:21}, and it is close
+enough to sit in the same table: the same metric triple, the same task, and a
+sample built to be the best case that spectroscopy can produce. They measured 16
+elements differentially in 175 red-clump members of 31 thin-disc open clusters,
+with an internal coherence of about $0.03$ dex per element and \emph{no field
+stars}. They then clustered the abundances directly with HDBSCAN --- no
+embedding, no projection --- and fine-tuned its free parameters to maximise the
+number of correctly recovered clusters (their Sect. 4.2). They call the sample
+itself their \emph{best-case scenario}. Their published result is $h = 0.49$, $c = 0.63$, $V = 0.55$,
+$\mathrm{RF}_{40} = 0.29$ (9 of 31 clusters) and $\mathrm{RF}_{70} = 0.03$ (one
+cluster, NGC~2682); their own summary of that run is that more than 70\,\% of the
+groups it finds are statistical, mixing stars from several real clusters.
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep5pt
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+sample & $n_\star$ / $n_{\rm cl}$ & $h$ & $c$ & $V$ & $\mathrm{RF}_{40}$ & $\mathrm{RF}_{70}$ \\
+\midrule
+\citet{Casamiquela:21}, published                  & 175 / 31 & 0.49  & 0.63  & 0.55  & 0.290 & 0.030 \\
+their clustering step, our stars (raw dex)         & 982 / 25 & 0.499 & 0.416 & 0.454 & 0.080 & 0.040 \\
+their clustering step, our stars (standardised)    & 982 / 25 & 0.475 & 0.407 & 0.438 & 0.000 & 0.000 \\
+\midrule
+our pipeline: t-SNE                                & 982 / 25 & 0.560 & 0.601 & 0.580 & 0.320 & 0.080 \\
+our pipeline: UMAP                                 & 982 / 25 & 0.578 & 0.572 & 0.575 & 0.326 & 0.006 \\
+our pipeline: EVoC                                 & 982 / 25 & 0.420 & 0.529 & 0.466 & 0.189 & 0.006 \\
+our pipeline: K-means ($K$ known)                  & 982 / 25 & 0.454 & 0.490 & 0.471 & 0.080 & 0.000 \\
+\midrule
+open clusters only, UMAP                           & 665 / 18 & 0.573 & 0.422 & 0.486 & 0.405 & 0.040 \\
+open clusters only, t-SNE                          & 665 / 18 & 0.471 & 0.458 & 0.465 & 0.222 & 0.000 \\
+open clusters only, EVoC                           & 665 / 18 & 0.520 & 0.419 & 0.464 & 0.214 & 0.048 \\
+\bottomrule
+\end{tabular}
+\caption{The published comparison. Rows 2--3 are \textit{their} clustering step
+--- HDBSCAN on the abundances, \texttt{min\_cluster\_size}$=2$, their
+$4 \times 7$ parameter grid, best grid point by $\mathrm{RF}_{40}$ --- run on
+our stars; their configuration is defined in dex, so the raw-abundance row is
+the faithful replication and the standardised row is a rescaling check. Their
+$4 \times 7$ grid never reaches $\mathrm{RF}_{40} > 0.11$ on our stars. Rows
+4--10 are our arms, mean over seven seeds (the $h$, $c$, $V$ columns repeat
+\textbf{Table~\ref{tab:honest}}); the open-cluster subset is the closest
+analogue of their sample. Chance levels, from shuffling the true labels into
+groups of the observed sizes: for their sample shape $V = 0.51$ ($0.44$--$0.51$
+across the three partition shapes tested) and $\mathrm{RF}_{40} = 0.04$ (95th
+percentile $0.10$); for their clustering step run on \emph{our} stars $V = 0.29$
+--- their rule cuts 165 groups, and many small groups inflate the null --- with
+$\mathrm{RF}_{40} \le 0.001$; for our own arms $V = 0.06$--$0.13$ and
+$\mathrm{RF}_{40} \le 0.001$. Source:
+\texttt{results/casamiquela\_comparison*.csv} and
+\texttt{results/casamiquela\_protocol.csv}; the second one also carries the grid
+search.}
+\label{tab:literature}
+\end{table}
+
+Four things follow from that table.
+
+\textbf{Their clustering step recovers less on our stars than on theirs.} Run
+their configuration on our 982 stars and the recovery fraction falls to
+$0.08$ ($0.11$ on the open clusters alone, both being Berkeley~17 and
+NGC~1245), against $0.29$ on their own sample; under the standardised variant it
+returns 168 groups and recovers nothing at all. Two differences remain that we
+cannot separate: our abundances are survey-quality --- $\sim\!0.05$ dex per
+element against their $0.03$ --- and our clusters are not a single evolutionary
+stage.
+
+\textbf{Our two-stage pipeline lands in the same range as their one-stage
+pipeline.} t-SNE and UMAP on 16 survey abundances, with default HDBSCAN, recover
+$0.32$ and $0.33$ of the 25 clusters, and on the 18 open clusters alone --- the
+subset closest to their sample --- UMAP reaches $0.41$. The honest reading is not
+that we beat them. It is that embed-then-cluster on coarser abundances reaches
+the same recovery as cluster-the-abundances on the best abundances available,
+and that neither gets past about a third of the clusters.
+
+\textbf{The failures have the same shape.} Their surviving clusters sit at the
+edges of the abundance distribution --- NGC~6705, NGC~2682, and NGC~2420, which
+they call the most metal-poor cluster in their sample. NGC~2420 is a regular
+recovery of ours too: UMAP recovers it in every seed of the open-cluster subset
+and EVoC in six of seven. Our arms otherwise recover the same handful of
+clusters in every seed --- Berkeley~17, IC~166, M~71, NGC~1245, NGC~6819,
+NGC~7789, the Pleiades --- and that set contains M~3, which \S\ref{sec:clusters}
+introduces as the metal-poor outlier of the sample. Whether this is the same
+edge-of-distribution mechanism their paper describes is a hypothesis this
+workbook does not settle: member evolutionary state is a confound we have not
+yet removed, which is what the \texttt{DWARF\_ONLY} lever of
+\S\ref{sec:assignment} is for.
+
+\textbf{Their field-star test is the published analogue of our Task 2, and it
+agrees.} Adding field stars to their sample leaves one cluster above the 40\,\%
+threshold (NGC~188) and none at 70\,\%. Our field retrieval
+(\textbf{Table~\ref{tab:field}}) agrees in direction and goes further: the best
+abundance-only arm reaches recall $0.20$ at precision $0.24$, and the arms that
+reach high recall do it by labelling most of the field as cluster. Their element
+tests agree with ours too: restricting the set to 8 or 7 elements did not improve
+their recovery, and our dropped-element row in \textbf{Table~\ref{tab:levers}}
+loses recall as well.
+
+\subsection{What this benchmark cannot tell you}
+\label{sec:limitations}
+
+Five limits, in descending order of how much they should trouble a reader.
+
+\begin{enumerate}
+\item \textbf{The sample is small and uneven.} 982 stars across 25 clusters is
+  a few tens of stars per object, and the distribution is wide: M~67 supplies
+  218 stars and the Pleiades 113, while five clusters supply fewer than ten each
+  once the duplicate rows are collapsed (Berkeley~17, NGC~1798, King~5,
+  NGC~2158, King~7 --- \textbf{Table~\ref{tab:clusters}} counts rows, and lists
+  three). \textbf{Table~\ref{tab:ablation}}
+  shows what a single well-populated cluster can do to a result, and every macro
+  average in this chapter is therefore an average over a handful of clusters
+  that are not equally measured. The member frame is itself
+  configuration-dependent: the 1\,002 rows counted in
+  \textbf{Table~\ref{tab:clusters}} need a finite-abundance floor of nine out
+  of sixteen elements, while the shipped default of eight keeps 1\,215 rows ---
+  so the saved baseline scores are not reproducible from a bare
+  \texttt{cluster baseline} run
+  (\texttt{python scripts/population\_counts.py --baseline-min-finite 9}).
+\item \textbf{The member matrix contains duplicated stars.} 298 rows share an
+  \texttt{APOGEE\_ID} with another row, the duplicates differ by
+  $\sim\!0.04$ dex per element, and they inflate the largest clusters most.
+  Until the sample is collapsed to unique stars, every macro average in this
+  chapter is a weighted average over something that is not quite a
+  star.
+\item \textbf{Some rows are not measurements.} The abundances-only t-SNE row
+  is row-order unstable (\S\ref{sec:validation}); the ablation row is
+  degenerate by construction. Both are printed rather than dropped, because
+  the pattern of which arms are fragile is itself a result: the
+  spectral-latent arms are stable, and the raw-abundance t-SNE arm is not.
+\item \textbf{The external comparison is one pipeline, not a survey of the
+  literature.} \S\ref{sec:literature} runs \citet{Casamiquela:21}'s clustering
+  step on our stars and their metric triple on our scores, which is as far as a
+  like-for-like comparison goes without their star list. We do not re-run the
+  graph-attention autoencoder of \citet{Spina:25}, which works on
+  $\sim\!47\,000$ APOGEE stars and deliberately adds kinematics and age to the
+  chemistry, so any claim of state-of-the-art in this space should be read as
+  unaudited.
+\item \textbf{The counter-result stands, and it is not the same measurement.}
+  \citet{Hogg:16} recovered phase-space structure by clustering 15 abundances
+  with K-means, and our K-means row in \textbf{Table~\ref{tab:honest}} matches
+  EVoC's homogeneity. On the recovery fraction it is the weakest arm of the
+  table ($0.08$ against t-SNE's $0.32$), which is the difference between a tidy
+  partition and a recovered cluster: $K$-means is told how many groups to make,
+  so its homogeneity is high by construction, while the density methods have to
+  find the groups. Whatever this workbook demonstrates about the limits of
+  abundance-space clustering, it is a statement about APOGEE's ASPCAP
+  precision, these 25 clusters, and these methods --- not a statement that
+  chemical tagging does not work.
+\end{enumerate}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Reproduce one row of \textbf{Table~\ref{tab:honest}}: pick a signal and
+  a method, run it over the seven seeds, and report mean $\pm$ standard
+  deviation. Compare with the published row. If your numbers differ, is the
+  cause the population, the seed set, or a default?
+\item \textbf{Table~\ref{tab:field}} reports precision for the kinematic
+  referee. Recompute it against the Simbad memberships and plot the
+  difference per cluster. Which clusters are most referee-sensitive, and does
+  that correlate with their age or their [Fe/H]?
+\item The ablation of \textbf{Table~\ref{tab:ablation}} removes M~3. Repeat
+  it for the other clusters with more than 100 rows (M~67, NGC~6819, NGC~2243)
+  and for the duplicates-cleaned matrix. How much of the instability survives
+  cleaning?
+\item \S\ref{sec:literature} runs their pipeline on our stars but not ours on
+  theirs. Their sample reachable star list is not public in a form we can
+  re-run, so state what you would need from the other authors --- and what a
+  re-run on their stars would change about the conclusion of
+  \textbf{Table~\ref{tab:literature}}.
+\end{enumerate}
+\end{issues}

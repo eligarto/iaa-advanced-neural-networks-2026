@@ -1,9 +1,14 @@
 name: day4 tests
 
-# The Day 4 package has 229 tests; this workflow runs the ones that need no real
+# The Day 4 package has 705 tests; this workflow runs the ones that need no real
 # data — synthetic fixtures only — so it is a cheap gate on every change under
-# day_4_clustering/. (The optional torch extra and the PARSEC grid are skipped
-# here.) Cold JIT caches make a first run ~7 min.
+# day_4_clustering/. The 476 workbook-exercise tests are part of that: the two
+# that read the DR19 catalogue carry a `needs_data` skip, and everything else
+# (module contracts, the citation keys resolving against article/references.bib,
+# and every shipped notebook cell compiling) runs dataless.
+#
+# The optional torch extra and the PARSEC grid are skipped here. Measured on a
+# clean environment with no catalogue: 703 passed, 3 skipped, ~5 min.
 
 on:
   workflow_dispatch:
@@ -15,10 +20,21 @@ on:
     branches: [main]
     paths:
       - "day_4_clustering/**"
+      - ".github/workflows/day4-tests.yml"
+
+# A second push to the same PR makes the first run pointless; stop it rather
+# than pay for both. Never cancel a run on main — those gate the image build.
+concurrency:
+  group: day4-tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
   pytest:
     runs-on: ubuntu-24.04
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: day_4_clustering
@@ -34,6 +50,15 @@ jobs:
 
       - name: tests
         run: uv run pytest -q
+
+      # The decks are generated from src/exercises, so the text a student is
+      # asked to run can fall out of step with the modules. This catches drift
+      # in anything rendered into a deck — the workbook prose and the scratch
+      # cell's imports — which is where an exercise once shipped telling
+      # students to `import as`. (Module internals are covered by pytest, not
+      # here: changing a module body alone does not change the decks.)
+      - name: notebook decks match the exercise modules
+        run: uv run python scripts/make_exercise_notebooks.py --check
 
       - name: type check (informational — strict mode is not clean yet)
         continue-on-error: true

@@ -1,0 +1,11 @@
+# LaTeX build products — the PDF and figures/ are deliverables and are kept.
+workbook.aux
+workbook.bbl
+workbook.blg
+workbook.fdb_latexmk
+workbook.fls
+workbook.log
+workbook.out
+workbook.toc
+workbook.run.xml
+build*.log

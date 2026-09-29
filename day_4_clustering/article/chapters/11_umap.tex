@@ -1,0 +1,164 @@
+% 11 · UMAP — fuzzy graphs and a cross-entropy layout
+\section{UMAP: A GRAPH, THEN A LAYOUT}
+\label{sec:umap}
+
+\deckslides{slides 39--42 --- graph, fuzzy edges, layout.}
+
+t-SNE converts a fully connected distance matrix into probabilities and then
+optimises a two-dimensional layout against them. UMAP \citep{McInnes:18} takes
+a different route to a similar-looking picture: build a weighted
+nearest-neighbour graph, decide what that graph's low-dimensional analogue
+should look like, and find positions that make the two agree. The construction
+is more explicit about its assumptions, it is faster, and --- as
+\S\ref{sec:benchmark} shows --- it behaves differently on our data in a way
+that teaches something about both methods.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip5pt}c@{\hskip5pt}c@{}}
+    \fig[0.30]{umap_step1.png} &
+    \fig[0.30]{umap_step2.png} &
+    \fig[0.30]{umap_step3.png}
+  \end{tabular}
+  \caption{UMAP in three moves, from the deck: \panel{a} build the
+  $k$-nearest-neighbour graph of the high-dimensional data; \panel{b} weight
+  its edges by local distance and treat the result as a fuzzy set --- every
+  edge has a probability of existing; \panel{c} lay the graph out in low
+  dimensions so that strong edges are short and the layout stays spread out,
+  by minimising the cross-entropy between the two edge distributions.}
+  \label{fig:umapsteps}
+\end{figure}
+
+\subsection{The high-dimensional graph}
+
+For each point $i$, let $\rho_i$ be the distance to its nearest neighbour ---
+a local connectivity term that makes the metric robust in dense regions ---
+and let $\sigma_i$ be a bandwidth chosen so that the total edge weight out of
+$i$ is a fixed constant:
+
+\begin{equation}
+w_{ij} = \exp\!\left(-\frac{d(i,j) - \rho_i}{\sigma_i}\right).
+\label{eq:umapw}
+\end{equation}
+
+Small distances between close neighbours are saturated at $\exp(0)=1$; the
+bandwidth is solved per point by binary search, exactly as t-SNE solves for
+$\sigma_i$ in \textbf{Equation~\ref{eq:phigh}}, with the target here being
+$\sum_j w_{ij} = \log_2 k$ rather than a perplexity. The result is a directed
+graph, made symmetric by the fuzzy-set union
+$w_{ij} + w_{ji} - w_{ij}w_{ji}$.
+
+Two design decisions are worth naming. First, the graph is built from an
+approximate $k$NN search (NN-descent, \S\ref{sec:knn}), which is why UMAP
+scales to $10^6$ points where t-SNE does not. Second, the graph is
+\emph{local}: edges exist only to the $k$ nearest neighbours, so UMAP never
+sees a long-range distance. Every claim about UMAP preserving ``more global
+structure'' than t-SNE has to be read against that fact --- the long ranges it
+appears to preserve are produced by the layout's initialisation and by the
+repulsion term, not by information in the graph.
+
+\subsection{The low-dimensional half}
+
+In the map, the probability assigned to an edge is a parameterised curve
+
+\begin{equation}
+q_{ij} = \left(1 + a\,\|\mathbf{y}_i - \mathbf{y}_j\|^{2b}\right)^{-1},
+\label{eq:umapq}
+\end{equation}
+
+with $a$ and $b$ fitted so that the curve approximates the shape of the
+high-dimensional weights for the requested \texttt{min\_dist}. The objective is
+the cross-entropy between the two edge distributions, minimised by stochastic
+gradient descent with negative sampling --- a handful of random non-edges
+attracted or repelled per real edge, which is the second reason UMAP is fast.
+
+\begin{marginnote}[]
+\entry{\texttt{n\_neighbors}}{The size of the local graph, and UMAP's analogue
+of perplexity: it sets the scale of structure the layout can see. Small values
+concentrate on very local structure; large values give a more global, blobier
+picture.}
+\entry{\texttt{min\_dist}}{How tightly points may pack in the layout. It
+changes the appearance of density, not the structure found: a low value makes
+clusters look like tight clumps.}
+\end{marginnote}
+
+\subsection{Parameters, and why our defaults are what they are}
+
+UMAP exposes more knobs than t-SNE, and three of them matter here.
+
+\begin{itemize}
+\item \texttt{n\_neighbors} (default 15 in our pipeline, 15 in the library).
+  On the DR17 lever sweep this was the difference between a working and a
+  broken layout: at \texttt{n\_neighbors} $=5$ the recall on M~67 fell from
+  $0.415$ to $0.071$, while at $30$ it was indistinguishable from the default
+  ($0.410$). The lesson generalises: too few neighbours gives a graph that
+  fragments the field, not one that isolates the cluster.
+\item \texttt{metric}. Our matrix is L2-normalised (\S\ref{sec:data}), so
+  Euclidean and cosine distances are monotonically related and the metric
+  should be nearly irrelevant. In the same sweep, forcing
+  \texttt{metric=cosine} cut recall from $0.415$ to $0.044$. The nominal
+  geometry did not change; the implementation's internal handling of the graph
+  did. Report the setting you used.
+\item \texttt{random\_state}. UMAP's optimisation is genuinely stochastic ---
+  unlike the t-SNE rows in our tables, which came out identical across the
+  seven seeds we tried, UMAP's homogeneity spread is $\pm0.011$ on the
+  masked-AE latent. That is small, but it is the same order as some of the
+  gaps quoted between arms.
+\end{itemize}
+
+\begin{figure}[htbp]\centering
+  \fig[0.94]{umap_film.png}
+  \caption{The layout being optimised, four frames of the deck's animation:
+  the graph is embedded with attraction along the edges and repulsion between
+  sampled non-neighbours, and the structure emerges as the cross-entropy
+  falls. There is no phase analogous to t-SNE's early exaggeration; the layout
+  is driven the whole way by the same objective.}
+  \label{fig:umapfilm}
+\end{figure}
+
+\subsection{How it differs from t-SNE in practice}
+
+The two methods answer the same question --- produce a low-dimensional map that
+keeps neighbours together --- and disagree in ways that matter for the rest of
+this workbook:
+
+\begin{itemize}
+\item \textbf{Speed and scaling.} UMAP is the only arm we can run on the full
+  357\,056-star field without sampling; the density-clustering arm of our
+  pipeline therefore defaults to it for field work, and the t-SNE arm is run in
+  region mode or on subsamples.
+\item \textbf{What ``noise'' looks like.} UMAP has no noise model. Everything
+  gets a position, so a cluster in a UMAP map is a density peak and nothing
+  more --- which is why the pipeline clusters the embedding afterwards rather
+  than reading groups off the picture.
+\item \textbf{Blob formation.} On our abundance matrix, UMAP reaches a higher
+  cluster-only homogeneity than t-SNE ($0.578$ vs $0.560$) while producing
+  larger, fewer groups --- and in the field-retrieval task it recovers all
+  978 members at a precision of $0.0013$, that is, by declaring a large part of
+  the field to be cluster members. \textbf{Table~\ref{tab:field}} is the
+  clearest illustration in the workbook of why recall and precision must be
+  read as a pair, and of why the ``which method is better'' question has no
+  answer until the task is specified.
+\end{itemize}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Implement the per-point binary search for $\sigma_i$ in
+  \textbf{Equation~\ref{eq:umapw}} that fixes $\sum_j w_{ij} = \log_2 k$, and
+  verify numerically on a random dataset. Where does the local-connectivity
+  term $\rho_i$ matter most: dense regions or sparse ones?
+\item For a small dataset, compute UMAP's edge weights and then run the
+  layout twice: once with PCA initialisation and once with a random one. Do
+  the two layouts agree on which points are neighbours? Which of them would
+  you publish, and what would you have to state about it?
+\item \texttt{min\_dist} changes the appearance of the map without changing
+  the graph. Using a fixed embedding, vary \texttt{min\_dist} over
+  $\{0.0, 0.1, 0.5, 1.0\}$ and compute the cluster-only homogeneity each time.
+  Does the clustering result move, and does that support or undercut the use
+  of UMAP maps as evidence?
+\item UMAP's repulsion term acts on sampled non-edges, so its notion of
+  ``far'' is an artefact of negative sampling. Construct a small dataset in
+  which the layout places two true clusters far apart and the reverse, by
+  changing only \texttt{random\_state}. What does that imply for reading
+  distances from a published UMAP figure?
+\end{enumerate}
+\end{issues}

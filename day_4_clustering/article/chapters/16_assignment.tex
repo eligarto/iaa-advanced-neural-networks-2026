@@ -1,0 +1,196 @@
+% 16 · The assignment
+\section{THE ASSIGNMENT}
+\label{sec:assignment}
+
+\deckslides{slide 50, the hands-on brief.}
+
+This chapter is the brief. Everything before it is the material you need to
+execute it; everything you need to execute it is in this repository.
+
+\subsection{What you are producing}
+
+One object each --- your assigned cluster --- and one short report. The report
+makes exactly three claims, each with evidence:
+
+\begin{enumerate}
+\item \textbf{A membership list} for your cluster, with the criterion stated
+  precisely enough that another student can reproduce it: the cuts, the
+  parameters, the random seed, the commit hash.
+\item \textbf{An honest score} for that list, against both available referees
+  (kinematic selection and Simbad memberships), reported as recall
+  \emph{and} precision, and with the degenerate cases printed
+  (\S\ref{sec:validation}).
+\item \textbf{One physical parameter} derived from the list --- an isochrone
+  age and distance, or a red-clump distance --- with its uncertainty, and a
+  sentence on how the answer would change if your membership were 20\% larger
+  or smaller.
+\end{enumerate}
+
+A report that claims a method is ``better'' without stating the population,
+the task, the seed count and both halves of the metric pair has not met the
+brief. This is the whole content of \S\ref{sec:validation}, applied to you.
+
+\subsection{Setup}
+
+The environment is reproducible from the repository root:
+
+\begin{verbatim}
+uv sync                     # python + dependencies
+uv run cluster --help       # the CLI
+uv run cluster download     # APOGEE DR19 + GALAH DR4 + Gaia DR3 subsets
+\end{verbatim}
+
+Field runs are the slow ones. For interactive work, set \texttt{CLUSTER\_FAST=1}
+to cap the field sample; every number quoted in this workbook was produced with
+\texttt{CLUSTER\_FAST=0}. A container with the same environment is provided
+(\texttt{Dockerfile}), and the full walkthrough with worked examples is
+\texttt{docs/student\_activities.md}.
+
+\subsection{Your cluster}
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep4pt
+\begin{tabular}{@{}llll@{}}
+\toprule
+cluster & kind & note & suggested track \\
+\midrule
+M~3 & globular & metal-poor ($-1.6$) & A --- spectral wins \\
+M~5 & globular & & A \\
+M~13 & globular & & A \\
+M~15 & globular & metal-poor ($-2.2$), southern & A or C \\
+M~71 & globular & & A \\
+M~107 & globular & southern (DEC $-13^\circ$) & C \\
+M~92 & globular & metal-poor ($-2.3$) & A \\
+Pleiades & open & young ($0.1$ Gyr); chemistry fails here & A (expect a null) \\
+King~7 & open & sparse, faint & A \\
+Berkeley~71 & open & sparse & A \\
+IC~166 & open & sparse, contaminated & A \\
+NGC~2158 & open & & A \\
+NGC~1245 & open & & A \\
+King~5 & open & & A \\
+NGC~7789 & open & giant-rich ($1.4$ Gyr) & B --- clump \\
+NGC~1798 & open & & A \\
+NGC~2420 & open & & A \\
+NGC~6819 & open & giant-rich; clump residual $+0.01$ & B \\
+M~67 & open & the workhorse; most data to beat & C (or A) \\
+Berkeley~66 & open & sparse & A \\
+NGC~188 & open & old ($7.6$ Gyr) & B \\
+NGC~6791 & open & old, metal-rich ($+0.4$) & B (or A) \\
+Berkeley~17 & open & & A \\
+NGC~2243 & open & the sweet spot: main sequence \emph{and} clump & B or C \\
+Collinder~261 & open & the sweet spot: 214 GALAH members & C \\
+\bottomrule
+\end{tabular}
+\caption{The 25 clusters and the track each one suggests. Track assignments
+are advisory; the reasons are in the notes and in
+\S\ref{sec:benchmark}--\S\ref{sec:physics}. Metadata for every cluster,
+including the literature ages and distances you will be scored against, is in
+\texttt{src/cluster/literature.py}.}
+\label{tab:assignment}
+\end{table}
+
+Pair up on the open clusters; they are the hard part. Globulars tag cleanly
+already, which makes them a faster and solo-friendly track --- and it is worth
+asking, while you work on one, why that is (\S\ref{sec:benchmark}: metallicity,
+age and the absence of recent star formation all push in the same direction).
+
+\subsection{The three tracks}
+
+\textbf{Track A --- spectral embeddings.} Compare the 16 abundances with the
+256-dimensional spectral latent on your cluster:
+
+\begin{verbatim}
+uv run cluster run --spectral data/embeddings/attention_broad_merged.parquet
+\end{verbatim}
+
+Best on the metal-poor globulars, where element ratios lose discriminating
+power and the spectrum retains it. Expect a null result on the Pleiades, and
+report it as a result.
+
+\textbf{Track B --- isochrones and the red clump.} Recover age and distance:
+
+\begin{verbatim}
+uv run python scripts/red_clump.py
+uv run python scripts/sweet_spot.py
+\end{verbatim}
+
+Best on the giant-rich open clusters (NGC~6819, NGC~7789). Compare against
+\texttt{src/cluster/literature.py} and be explicit about the age--metallicity
+degeneracy of \S 15.1.
+
+\textbf{Track C --- two surveys.} GALAH main sequence plus APOGEE giants:
+
+\begin{verbatim}
+uv run python scripts/build_galah_apogee.py
+uv run python scripts/rerun_combined.py
+\end{verbatim}
+
+Southern clusters only (DEC $\lesssim +25^\circ$). This is the track with the
+largest payoff and the largest number of ways to go quietly wrong: the parallax
+relaxation is required, not optional, and the two surveys' abundance scales must
+be reconciled before the combined fit means anything.
+
+\subsection{Levers you may turn}
+
+One axis at a time, and log the configuration each time --- the sweep in
+\textbf{Table~\ref{tab:levers}} was only interpretable because every run
+recorded its settings.
+
+\begin{table}[htbp]
+\centering
+\small
+\tabcolsep5pt
+\begin{tabular}{@{}lll@{}}
+\toprule
+lever & where & what it changes \\
+\midrule
+\texttt{TSNE.perplexity} & \texttt{src/cluster/config.py} & neighbourhood size of the embedding \\
+\texttt{UMAP.n\_neighbors} & \texttt{src/cluster/config.py} & local graph scale \\
+\texttt{HDBSCAN.min\_cluster\_size} & \texttt{src/cluster/config.py} & the size floor (removed by EVoC) \\
+\texttt{SNR\_MIN} & environment & sample quality \\
+\texttt{NORMALIZE\_ROWS} & environment & Euclidean $\leftrightarrow$ cosine equivalence \\
+\texttt{USE\_ELEMENT\_WEIGHTS} & environment & element weighting, post-standardisation \\
+\texttt{DWARF\_ONLY} & environment & giant/dwarf selection \\
+\bottomrule
+\end{tabular}
+\caption{The levers, and the one rule that applies to all of them: change one
+at a time, and report the effect with both halves of the metric pair. The
+test-suite defaults are in \texttt{src/cluster/config.py}; the measured effects
+on the DR17 sample are in \texttt{docs/experiment\_results.md}, and they do not
+all survive on the current data.}
+\label{tab:levers2}
+\end{table}
+
+\subsection{How you are assessed}
+
+\begin{issues}[THE RUBRIC]
+\textbf{Reproducibility (40\%).} A second person, on a clean checkout, gets
+your numbers. Configuration, seed, commit hash and the exact command are in
+your report. If you used a subsample, say how it was drawn.
+
+\textbf{Empirical care (40\%).} Both referees. Both halves of recall and
+precision. Mean $\pm$ s.d. over at least three seeds for any stochastic step.
+The largest-group fraction printed. A null result reported as a null result ---
+a cluster that chemistry cannot separate is a finding, not a failure.
+
+\textbf{Physics (20\%).} One parameter with an uncertainty, a comparison with
+the literature value, and an honest statement of the dominant systematic ---
+which in most cases will be your membership list, not your photometry.
+\end{issues}
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Write the one-paragraph methods section of your report before you run
+  anything: the population, the cuts, the method, the seed, the metrics, the
+  referees. If you cannot write it, you are not ready to run.
+\item Take a published tagging result in the field --- a table of members, or a
+  claimed purity --- and try to score it with this workbook's protocol. What
+  information is missing from the paper, and what would you have asked the
+  authors for?
+\item Your cluster is listed with a suggested track. Write two sentences
+  arguing for the other track, using only the cluster's properties (age,
+  metallicity, declination, richness).
+\end{enumerate}
+\end{issues}

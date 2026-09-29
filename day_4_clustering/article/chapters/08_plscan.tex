@@ -1,0 +1,141 @@
+% 08 · PLSCAN — persistence instead of a size floor
+\section{PLSCAN: DROPPING THE SIZE FLOOR}
+\label{sec:plscan}
+
+\deckslides{slides 27--31 --- peaks, persistence, and the bars that survive.}
+
+HDBSCAN$^*$ removed DBSCAN's density threshold but kept a single global
+\texttt{min\_cluster\_size}: a point count, below which a structure is treated
+as noise. That floor is a bad fit for our sample, where clusters range from 6
+to 230 members. PLSCAN --- persistent multiscale density-based clustering,
+\citet{Bot:25} --- takes the last step and removes it, replacing ``is this
+group big enough?'' with ``how long does this group persist?''.
+
+\subsection{Scale-space, and what persistence measures}
+
+The idea comes from topological data analysis. Rather than committing to one
+density threshold, consider the whole family of density estimates obtained by
+smoothing the data at every scale. A real cluster appears as a \emph{peak}
+that stays separate from its neighbours as the scale changes; a fluctuation
+appears as a peak that is absorbed almost immediately. The range of scales
+over which a peak exists as an independent object is its \emph{persistence},
+and it is a statement about the data's structure rather than about a count.
+
+The algorithm builds this structure explicitly:
+
+\begin{enumerate}
+\item \textbf{Scale-space.} Estimate the density field over a range of scales
+  (equivalently: over a range of effective minimum cluster sizes), tracking the
+  peaks at each scale.
+\item \textbf{Leaf tree.} Record the peaks and their merges as a tree, where a
+  \emph{leaf} is a density peak that exists in its own right --- the analogue
+  of the branches of the HDBSCAN$^*$ condensed tree, but indexed by scale
+  rather than by $k$-th-neighbour distance.
+\item \textbf{Persistence trace.} For each leaf, measure the interval of scale
+  over which the cluster survives as a separate object. Clusters by
+  construction cannot be shorter-lived than their own persistence, which is
+  what makes the criterion self-consistent.
+\item \textbf{Selection.} Rate every cut of the leaf tree by the total
+  persistence of the leaves it keeps, and take the cut with the highest total
+  persistence; read off the labels at that cut.
+\end{enumerate}
+
+\begin{marginnote}[]
+\entry{Persistence}{The range of minimum cluster sizes over which a cluster
+exists as a separate structure, $s_{\max} - s_{\min}$ \citep{Bot:25}. A
+long-lived peak is structure; a short-lived one is noise. It is measured in
+stars --- the same units as the size floor it replaces --- which is why a
+6-member cluster can outlive a 60-member fluctuation.}
+\entry{Barcode}{One horizontal bar per cluster, its length equal to its
+persistence, drawn on a common scale axis. Reading the barcode is the whole
+selection step.}
+\end{marginnote}
+
+\begin{figure}[htbp]\centering
+  \fig[0.94]{plscan_film.png}
+  \caption{The persistence sweep, four frames of the deck's animation: the
+  minimum-cluster-size axis is swept, and each peak's bar grows for as long as
+  that peak remains a distinct cluster. Bars that stop early are fluctuations;
+  bars that run the length of the sweep are structure.}
+  \label{fig:plscanfim}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{@{}c@{\hskip5pt}c@{\hskip5pt}c@{}}
+    \fig[0.30]{plscan_step1.png} &
+    \fig[0.30]{plscan_step2.png} &
+    \fig[0.30]{plscan_step3.png}
+  \end{tabular}
+  \caption{The three moves: \panel{a} find the density peaks; \panel{b} measure
+  each peak's persistence and draw the barcode; \panel{c} keep the bars of the
+  cut with the largest total persistence. The barcode replaces the size floor
+  with a quantity measured over a range of sizes; the neighbour count $k$ that
+  defines the core distance is still a choice, and when the trace has several
+  peaks, so is which peak to report.}
+  \label{fig:plscansteps}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \fig[0.78]{plscan_barcode.png}
+  \caption{A three-peak density profile and its persistence barcode. The
+  vertical extent of each bar is the range of ``minimum cluster size'' over
+  which the corresponding cluster exists; the horizontal position identifies
+  the peak. A min-cluster-size floor would cut all three bars at the same
+  height, which is exactly the assumption PLSCAN avoids.}
+  \label{fig:plscanbarcode}
+\end{figure}
+
+\subsection{What changes, and what does not}
+
+Two honest statements, because the summary of this method is often oversold.
+
+\textbf{What changes.} The criterion for ``is this a cluster?'' is no longer
+a single size. A 6-member cluster that is a strong, long-lived density peak
+survives; a 60-member fluctuation that dissolves as soon as the scale changes
+does not, because the cut through the leaf tree is chosen by the trace over all
+cuts rather than fixed in advance. That is the behaviour our sample needs, where
+M~67 (230 members) and NGC~2158 (6 members) must be judged by the same rule.
+What changes is not the units but who chooses: persistence is measured in stars,
+and the data pick the value.
+
+\textbf{What does not change.} The cut is still a choice --- PLSCAN makes it
+automatically, by maximum total persistence, not without assumptions. The
+neighbour count $k$ that sets the core distance is still an input, and their
+own sensitivity study is the evidence that this matters less than HDBSCAN$^*$'s
+size threshold. The assumption is moved to a quantity whose meaning is more
+stable across datasets, and it is made explicit in the barcode, where a user can
+see what a different cut would cost.
+Nor does any of this repair a bad space: if the field and the clusters are not
+separated in the geometry, no persistence criterion will separate them.
+
+\subsection{Where it appears in this workbook}
+
+PLSCAN enters our pipeline through EVoC, and that is worth understanding
+before \S\ref{sec:evoc}. EVoC's final step sweeps the clustering of its
+internal node embedding across scales, scores each resulting layer by the
+total persistence of the clusters it contains, and returns the best-scoring
+layer's labels. That is the PLSCAN idea used as a \emph{model-selection rule}
+inside a larger algorithm --- the reason EVoC needs no
+\texttt{min\_cluster\_size} from the user even though the density clustering
+inside it would otherwise want one. On the deck's own terminology: the first
+two columns of the EVoC pipeline come from UMAP's graph machinery, the middle
+from HDBSCAN$^*$, and the last from PLSCAN.
+
+\begin{issues}[EXERCISES]
+\begin{enumerate}
+\item Sketch a one-dimensional density with three peaks of different heights
+  and widths. For each peak, mark the interval of smoothing scale over which
+  it survives as a separate peak, and draw the resulting barcode. Now add a
+  fourth peak that is real but tiny --- 2\% of the mass of the smallest other
+  peak. Does the barcode distinguish it from a fluctuation?
+\item In HDBSCAN$^*$ terms, what is the difference between ``this branch is
+  shorter than \texttt{min\_cluster\_size}'' and ``this branch is shorter-lived
+  than the others''? Construct a dataset where the two rules give different
+  answers, and say which you would trust.
+\item The persistence of a cluster is a range of minimum cluster sizes, i.e.\
+  a number of stars (their Eq.~7). Using the member counts of
+  \textbf{Table~\ref{tab:clusters}}, work out what a persistence of a given
+  value implies for M~67 and for NGC~2158, and argue whether the same cut can
+  serve both.
+\end{enumerate}
+\end{issues}

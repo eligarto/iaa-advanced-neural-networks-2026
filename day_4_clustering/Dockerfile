@@ -42,6 +42,15 @@ COPY hf ./hf
 ARG WITH_TORCH=""
 RUN uv sync --frozen --no-dev ${WITH_TORCH:+--extra torch} --no-cache
 
+# The exercise answers cite the workbook bibliography at *runtime*: every module
+# builds its `references` block from `article/references.bib` as it is imported,
+# so without this file every deck cell dies with
+#   FileNotFoundError: bibliography not found: /app/article/references.bib
+# Only the .bib is needed to run the decks — the workbook sources, figures and
+# PDF are not (.dockerignore drops *.pdf anyway). Copied after `uv sync` on
+# purpose: editing the bibliography must not invalidate the dependency layer.
+COPY article/references.bib ./article/references.bib
+
 # --- runtime: the slim image students pull ---------------------------------
 FROM python:3.13.15-slim
 
