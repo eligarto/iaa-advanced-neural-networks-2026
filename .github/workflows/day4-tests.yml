@@ -1,14 +1,14 @@
 name: day4 tests
 
-# The Day 4 package has 705 tests; this workflow runs the ones that need no real
+# The Day 4 package has 887 tests; this workflow runs the ones that need no real
 # data — synthetic fixtures only — so it is a cheap gate on every change under
-# day_4_clustering/. The 476 workbook-exercise tests are part of that: the two
+# day_4_clustering/. The workbook-exercise tests are part of that: the two
 # that read the DR19 catalogue carry a `needs_data` skip, and everything else
 # (module contracts, the citation keys resolving against article/references.bib,
 # and every shipped notebook cell compiling) runs dataless.
 #
 # The optional torch extra and the PARSEC grid are skipped here. Measured on a
-# clean environment with no catalogue: 703 passed, 3 skipped, ~5 min.
+# clean environment with no catalogue: 884 passed, 3 skipped, ~5 min.
 
 on:
   workflow_dispatch:
