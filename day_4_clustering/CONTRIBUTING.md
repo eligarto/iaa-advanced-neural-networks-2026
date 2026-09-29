@@ -36,11 +36,17 @@ mentioned forking. **You do not need a second clone.** A clone is not bound to
 the repository it came from; the remote is just a URL in `.git/config`, and
 renaming it costs nothing.
 
-Re-cloning, on the other hand, is genuinely expensive here: the checkout pulls
-a 1.3 GB Git-LFS archive belonging to Day 1, and you would then re-download the
-~2.2 GB of DR19 data under `day_4_clustering/data/` (gitignored, so a fresh
-clone does not carry it) and rebuild the virtual environment. That is several
-gigabytes and a long wait to arrive exactly where you already are.
+Re-cloning, on the other hand, is genuinely expensive here — roughly 5 GB and a
+long wait to arrive exactly where you already are:
+
+| What | Size | Why a fresh clone pays for it again |
+|---|---|---|
+| `day1_radio_surveys/…LoTSS_raw.tar.gz` | 1.3 GB | Git-LFS archive belonging to Day 1, fetched on checkout |
+| `day_4_clustering/data/` | ~2.2 GB | Gitignored, so the clone does not carry it — you re-download DR19 |
+| `day_4_clustering/.venv/` | ~1.4 GB | Gitignored, so `uv sync` has to rebuild it |
+
+On conference wifi that is the difference between a two-minute fix and a lost
+afternoon.
 
 Fork it on GitHub first, then, **from inside your existing clone**:
 
@@ -48,8 +54,21 @@ Fork it on GitHub first, then, **from inside your existing clone**:
 git remote rename origin upstream                 # the original becomes 'upstream'
 git remote add origin https://github.com/<your-username>/iaa-advanced-neural-networks-2026.git
 git fetch origin
-git remote -v                                     # origin = your fork, upstream = the original
 ```
+
+Check it worked — you should see exactly two remotes, pointing at two different
+repositories:
+
+```console
+$ git remote -v
+origin    https://github.com/<your-username>/iaa-advanced-neural-networks-2026.git (fetch)
+origin    https://github.com/<your-username>/iaa-advanced-neural-networks-2026.git (push)
+upstream  https://github.com/iaa-so-training/iaa-advanced-neural-networks-2026.git (fetch)
+upstream  https://github.com/iaa-so-training/iaa-advanced-neural-networks-2026.git (push)
+```
+
+If `origin` still shows `iaa-so-training`, the rename did not take effect and
+your pushes will be rejected — run the three commands again.
 
 Nothing in your working tree is touched — uncommitted edits, notebooks, the
 downloaded data and `.venv` all stay exactly where they are. Afterwards
