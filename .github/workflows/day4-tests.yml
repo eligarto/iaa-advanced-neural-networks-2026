@@ -42,7 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v10
+      # astral-sh publishes no moving v10 tag (major tags stop at v7, which is the
+      # older series), so this pins the exact current release. Bump it deliberately.
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
