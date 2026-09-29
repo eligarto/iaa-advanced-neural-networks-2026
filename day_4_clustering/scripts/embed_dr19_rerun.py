@@ -106,7 +106,7 @@ def verify(flux_csv: str) -> None:
     print(f"checkpoint reproduction on {len(ids)} DR19 stars: "
           f"max |Δ| = {delta:.2e}, mean rel = {rel:.1%}")
     print("=> PASS, preprocessing + checkpoint confirmed" if delta < 1e-4
-          else "=> MISMATCH — do not re-embed until this is understood")
+          else "=> MISMATCH. Do not re-embed until this is understood")
 
 
 def download(urls: pd.DataFrame) -> None:

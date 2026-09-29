@@ -1,4 +1,4 @@
-% 02 · The data — surveys, abundance space, kinematic truth, the cluster set
+% 02 · The data: surveys, abundance space, kinematic truth, the cluster set
 \section{THE DATA}
 \label{sec:data}
 
@@ -7,8 +7,8 @@
 Three surveys supply everything this workbook measures. APOGEE provides the
 chemistry, Gaia the astrometry and radial velocities, and GALAH the southern
 main sequence that appears in \S\ref{sec:physics}. The samples are built from
-public data releases, and the whole pipeline --- download, quality cuts,
-membership, matrices --- is reproducible with three commands
+public data releases, and the whole pipeline (download, quality cuts,
+membership, matrices) is reproducible with three commands
 (\S\ref{sec:howtorun}).
 
 \subsection{APOGEE: abundances for giants}
@@ -22,18 +22,18 @@ this project: it sees through the dust that hides the inner disc, and it
 targets cool giants, which are bright enough to be observed across the whole
 Galaxy.
 
-Until recently the abundances came from the ASPCAP pipeline. The SDSS-V
-release used here --- DR19 \texttt{astraAllStarASPCAP} \citep{Almeida:23},
-$1.17$ GB, $1\,095\,480$ targets --- is produced by its successor, the
-\emph{Astra} framework. The transfer is not cosmetic; two schema changes are
-worth knowing about because they bite silently rather than loudly:
+Until recently the abundances came from the ASPCAP pipeline. The SDSS-V release
+used here (DR19 \texttt{astraAllStarASPCAP} \citep{Almeida:23}, $1.17$ GB,
+$1\,095\,480$ targets) is produced by its successor, the \emph{Astra}
+framework. The transfer is not cosmetic; two schema changes are worth knowing
+about because they bite silently rather than loudly:
 
 \begin{itemize}
 \item abundances are published as \emph{$[$X/H$]$}, not $[$X/Fe$]$ under a
   different name, so element ratios must be formed explicitly as
   $[$X/Fe$] = [$X/H$] - [$Fe/H$]$;
-\item the quality flags were renamed --- \texttt{ASPCAPFLAG} became
-  \texttt{flag\_bad}, \texttt{STARFLAG} became \texttt{spectrum\_flags}.
+\item the quality flags were renamed: \texttt{ASPCAPFLAG} became
+\texttt{flag\_bad}, \texttt{STARFLAG} became \texttt{spectrum\_flags}.
 \end{itemize}
 
 DR19 also reanalyses rather than replaces DR17: 717\,689 of its rows carry
@@ -42,13 +42,12 @@ That detail becomes important in \textbf{Section~\ref{sec:spectral}}, where an
 earlier version of our benchmark was nearly derailed by mixing data
 \emph{products} from the two.
 
-\begin{marginnote}[]
-\entry{ASPCAP / Astra}{The abundance pipelines: ASPCAP up to SDSS-IV DR17,
-Astra from SDSS-V DR19 onwards. Same philosophy --- fit synthetic spectra
-to the observation --- different catalogues and column names.}
+\begin{marginnote}[] \entry{ASPCAP / Astra}{The abundance pipelines: ASPCAP up
+to SDSS-IV DR17, Astra from SDSS-V DR19 onwards. Same philosophy (fit synthetic
+spectra to the observation) different catalogues and column names.}
 \entry{Abundance precision}{The per-element statistical error on $[$X/H$]$,
-typically $0.02$--$0.1$ dex for APOGEE giants, depending on the element and
-the signal-to-noise ratio. It sets the ceiling on what chemistry can tag.}
+typically $0.02$--$0.1$ dex for APOGEE giants, depending on the element and the
+signal-to-noise ratio. It sets the ceiling on what chemistry can tag.}
 \end{marginnote}
 
 \subsection{Gaia and GALAH: the referee and the main sequence}
@@ -78,18 +77,17 @@ we have hit.
   zero, stellar flag zero. Cuts this aggressive remove the noisy tail at the
   cost of sample size; loosening them changes the answer
   (\S\ref{sec:benchmark}, the levers).
-\item \textbf{The element set.} C, N, O, Na, Mg, Al, Si, S, K, Ca, Ti, V,
-  Cr, Mn, Ni --- the $\alpha$ and iron-peak elements --- plus $[$Fe/H$]$ as
-  the sixteenth coordinate. This is the set used by the reference papers, so
-  results are comparable with them.
-\item \textbf{Missing values.} Weak lines go undetected in metal-poor stars
-  and their abundances come back as NaN. Dropping every star with a NaN
-  deletes the metal-poor globulars \emph{entirely} --- M~15 and M~92 vanish
-  from the sample, and with them the cleanest tagging cases in the whole
-  project. We therefore keep stars with at least 8 of 16 finite elements and
-  fill the remaining gaps with the column median. This single choice is the
-  difference between a sample that contains the interesting objects and one
-  that does not.
+\item \textbf{The element set.} C, N, O, Na, Mg, Al, Si, S, K, Ca, Ti, V, Cr,
+Mn, Ni (the $\alpha$ and iron-peak elements) plus $[$Fe/H$]$ as the sixteenth
+coordinate. This is the set used by the reference papers, so results are
+comparable with them.
+\item \textbf{Missing values.} Weak lines go undetected in metal-poor stars and
+their abundances come back as NaN. Dropping every star with a NaN deletes the
+metal-poor globulars \emph{entirely}: M~15 and M~92 vanish from the sample, and
+with them the cleanest tagging cases in the whole project. We therefore keep
+stars with at least 8 of 16 finite elements and fill the remaining gaps with
+the column median. This single choice is the difference between a sample that
+contains the interesting objects and one that does not.
 \item \textbf{Standardisation.} Each element is shifted to zero median and
   scaled to unit standard deviation, so that no element dominates the distance
   metric by virtue of its units. (An early bug in this project applied
@@ -106,13 +104,12 @@ we have hit.
 
 \begin{figure}[htbp]\centering
   \fig[0.62]{cspace.png}
-  \caption{The shape of the problem, in two of the sixteen dimensions (from
-  the deck). Field stars in grey; the members of one cluster in red. The
-  cluster is a tight, slightly elongated clump embedded in a cloud several
-  orders of magnitude larger --- a small overdensity in a big, structured
-  background. Everything in
-  \S\ref{sec:fundamentals}--\S\ref{sec:evoc} is a strategy for finding
-  objects like this one.}
+  \caption{The shape of the problem, in two of the sixteen dimensions (from the
+  deck). Field stars in grey; the members of one cluster in red. The cluster is
+  a tight, slightly elongated clump embedded in a cloud several orders of
+  magnitude larger: a small overdensity in a big, structured background.
+  Everything in \S\ref{sec:fundamentals}--\S\ref{sec:evoc} is a strategy for
+  finding objects like this one.}
   \label{fig:cspace}
 \end{figure}
 
@@ -129,17 +126,17 @@ centre, to label each star \emph{member} or \emph{field}.
 The circularity risk is obvious: if kinematics are used to build the labels,
 then a method that receives kinematics as an input is being scored on its own
 input. We therefore treat kinematics as a \emph{ceiling}, not a competing
-signal --- the number that says how well \emph{any} chemistry-based method
-could possibly do on this sample. Published cluster catalogues provide an
-independent cross-check: scoring against Simbad memberships gives numbers
-within a few percent of the kinematic ones, and both are reported in the
-benchmark \citep{Dias:02, Harris:96}.
+signal. The number that says how well \emph{any} chemistry-based method could
+possibly do on this sample. Published cluster catalogues provide an independent
+cross-check: scoring against Simbad memberships gives numbers within a few
+percent of the kinematic ones, and both are reported in the benchmark
+\citep{Dias:02, Harris:96}.
 
 \subsection{The cluster set}
 \label{sec:clusters}
 
 The target list is the 23 clusters of \citet{GarciaDias:19} plus the Pleiades
-of \citet{Kos:17} --- and, for the two-survey work, the southern open clusters
+of \citet{Kos:17}, and, for the two-survey work, the southern open clusters
 NGC~2243 and Collinder~261. Twenty-five objects in total: seven globular and
 eighteen open. They span two orders of magnitude in age, from the Pleiades at
 $\sim\!100$ Myr to NGC~188 at $7.6$ Gyr, and two orders of magnitude in mass.
@@ -182,12 +179,11 @@ Total: 1\,002 members in 25 clusters.}\\
 \hline
 \end{tabular}
 \end{center}
-\begin{tabnote}
-Counts from the full-sky DR19 run (\texttt{cluster run}), field star cap
-disabled, on the member frame the DR19 baseline scores --- every member row
-with at least nine finite abundances out of sixteen. Reproduce with
-\texttt{python scripts/population\_counts.py --baseline-min-finite 9};
-the counts are identical for any floor between nine and fifteen. Member counts
+\begin{tabnote} Counts from the full-sky DR19 run (\texttt{cluster run}), field
+star cap disabled, on the member frame the DR19 baseline scores: every member
+row with at least nine finite abundances out of sixteen. Reproduce with
+\texttt{python scripts/population\_counts.py --baseline-min-finite 9}; the
+counts are identical for any floor between nine and fifteen. Member counts
 differ slightly between runs because the clustering must first find a group
 before its overlap with the truth can be measured; these are the truth-side
 counts.
@@ -257,8 +253,8 @@ element weights & off \\
 \end{tabular}
 \caption{The pipeline's settings for every number in this workbook, unless a
 variant is named. Overrides are environment variables with the
-\texttt{CLUSTER\_} prefix --- \texttt{CLUSTER\_NORMALIZE\_ROWS=0} is the one
-that most changes the answer.}
+\texttt{CLUSTER\_} prefix. \texttt{CLUSTER\_NORMALIZE\_ROWS=0} is the one that
+most changes the answer.}
 \label{tab:config}
 \end{table}
 

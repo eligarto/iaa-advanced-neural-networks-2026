@@ -3,7 +3,7 @@
 GALAH DR4 (galah_dr4_allstar_240705.fits, Data Central) ships stellar
 parameters + ``[X/Fe]`` abundances and a Gaia DR3 crossmatch VAC
 (``galah_dr4_vac_wise_tmass_gaiadr3_240705.fits``) with parallax/PM/RV, so
-no astroquery cone crossmatch is needed — just two local FITS files joined on
+no astroquery cone crossmatch is needed: just two local FITS files joined on
 ``sobject_id``.
 
 For each covered cluster:

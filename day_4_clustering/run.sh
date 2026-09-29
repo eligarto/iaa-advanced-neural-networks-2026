@@ -2,7 +2,7 @@
 # ---------------------------------------------------------------------------
 # OPTIONAL shortcut for the exact commands in README.md / docs/docker.md.
 #
-# You do not need this file — it only saves typing the mount flags:
+# You do not need this file: it only saves typing the mount flags:
 #
 #   ./run.sh download --all    ==  docker run --rm -it \
 #                                    -v "$PWD/data:/app/data" -v "$PWD/results:/app/results" \
@@ -57,7 +57,7 @@ ensure_image() {
   if docker image inspect "$TAG" >/dev/null 2>&1; then
     return 0
   fi
-  echo "▸ No local '$TAG' image yet — trying the prebuilt one:"
+  echo "▸ No local '$TAG' image yet: trying the prebuilt one:"
   echo "    $IMAGE"
   if docker pull "$IMAGE" >/dev/null 2>&1; then
     docker tag "$IMAGE" "$TAG"
@@ -65,7 +65,7 @@ ensure_image() {
     return 0
   fi
   echo "  Not available (it is published from the workshop repository once merged)."
-  echo "▸ Building it locally from this folder — a few minutes, once:"
+  echo "▸ Building it locally from this folder: a few minutes, once:"
   docker build -t "$TAG" "$HERE"
 }
 
@@ -82,7 +82,7 @@ case "${1:-}" in
   lab|jupyter|notebook)
     ensure_image
     shift
-    echo "▸ JupyterLab starting — open http://localhost:8889 (no password). Ctrl-C to stop."
+    echo "▸ JupyterLab starting: open http://localhost:8889 (no password). Ctrl-C to stop."
     exec docker run "${COMMON_ARGS[@]}" ${TTY_ARGS[@]+"${TTY_ARGS[@]}"} -p 8889:8889 "$TAG" \
       uv run jupyter lab --ip=0.0.0.0 --port=8889 --no-browser --IdentityProvider.token="" notebooks "$@"
     ;;

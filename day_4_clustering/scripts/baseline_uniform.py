@@ -128,7 +128,7 @@ def main() -> None:
         yp = part["cluster"].to_numpy()
         cm = confusion_matrix_frame(yp, preds[tag])
         suffix = "kin" if use_kin else "chem"
-        title = f"t-SNE — {'abundances + kinematics' if use_kin else 'abundances only'}"
+        title = f"t-SNE: {'abundances + kinematics' if use_kin else 'abundances only'}"
         plot_confusion(cm, outdir / f"confusion_tsne_{suffix}.png", title=title)
         cm.to_csv(outdir / f"confusion_tsne_{suffix}.csv")
         print(f"{label}: t-SNE cluster counts over row orders {dict(counts)}; "

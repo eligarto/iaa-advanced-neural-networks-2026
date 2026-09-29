@@ -1,4 +1,4 @@
-"""Chapter 4, exercise 1 — why Lloyd's algorithm stops, and where it stops.
+"""Chapter 4, exercise 1: why Lloyd's algorithm stops, and where it stops.
 
     Show that the assignment and update steps each cannot increase J, and
     conclude that the algorithm terminates. Then construct a one-dimensional
@@ -8,7 +8,7 @@
 The proof is \\S 4.2 written out, and the counterexample is the reason
 \\S 4.3 treats initialisation as a modelling decision rather than a detail.
 The construction is worth doing carefully: the obvious candidate, three
-points at 0, 1, 3, does *not* work — every starting pair either reaches the
+points at 0, 1, 3, does *not* work: every starting pair either reaches the
 global optimum or collapses to one centre. The points 0, 1, 2.5 do work, and
 :func:`solve` proves it by enumerating every partition and every start.
 """
@@ -209,7 +209,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The two partitions, and J along both runs."""
     import matplotlib.pyplot as plt
 
@@ -247,7 +247,7 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
         ax.plot(range(len(trace)), trace["J"], "o-", color=colour, label=label)
     ax.set_xlabel("half-step (assign, update, assign, ...)")
     ax.set_ylabel("J")
-    ax.set_title("J never rises — but it stops in different places")
+    ax.set_title("J never rises, but it stops in different places")
     ax.legend(frameon=False, fontsize=8)
     fig.tight_layout()
     return fig
@@ -257,7 +257,7 @@ ANSWER: dict[str, object] = {
     "the assignment step cannot increase J": (
         "Hold the centres fixed. J = sum over points of ||x - mu(x)||^2 "
         "where mu(x) is the centre x is assigned to, and the terms are "
-        "independent across points — no constraint couples them. Assigning "
+        "independent across points, no constraint couples them. Assigning "
         "each x to argmin_k ||x - mu_k||^2 therefore minimises every term "
         "separately, so it minimises the sum. The step replaces each term by "
         "a value that is by construction no larger than its previous value, "
@@ -269,7 +269,7 @@ ANSWER: dict[str, object] = {
         "sum_k sum_{x in C_k} ||x - mu_k||^2, and the clusters are now "
         "independent. For one cluster, f(mu) = sum ||x - mu||^2 is a convex "
         "quadratic in mu with grad f = -2 sum (x - mu) = 0 at "
-        "mu = (1/|C_k|) sum x — the arithmetic mean, and the unique "
+        "mu = (1/|C_k|) sum x. The arithmetic mean, and the unique "
         "minimiser since the Hessian 2|C_k| I is positive definite. So "
         "moving each centre to its members' mean minimises each term, hence "
         "J_new <= J_old. This is §4.1's remark that the second half of "
@@ -277,8 +277,8 @@ ANSWER: dict[str, object] = {
         "first."
     ),
     "why it terminates": (
-        "J is non-increasing along the loop, bounded below by 0, and — the "
-        "step that actually closes the argument — takes only finitely many "
+        "J is non-increasing along the loop, bounded below by 0, and: the "
+        "step that actually closes the argument: takes only finitely many "
         "values, because after each update the centres are determined by the "
         "assignment and there are at most K^n assignments of n points to K "
         "groups. A non-increasing sequence over a finite set must become "
@@ -287,7 +287,7 @@ ANSWER: dict[str, object] = {
         "fixed point. Note what this does *not* prove: nothing bounds how "
         "good that fixed point is, and nothing bounds the iteration count "
         "better than K^n (in practice a few dozen). Ties need a tie-break "
-        "rule — assign to the lowest index, say — or a point can oscillate "
+        "rule (assign to the lowest index, say) or a point can oscillate "
         "between two equidistant centres forever at constant J. The argument "
         "is the standard one for the two-move loop of "
         f"{cite('Lloyd:82', parenthetical=False)}, the modern formulation of "
@@ -303,10 +303,10 @@ ANSWER: dict[str, object] = {
         "{0}|{1,2.5} has J = 1.125, {0,2.5}|{1} has J = 3.125. The global "
         "optimum is J = 0.5. Now run Lloyd from centres (-2, 4): the first "
         "assignment puts {0,1} left and {2.5} right, the centres move to 0.5 "
-        "and 2.5, nothing changes, J = 0.5 — the optimum. Run it instead "
+        "and 2.5, nothing changes, J = 0.5: the optimum. Run it instead "
         "from (-2, 2): the first assignment puts {0} left and {1, 2.5} "
         "right, centres move to 0.0 and 1.75, and that is already a fixed "
-        "point — 1 is closer to 1.75 than to 0.0, so no point changes hands. "
+        "point: 1 is closer to 1.75 than to 0.0, so no point changes hands. "
         "J = 1.125, which is 2.25x the optimum. Same data, same algorithm, "
         "different seed, and J decreased monotonically in both runs."
     ),
@@ -315,21 +315,21 @@ ANSWER: dict[str, object] = {
         "[-2, 5]: 1 117 starts reach the global optimum J = 0.500, 621 "
         "starts reach the local optimum J = 1.125, and 747 starts collapse "
         "to a single occupied centre (J = 3.167, the other centre keeps no "
-        "points). So the suboptimal basin is not a measure-zero curiosity — "
+        "points). So the suboptimal basin is not a measure-zero curiosity: "
         "it is a quarter of the starting space on a three-point problem, "
         "which is why n_init=10 is the default rather than a luxury, and why "
         "the D^2 seeding rule of "
-        f"{cite('Arthur:07', parenthetical=False)} exists at all — exercise "
+        f"{cite('Arthur:07', parenthetical=False)} exists at all. Exercise "
         "4.2 measures what each of the two is worth."
     ),
     "the example that does not work": (
         "Worth recording, because it is the obvious first try. Points at "
         "0, 1, 3 have partitions with J = 0.5, 2.0 and 4.5, and *every* "
         "two-centre start on the same grid reaches J = 0.5 or collapses to "
-        "one centre — there is no suboptimal two-group fixed point at all. "
+        "one centre. There is no suboptimal two-group fixed point at all. "
         "The reason is the geometry: for {0}|{1,3} to be stable, 1 must be "
         "closer to the right centre 2.0 than to the left centre 0.0, and it "
-        "is not (distances 1.0 and 1.0 — an exact tie, which breaks the "
+        "is not (distances 1.0 and 1.0: an exact tie, which breaks the "
         "other way or oscillates). Moving the third point in to 2.5 makes "
         "the right centre 1.75, distance 0.75 against 1.0, and the fixed "
         "point becomes genuinely stable. A counterexample has to be checked, "
@@ -341,7 +341,7 @@ ANSWER: dict[str, object] = {
         "scale: K-means on "
         "153 847 APOGEE spectra gives a solution that moves with the "
         "initialisation. Coordinate descent on a non-convex objective is "
-        "guaranteed to stop and guaranteed to stop somewhere — those are two "
+        "guaranteed to stop and guaranteed to stop somewhere. Those are two "
         "different guarantees, and only the first is a theorem. Hence the "
         "workbook's protocol of reporting a mean over seven seeds (§9.4 "
         "rule 2) rather than a single run."

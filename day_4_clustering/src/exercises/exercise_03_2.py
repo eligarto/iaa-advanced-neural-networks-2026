@@ -1,4 +1,4 @@
-"""Chapter 3, exercise 2 — what row-normalisation does to metallicity.
+"""Chapter 3, exercise 2: what row-normalisation does to metallicity.
 
     Standardise the 16-D matrix, then row-normalise it. A star with an
     unusually low [Fe/H] and a star with an unusually high one now have the
@@ -12,7 +12,7 @@ questions that are easy to run together:
 
 1. what the row norm *was* before normalisation, and what it encoded;
 2. what survives the projection onto the unit sphere;
-3. whether the pipeline is better or worse for it — measured, not asserted,
+3. whether the pipeline is better or worse for it: measured, not asserted,
    and with the one metric where it comes out *worse* reported too.
 """
 
@@ -61,7 +61,7 @@ def _plain_and_normalised() -> tuple[pd.DataFrame, np.ndarray, np.ndarray, list[
 
     Returns ``(df, X_standardised, X_normalised, elements)``. Both matrices go
     through :func:`cluster.data.make_matrix`, so the only difference is the
-    ``normalize_rows`` flag — not a re-implementation of the recipe.
+    ``normalize_rows`` flag, not a re-implementation of the recipe.
     """
     from cluster.data import make_matrix
 
@@ -114,7 +114,7 @@ def metallicity_survival() -> dict[str, object]:
     """How much metallicity information survives the projection.
 
     Two different questions, often conflated: whether the *scale* survives
-    (it does not — every row becomes length 1) and whether the *ordering*
+    (it does not: every row becomes length 1) and whether the *ordering*
     survives (measured here, because it is not obvious).
     """
     from scipy.spatial.distance import pdist
@@ -200,9 +200,9 @@ def hdbscan_effect(max_stars: int | None = 25_000) -> pd.DataFrame:
     return pd.DataFrame(rows).set_index("setting")
 
 
-def plot(  # pragma: no cover — figure
+def plot(  # pragma: no cover (figure)
     frame: dict[str, object] | None = None,
-):  # pragma: no cover — figure
+):  # pragma: no cover (figure)
     """Row norm against [Fe/H] before normalisation."""
     import matplotlib.pyplot as plt
 
@@ -251,7 +251,7 @@ ANSWER: dict[str, object] = {
         "deviations from the median abundance pattern add up across all "
         "sixteen elements at once instead of cancelling. So the premise of "
         "the exercise is exactly right, and stronger than it looks: the two "
-        "stars it describes do not merely end up with the same norm — the "
+        "stars it describes do not merely end up with the same norm: the "
         "norm they are made to share was, to a first approximation, a "
         "rescaled [Fe/H]."
     ),
@@ -276,9 +276,9 @@ ANSWER: dict[str, object] = {
         "same cluster share it with the whole Galactic neighbourhood. Left "
         "in as a scale, it dominates every distance (Spearman 0.708 against "
         "|d[Fe/H]| alone, so about half the distance variance) and pulls "
-        "together stars that merely sit at the same metallicity — which is "
+        "together stars that merely sit at the same metallicity, which is "
         "why the pipeline keeps it as a *direction*. The birth signature is "
-        "the pattern, the [X/Fe] ratios relative to each other — which is "
+        "the pattern, the [X/Fe] ratios relative to each other, which is "
         "also the level at which the abundance differences between similar "
         "clusters are found to be marginal "
         f"{cite('GarciaDias:19', 'Casamiquela:21')}; that is the "
@@ -289,14 +289,14 @@ ANSWER: dict[str, object] = {
     ),
     "the measurement that decides it": (
         "On the 25 000-star field, HDBSCAN "
-        f"{cite('Campello:13')} — the reference implementation "
-        f"{cite('McInnes:17')} — on the un-normalised matrix "
+        f"{cite('Campello:13')}, the reference implementation "
+        f"{cite('McInnes:17')}, on the un-normalised matrix "
         "collapses to a degenerate solution: 2 clusters with 88.9% of all "
         "stars in the largest, which is the blob failure the workbook flags "
         "in §7. On the row-normalised matrix the same algorithm returns 30 "
         "clusters with the largest holding 11.0%. A density threshold is "
         "exactly what a row-length gradient destroys, and this is the "
-        "comparison that sets the pipeline default — not the local kNN "
+        "comparison that sets the pipeline default, not the local kNN "
         "metric. The caveat that belongs beside it: 'not degenerate' is not "
         "the same as 'good'. The normalised run assigns only 24% of the "
         "field at all (76.0% noise), so what normalisation buys is a usable "
@@ -306,15 +306,15 @@ ANSWER: dict[str, object] = {
     ),
     "where the defence is weakest": (
         "Normalisation does not help every metric, and the honest answer "
-        "says so. On a purely *local* measure — the fraction of a member "
-        "star's k nearest neighbours that are also members — the "
+        "says so. On a purely *local* measure: the fraction of a member "
+        "star's k nearest neighbours that are also members: the "
         "un-normalised matrix does slightly *better* at every k tested "
         "(0.363/0.314/0.282 against 0.327/0.280/0.254 at k = 5/15/30). The "
         "reason is that the row norm is itself informative about membership "
         "in this particular sample: the members are mostly metal-poor "
         "globular stars, so a large row norm is a weak membership cue, and "
         "keeping it hands the neighbour search a free hint. That is a "
-        "property of this member sample, not of the method — and it is the "
+        "property of this member sample, not of the method, and it is the "
         "kind of accident that makes a benchmark flattering. The density "
         "view is the one that decides the pipeline setting, and it is not "
         "close."

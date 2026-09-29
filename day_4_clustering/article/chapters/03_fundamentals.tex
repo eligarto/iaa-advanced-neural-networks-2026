@@ -1,4 +1,4 @@
-% 03 · Clustering fundamentals — what a cluster is, and what breaks
+% 03 · Clustering fundamentals: what a cluster is, and what breaks
 \section{CLUSTERING FUNDAMENTALS}
 \label{sec:fundamentals}
 
@@ -34,21 +34,19 @@ definitions in play in this workbook are:
   probability of belonging to each group.
 \end{itemize}
 
-The reference chapter behind the lecture's framing --- \citet{GarciaDias:20},
-a methods chapter written for a psychiatry audience --- makes the same point
-from the other direction: clustering is worth attempting when the joint
-distribution of the variables is \emph{multipeaked}, and the first decision is
-whether the data are multimodal at all. If a distribution is unimodal, every
-algorithm will return groups anyway, and every one of them will be an
-artefact.
+The reference chapter behind the lecture's framing (\citet{GarciaDias:20}, a
+methods chapter written for a psychiatry audience) makes the same point from
+the other direction: clustering is worth attempting when the joint distribution
+of the variables is \emph{multipeaked}, and the first decision is whether the
+data are multimodal at all. If a distribution is unimodal, every algorithm will
+return groups anyway, and every one of them will be an artefact.
 
-\begin{marginnote}[]
-\entry{Multimodality}{A distribution with more than one peak. Clustering is
-only meaningful if the peaks are physical --- here, if stars of different
-birth sites occupy different regions of C-space.}
-\entry{No free lunch}{No algorithm is best on every problem: each encodes
-assumptions about shape, scale, density and metric. Choosing a method is
-choosing which assumptions are safe for your data.}
+\begin{marginnote}[] \entry{Multimodality}{A distribution with more than one
+peak. Clustering is only meaningful if the peaks are physical: here, if stars
+of different birth sites occupy different regions of C-space.} \entry{No free
+lunch}{No algorithm is best on every problem: each encodes assumptions about
+shape, scale, density and metric. Choosing a method is choosing which
+assumptions are safe for your data.}
 \end{marginnote}
 
 \subsection{Distance in C-space}
@@ -67,10 +65,10 @@ d_{\rm cos}(\mathbf{x},\mathbf{y}) = 1 - \frac{\mathbf{x}\cdot\mathbf{y}}
 
 After per-element standardisation and per-star $L_2$ normalisation, all stars
 lie on the unit sphere in 16 dimensions and $d_{\rm Euclid}$ is a monotone
-function of $d_{\rm cos}$ --- so t-SNE and UMAP (Euclidean internally) and
-EVoC (cosine) are looking at the same geometry, and comparing them is fair.
-The Euclidean alternative without normalisation is not wrong, but it inherits
-a scale from the standardisation: elements with a long tail of outliers become
+function of $d_{\rm cos}$, so t-SNE and UMAP (Euclidean internally) and EVoC
+(cosine) are looking at the same geometry, and comparing them is fair. The
+Euclidean alternative without normalisation is not wrong, but it inherits a
+scale from the standardisation: elements with a long tail of outliers become
 the elements that decide every distance.
 
 High dimension does the rest. Two effects matter here.
@@ -94,26 +92,25 @@ High dimension does the rest. Two effects matter here.
   information, it added dimensions.
 \end{enumerate}
 
-That last result deserves emphasis because the intuitive fix --- ``if both
-signals are useful, feed both'' --- is the one most people try first:
+That last result deserves emphasis because the intuitive fix (``if both signals
+are useful, feed both'') is the one most people try first:
 
-\begin{issues}[THE TRAP OF CONCATENATION]
-Fusing two signals of very different dimensionality into one Euclidean space
-is not a fusion of information; it is a weighted sum in which the weight of
-each channel is set by how many coordinates it happens to contribute. A
-256-dimensional spectral latent next to 4 kinematic coordinates gives the
-spectrum 98\% of the vote, whatever the physics says. The two ways out are to
-reduce the high-dimensional channel before concatenating it, or to combine the
-two at the level of the \emph{decisions} rather than the features --- the
-two-stage pipeline of \S\ref{sec:benchmark}, which uses kinematics for
-recall and a spectral distance for precision.
+\begin{issues}[THE TRAP OF CONCATENATION] Fusing two signals of very different
+dimensionality into one Euclidean space is not a fusion of information; it is a
+weighted sum in which the weight of each channel is set by how many coordinates
+it happens to contribute. A 256-dimensional spectral latent next to 4 kinematic
+coordinates gives the spectrum 98\% of the vote, whatever the physics says. The
+two ways out are to reduce the high-dimensional channel before concatenating
+it, or to combine the two at the level of the \emph{decisions} rather than the
+features: the two-stage pipeline of \S\ref{sec:benchmark}, which uses
+kinematics for recall and a spectral distance for precision.
 \end{issues}
 
 \subsection{Four tasks that are easily confused}
 
-The literature --- and our own first drafts --- mixes up four different
-questions that all get called ``clustering''. Keeping them separate is the
-single most useful discipline in this project.
+The literature (and our own first drafts) mixes up four different questions
+that all get called ``clustering''. Keeping them separate is the single most
+useful discipline in this project.
 
 \begin{enumerate}
 \item \textbf{Membership determination.} For a given cluster, label each star
@@ -123,9 +120,9 @@ single most useful discipline in this project.
   where to look or what they should look like. This is what chemical tagging
   means in the ``strong'' sense of \S\ref{sec:intro}, and it is much harder:
   the algorithm must invent the groups as well as find their members.
-\item \textbf{Refinement.} Clean an existing candidate list --- remove field
-  contaminants from a known cluster's sample. This is the task our two-stage
-  pipeline performs, and it is measurably easier than discovery.
+\item \textbf{Refinement.} Clean an existing candidate list. Remove field
+contaminants from a known cluster's sample. This is the task our two-stage
+pipeline performs, and it is measurably easier than discovery.
 \item \textbf{Cluster-only separation.} Take the members of several clusters,
   with no field stars present, and ask whether the clusters are
   distinguishable from one another. This is the experiment of
@@ -174,10 +171,9 @@ calculation. The toolbox has two halves, developed in
 \textbf{Section~\ref{sec:validation}}:
 
 \begin{itemize}
-\item \textbf{Internal} indices --- sum of squared errors, silhouette, the dip
-  test --- measure how \emph{tidy} a partition is. They are computed from the
-  data alone, they are cheap, and they cannot tell you whether the partition
-  is real.
+\item \textbf{Internal} indices (sum of squared errors, silhouette, the dip
+test) measure how \emph{tidy} a partition is. They are computed from the data
+alone, they are cheap, and they cannot tell you whether the partition is real.
 \item \textbf{External} indices compare the partition with something the
   algorithm never saw. In this project that something is kinematic membership;
   in general it is any independent measurement.
@@ -199,10 +195,9 @@ results and are flagged there.
   unusually low $[$Fe/H$]$ and a star with an unusually high one now have the
   same norm. What did normalisation do to the information about overall
   metallicity, and why is that mostly a feature here rather than a bug?
-\item Pick three clusters from \textbf{Table~\ref{tab:clusters}} --- one with
-  more than 60 members, one with about 20, one with fewer than 10 --- and
-  write down what ``$K$ is known'' would even mean for a field of 25 clusters
-  with these counts. Which of the four tasks of \S 3.3 does a fixed $K$
-  violate?
+\item Pick three clusters from \textbf{Table~\ref{tab:clusters}} (one with more
+than 60 members, one with about 20, one with fewer than 10) and write down what
+``$K$ is known'' would even mean for a field of 25 clusters with these counts.
+Which of the four tasks of \S 3.3 does a fixed $K$ violate?
 \end{enumerate}
 \end{issues}

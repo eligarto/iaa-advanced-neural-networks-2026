@@ -1,4 +1,4 @@
-"""Gaia DR3 photometry — deep CMDs for isochrone age fitting.
+"""Gaia DR3 photometry: deep CMDs for isochrone age fitting.
 
 APOGEE's SNR cut only reaches bright giants, so globular ages are
 unconstrained (the main sequence / turnoff is too faint). This module queries

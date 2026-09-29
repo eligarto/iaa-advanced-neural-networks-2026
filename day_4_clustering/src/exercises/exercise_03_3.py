@@ -1,4 +1,4 @@
-"""Chapter 3, exercise 3 — what "K is known" would have to mean.
+"""Chapter 3, exercise 3: what "K is known" would have to mean.
 
     Pick three clusters from Table 1 (one with more than 60 members, one with
     about 20, one with fewer than 10) and write down what "K is known" would
@@ -7,7 +7,7 @@
 
 The exercise is really asking whether supplying the true number of clusters is
 a gift to K-means or a red herring. The answer is measured: giving K-means
-exactly K = 25 — the true count — and scoring the result against the truth
+exactly K = 25 (the true count) and scoring the result against the truth
 shows that the binding constraint is not the *number* of clusters but the
 *size distribution*, which K-means cannot honour and which no choice of K
 fixes.
@@ -41,7 +41,7 @@ CHOSEN: dict[str, str] = {
 }
 
 #: The workbook's repeat-run seed; K-means here has ``n_init=10`` restarts of
-#: its own, so the result is stable across seeds — see :func:`seed_spread`.
+#: its own, so the result is stable across seeds. See :func:`seed_spread`.
 SEED = SEEDS[0]
 
 
@@ -129,7 +129,7 @@ def kmeans_with_true_k(seed: int = SEED) -> dict[str, object]:
 
     This is the generous version of the experiment: K is *not* estimated, it
     is handed over. What is scored is whether the resulting partition
-    resembles the truth — per cluster, the largest overlap with any predicted
+    resembles the truth: per cluster, the largest overlap with any predicted
     group, and how many predicted groups that cluster is spread across.
     """
     from sklearn.cluster import KMeans
@@ -208,7 +208,7 @@ ANSWER: dict[str, object] = {
         "members (the >60 class; M 3 at 154, M 5 at 67 and NGC 6819 at 62 "
         "also qualify), NGC 2420 with 19 (the ~20 class), and NGC 2158 with 6 "
         "(the <10 class; Berkeley 17 has 7, King 7 has 8). The three are not "
-        "an arbitrary pick — they span the actual dynamic range of the "
+        "an arbitrary pick: they span the actual dynamic range of the "
         "sample, which is 38.3x between the largest cluster and the smallest. "
         "Twelve of the 25 clusters hold fewer than 25 members while M 67 "
         "alone holds 230, so a quarter of the sample sits in one cluster and "
@@ -216,7 +216,7 @@ ANSWER: dict[str, object] = {
     ),
     "what 'K is known' would mean": (
         "It would mean knowing the answer to the wrong question. To set K you "
-        "must already know that this field holds exactly 25 clusters — which "
+        "must already know that this field holds exactly 25 clusters, which "
         "is precisely what a blind search is trying to discover, and what "
         "you cannot know in a real field where the count of clusters is the "
         "unknown. But grant it anyway, and the assumption still fails, "
@@ -230,8 +230,8 @@ ANSWER: dict[str, object] = {
         "cannot absorb it."
     ),
     "what happens when you hand it the true K": (
-        "It still fails, and the failure is the answer. Given K = 25 — the "
-        "exact truth — K-means returns cells between 7 and 98 members, a "
+        "It still fails, and the failure is the answer. Given K = 25: the "
+        "exact truth: K-means returns cells between 7 and 98 members, a "
         "much flatter distribution than the 6-to-230 truth, and the median "
         "cluster keeps only half its members in any one predicted group "
         "(overlap fraction 0.500 at seed 42; 0.473 averaged over the first "
@@ -239,9 +239,9 @@ ANSWER: dict[str, object] = {
         "the 25 clusters come back below 50% purity. The asymmetry is the "
         "informative part. M 67, the largest cluster, is shattered across 17 "
         "predicted groups with its largest overlap holding just 33 of its "
-        "230 members (14%) — a cluster five times the ideal cell gets "
+        "230 members (14%): a cluster five times the ideal cell gets "
         "divided. NGC 2158, the smallest, is spread over 4 groups and keeps "
-        "3 of its 6 members (50%) — a cluster an order of magnitude below "
+        "3 of its 6 members (50%): a cluster an order of magnitude below "
         "the ideal cell gets merged into whatever is nearby. Neither is a "
         "tuning problem: there is no K that makes a 230-member cluster and a "
         "6-member cluster both look like one cell of a Voronoi partition."
@@ -250,7 +250,7 @@ ANSWER: dict[str, object] = {
         "The clusters K-means recovers well are the ones that happen to sit "
         "near the ideal cell size or are unusually compact: M 71 (39 members) "
         "and M 107 (15) come back at 100%, the Pleiades (23) at 96%, NGC 1245 "
-        "(21) at 91%. The ten failures are concentrated at both extremes — "
+        "(21) at 91%. The ten failures are concentrated at both extremes: "
         "M 67 (230) and M 3 (154) at the top, King 5 (12), King 7 (8) and "
         "Berkeley 66 (12) at the bottom. That pattern is the equal-size prior "
         "made visible: the method is accurate where a cluster is already "
@@ -260,8 +260,8 @@ ANSWER: dict[str, object] = {
         "about a particular run."
     ),
     "which task a fixed K violates": (
-        "Of the four tasks in §3.3 — membership determination, discovery, "
-        "refinement, cluster-only separation — it violates *discovery*, and "
+        "Of the four tasks in §3.3: membership determination, discovery, "
+        "refinement, cluster-only separation: it violates *discovery*, and "
         "the violation is structural rather than practical. Discovery is "
         "defined as finding groups without knowing in advance where to look "
         "or what they should look like, so 'K is known' is not an "
@@ -269,15 +269,15 @@ ANSWER: dict[str, object] = {
         "defined against. Membership determination and refinement are not "
         "hurt by it, because both operate on one known cluster at a time, "
         "where the decision is binary (member or field) rather than a choice "
-        "of K. Cluster-only separation — the experiment of "
+        "of K. Cluster-only separation: the experiment of "
         f"{cite('GarciaDias:19', parenthetical=False)}, recreated as the "
-        "workbook's baseline — is where the workbook legitimately "
+        "workbook's baseline: is where the workbook legitimately "
         "fixes K = 25, and §4 is explicit that this is a deliberate "
         "concession: 'in this project we cheat, deliberately. The catalogue "
         "tells us there are 25 clusters, so the benchmarking arms are handed "
         "the true number of groups.' That is why the workbook keeps field "
-        "retrieval — a discovery-like task — and cluster-only separation — "
-        "'a K-known task' — in separate tables. The same fixed K is honest in "
+        "retrieval (a discovery-like task) and cluster-only separation: "
+        "'a K-known task': in separate tables. The same fixed K is honest in "
         "the baseline and dishonest in the field."
     ),
     "the practical consequence": (
@@ -286,7 +286,7 @@ ANSWER: dict[str, object] = {
         "may be, not how many groups to look for, and PLSCAN replaces size "
         "with persistence altogether (§7-§8). Both are answering the "
         "question a fixed K gets wrong "
-        f"({cite('Campello:13', bare=True)}) — how do you simultaneously "
+        f"({cite('Campello:13', bare=True)}). How do you simultaneously "
         "allow a "
         "230-member cluster and a 6-member one to both be real, when you do "
         "not know either number in advance. The measured cost of the K "

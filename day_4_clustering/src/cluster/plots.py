@@ -11,11 +11,11 @@ import pandas as pd
 
 from .benchmark import BenchmarkResult, knn_purity
 
-#: Field points drawn per panel. Every trace — and every hover string — is
+#: Field points drawn per panel. Every trace (and every hover string) is
 #: shipped to the browser, so a 25 000-star scatter with per-star hover text is
 #: ~2.5 MB of figure JSON and the notebook stops responding to the mouse long
 #: before the machine is busy. Members are never dropped; only *unlabelled
-#: field* stars are subsampled — the same budget ``abundance_violins`` already
+#: field* stars are subsampled. The same budget ``abundance_violins`` already
 #: applies on the data side, and the same idea as ``config.MAX_STARS``.
 #: ``CLUSTER_PLOT_MAX_POINTS`` overrides it.
 PLOT_MAX_FIELD_POINTS = int(os.environ.get("CLUSTER_PLOT_MAX_POINTS", "3000"))
@@ -329,7 +329,7 @@ def hr_interactive(
     One row, two panels: Gaia CMD (absolute G vs BP−RP) and Kiel diagram
     (logg vs Teff). Members of ``highlight`` (one of "catalog", "kinematic",
     "combined") are red, everything else grey. Hover shows the star id,
-    Teff/logg and which of the three membership sources flag it — so the
+    Teff/logg and which of the three membership sources flag it, so the
     students can zoom into a sequence and see where the methods agree.
     """
     import plotly.graph_objects as go
@@ -355,7 +355,7 @@ def hr_interactive(
         return "yes" if b else "no"
 
     # Only highlighted stars are drawn with hover text (the field traces set
-    # hoverinfo="skip"), so only their strings are built — the rest never reach
+    # hoverinfo="skip"), so only their strings are built: the rest never reach
     # the browser, and the figure JSON stays small enough to stay interactive.
     hover = np.empty(len(df), dtype=object)
     hover[:] = ""
@@ -427,8 +427,8 @@ def cluster_panels(
     """Three-panel plotly diagnostic: Kiel, 2MASS CMD, Gaia CMD.
 
     Panel 1: logg vs Teff (APOGEE spectroscopy).
-    Panel 2: K vs J-K (2MASS photometry) — the second colour.
-    Panel 3: G vs BP-RP (Gaia, full depth) — the main sequence.
+    Panel 2: K vs J-K (2MASS photometry). The second colour.
+    Panel 3: G vs BP-RP (Gaia, full depth). The main sequence.
     Members (of the selected source) are red, field grey; the fitted
     isochrone (if given) is overlaid on the Gaia panel.
     """
@@ -556,7 +556,7 @@ def embedding_interactive(benchmark: BenchmarkResult, method: str) -> Any:
         text=hover[member], hovertemplate="%{text}<extra></extra>",
     ))
     fig.update_layout(
-        title=f"{note} — coloured by {color_by} membership",
+        title=f"{note}: coloured by {color_by} membership",
         height=520, legend=dict(font=dict(size=11)),
         xaxis_title="dim 1", yaxis_title="dim 2",
     )
@@ -577,9 +577,9 @@ def hr_comparison(
 ) -> Any:
     """HR-diagram comparison of three membership sources.
 
-    Top row — Gaia colour-magnitude diagram (absolute G vs BP−RP).
-    Bottom row — Kiel diagram (logg vs Teff).
-    Columns — catalogue (Simbad) / kinematic / combined members.
+    Top row: Gaia colour-magnitude diagram (absolute G vs BP−RP).
+    Bottom row: Kiel diagram (logg vs Teff).
+    Columns: catalogue (Simbad) / kinematic / combined members.
     Field stars are grey; members of that source are red. A cleaner
     main sequence / giant branch under the members = better membership.
     """
@@ -636,7 +636,7 @@ def hr_comparison(
     axes[0, 0].set_ylabel("absolute G (mag)", fontsize=9)
     axes[1, 0].set_ylabel("log g (dex)", fontsize=9)
     fig.suptitle(
-        f"{cluster_name}: HR diagrams — Simbad catalogue vs kinematic vs combined",
+        f"{cluster_name}: HR diagrams. Simbad catalogue vs kinematic vs combined",
         fontsize=12, y=1.0,
     )
     fig.tight_layout()

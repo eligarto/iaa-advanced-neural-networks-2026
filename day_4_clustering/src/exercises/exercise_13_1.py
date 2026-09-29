@@ -1,4 +1,4 @@
-"""Chapter 13, exercise 1 — reproduce one row of the honest table.
+"""Chapter 13, exercise 1: reproduce one row of the honest table.
 
     Reproduce one row of Table 4 (the "honest" table): pick a signal and a
     method, run it over the seven seeds, and report mean ± standard deviation.
@@ -9,7 +9,7 @@ The row reproduced here is the abundances-only arm on all three methods, so
 the answer also covers the neighbouring rows of \\textbf{Table~\\ref{tab:honest}}.
 The exercise is the workbook's own rule (§9.4) turned on the workbook: a score
 without its population, its seed count and its defaults is not a measurement.
-The three candidate causes the exercise lists — population, seed set, default —
+The three candidate causes the exercise lists: population, seed set, default,
 are separated by actually running the three variants and reading off which one
 closes the gap.
 """
@@ -28,7 +28,7 @@ PUBLISHED: dict[str, float] = {"t-SNE": 0.560, "UMAP": 0.578, "EVoC": 0.420}
 PUBLISHED_N_STARS = 982
 PUBLISHED_N_CLUSTERS = 25
 #: Row orders used for the t-SNE ordering check (the sorted order plus this many
-#: fixed permutations) — the instability §9.3 reports and §13 keeps printing.
+#: fixed permutations). The instability §9.3 reports and §13 keeps printing.
 N_ORDERS = 4
 
 
@@ -143,7 +143,7 @@ def solve(seeds: tuple[int, ...] = SEEDS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Published row against the two populations, with seed error bars."""
     import matplotlib.pyplot as plt
 
@@ -175,13 +175,13 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 
 ANSWER: dict[str, object] = {
     "what was run": (
-        "All three methods on the abundances arm — t-SNE "
+        "All three methods on the abundances arm: t-SNE "
         f"{cite('vanderMaaten:08')}, UMAP {cite('McInnes:18')} and EVoC "
-        f"{cite('EVoC')} — seven seeds, on the shared "
+        f"{cite('EVoC')}: seven seeds, on the shared "
         "member matrix: t-SNE 0.5199 ± 0.0000, UMAP 0.5214 ± 0.0178, EVoC "
         "0.4536 ± 0.0245 (1 002 rows, 25 clusters). The published row is "
         "0.560 / 0.578 / 0.420 on 982 stars. t-SNE is 0.040 low, UMAP 0.057 "
-        "low, EVoC 0.034 high — every method is outside its own seed spread "
+        "low, EVoC 0.034 high. Every method is outside its own seed spread "
         "except t-SNE, whose spread is zero by construction, so the gap is "
         "not seed noise and has to be explained by the population or by a "
         "default."
@@ -189,7 +189,7 @@ ANSWER: dict[str, object] = {
     "the cause is the population, and t-SNE's own instability": (
         "Running the same seven seeds on a deduplicated matrix (one row per "
         "APOGEE_ID, 803 stars in 24 clusters) moves t-SNE to 0.4274, UMAP to "
-        "0.5479, EVoC to 0.4639 — it does not converge on the published "
+        "0.5479, EVoC to 0.4639. It does not converge on the published "
         "numbers, so the population is not the whole story either. The "
         "remaining part is the one §13 prints rather than hides: the "
         "abundances-only t-SNE row is unstable under row order. Sorting the "
@@ -197,13 +197,13 @@ ANSWER: dict[str, object] = {
         "0.4435-0.5159 (mean 0.4786, s.d. 0.0222). The seed loop reports "
         "± 0.0000 because with init='pca' a fixed row order makes the run "
         f"deterministic (scikit-learn's TSNE, {cite('Pedregosa:11', bare=True)}) "
-        "— the spread the seed loop cannot see is larger than "
+        ", the spread the seed loop cannot see is larger than "
         "the spread it can."
     ),
     "the verdict on the three candidate causes": (
-        "(1) Population: real but partial — it accounts for a few hundredths, "
+        "(1) Population: real but partial. It accounts for a few hundredths, "
         "not the whole gap, and the direction differs per method. (2) Seed "
-        "set: not the cause — seven seeds is what the published row used, and "
+        "set: not the cause. Seven seeds is what the published row used, and "
         "the standard deviations are 0.000-0.025 while the gaps are "
         "0.034-0.057. (3) Default: the relevant default is not a "
         "hyperparameter but the row order, which no seed-averaged table "
@@ -218,7 +218,7 @@ ANSWER: dict[str, object] = {
         "three decimals with a ± that does not cover its own row-order drift. "
         "The honest way to publish it is the row-order band (0.44-0.52 here) "
         "next to the seed mean, and §13 does print the audit that found this. "
-        "The remaining rows of the table — the spectral latents — are stable "
+        "The remaining rows of the table (the spectral latents) are stable "
         "under the same treatment, which is the point: the fragility is a "
         "property of the arm, not of the method."
     ),

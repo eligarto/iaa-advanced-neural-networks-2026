@@ -4,7 +4,7 @@ Supersedes ``build_dr17_missing_list.py``, which was based on a wrong premise.
 
 That script assumed DR19 did not contain these stars. It does. The DR19 Astra
 summary file ``astraAllStarASPCAP-0.6.0.fits.gz`` carries 717,689 rows with
-``release='dr17'`` — DR19 reanalyses the DR17 sample and ships it under one
+``release='dr17'``: DR19 reanalyses the DR17 sample and ships it under one
 pipeline (``v_astra=0.6.0``). Every backfilled member resolves to an
 ``sdss_id`` there and 100% of a sampled check returned HTTP 200 on the SAS.
 
@@ -18,7 +18,7 @@ stars embedded through both pipelines, the same star lands 1.70x farther apart
 across products than two different stars within one product (cosine 0.389).
 
 SAS layout (mwmStar files are sharded on the LAST FOUR digits of sdss_id,
-zero-padded, split 2+2 — not on healpix):
+zero-padded, split 2+2, not on healpix):
 
     .../spectro/astra/0.6.0/spectra/star/<d1d2>/<d3d4>/mwmStar-0.6.0-<sdss_id>.fits
 

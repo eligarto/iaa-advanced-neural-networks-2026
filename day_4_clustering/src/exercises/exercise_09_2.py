@@ -1,4 +1,4 @@
-"""Chapter 9, exercise 2 — the row-order check.
+"""Chapter 9, exercise 2: the row-order check.
 
     Reproduce the row-order check: cluster the DR19 member matrix with
     t-SNE + HDBSCAN* nine times, once sorted and eight times with a random
@@ -37,7 +37,7 @@ PERMUTATION_SEED_BASE: int = 1000
 def row_orders(
     n: int, n_random: int = N_RANDOM_ORDERS,
 ) -> dict[str, np.ndarray]:
-    """``{'sorted': identity, 'random_0': perm, ...}`` — the nine orders."""
+    """``{'sorted': identity, 'random_0': perm, ...}``. The nine orders."""
     orders: dict[str, np.ndarray] = {"sorted": np.arange(n)}
     for i in range(n_random):
         rng = np.random.default_rng(PERMUTATION_SEED_BASE + i)
@@ -160,7 +160,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Strip plot of homogeneity under nine row orders, per arm."""
     import matplotlib.pyplot as plt
 
@@ -189,7 +189,7 @@ ANSWER: dict[str, object] = {
         "Permuting the rows of X is an isometry of the point cloud: every "
         "pairwise distance, every neighbourhood, every density is identical in "
         "all nine runs, and the model seed is pinned at 42 throughout. So any "
-        "spread in the score is produced entirely by the optimiser's path — "
+        "spread in the score is produced entirely by the optimiser's path: "
         "the order in which the Barnes-Hut approximation "
         f"{cite('vanderMaaten:14')} accumulates interactions, and the "
         "arbitrary sign/order conventions of the PCA initialisation. It is the "
@@ -205,7 +205,7 @@ ANSWER: dict[str, object] = {
         f"fraction 0.115-0.352. UMAP {cite('McInnes:18')} on the same "
         "matrix: sorted 0.545, random "
         "0.529 +- 0.018, range 0.503-0.562, but groups swing 28-50 and the "
-        "largest-group fraction jumps between 0.042 and 0.350 — two distinct "
+        "largest-group fraction jumps between 0.042 and 0.350: two distinct "
         "solution families, not a continuum."
     ),
     "how that compares with the workbook": (
@@ -213,7 +213,7 @@ ANSWER: dict[str, object] = {
         "the same check. My re-run on the current frame gives a smaller but "
         "unambiguous 0.394-0.520 and 18-35 groups. The direction and the "
         "lesson are identical; the magnitude is not, and the honest reading is "
-        "that the exact range is itself unstable — it depends on which eight "
+        "that the exact range is itself unstable: it depends on which eight "
         "permutations you draw, on the sklearn/openTSNE backend, and on the "
         "frame version (the published range was measured on an earlier "
         "preparation of this matrix). Quote a range from your own run, not "
@@ -244,11 +244,11 @@ ANSWER: dict[str, object] = {
         "a *diagnostic*: a large spread says 'the structure you are claiming is "
         "not in this representation', which is exactly the conclusion §10.5 "
         "draws about abundances-only t-SNE. A small spread does not prove the "
-        "structure is real — it proves the optimiser agrees with itself."
+        "structure is real: it proves the optimiser agrees with itself."
     ),
     "what to report": (
         "Three things, next to every embedding number. (1) The row-order "
-        "spread, not just the seed spread — with init='pca' the seed spread of "
+        "spread, not just the seed spread: with init='pca' the seed spread of "
         "t-SNE is identically zero and therefore meaningless. (2) The number of "
         "predicted groups and the largest-group fraction, which here move far "
         "more than the score does and reveal the two UMAP solution families "

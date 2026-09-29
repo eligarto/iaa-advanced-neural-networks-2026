@@ -5,7 +5,7 @@ then goes quiet would otherwise hang a notebook cell forever: the socket sits in
 ``CLOSE_WAIT``, no exception is raised, and the cell spins with no end. Every
 network call in the pipeline goes through :func:`call_with_timeout`, which gives
 up after ``CLUSTER_NET_TIMEOUT`` seconds (default 30) and raises
-:class:`NetworkTimeout`, so callers can degrade instead of freezing — the
+:class:`NetworkTimeout`, so callers can degrade instead of freezing. The
 literature table reports the gap and the notebooks print a note.
 """
 
@@ -34,8 +34,8 @@ def call_with_timeout[T](
 ) -> T:
     """Run ``fn(*args, **kwargs)`` with a bounded wait.
 
-    The worker thread cannot be cancelled — the underlying library owns the
-    socket — so it is abandoned and the pool is shut down *without* waiting
+    The worker thread cannot be cancelled: the underlying library owns the
+    socket, so it is abandoned and the pool is shut down *without* waiting
     (a plain ``with ThreadPoolExecutor(...)`` would block on the stuck thread
     and defeat the timeout). The caller gets :class:`NetworkTimeout` instead.
     """
@@ -46,7 +46,7 @@ def call_with_timeout[T](
         return future.result(timeout=limit)
     except FutureTimeout as exc:
         raise NetworkTimeout(
-            f"{what} did not answer within {limit:.0f} s — check your connection, "
+            f"{what} did not answer within {limit:.0f} s. Check your connection, "
             f"raise the budget with CLUSTER_NET_TIMEOUT=<seconds>, or work from the "
             f"cached files under data/"
         ) from exc

@@ -2,8 +2,8 @@
 
 An answer that asserts something the literature established should say where
 that comes from, in a form the student can follow to the paper. The rule here
-is that a citation is a *key into* ``article/references.bib`` — never a
-free-typed author-year string — so:
+is that a citation is a *key into* ``article/references.bib``, never a
+free-typed author-year string, so:
 
 * a key that is not in the bibliography raises immediately, instead of
   printing a plausible-looking reference that resolves to nothing;
@@ -33,7 +33,7 @@ __all__ = [
     "reference_list",
 ]
 
-#: The workbook's bibliography — the single source of truth for what may be
+#: The workbook's bibliography. The single source of truth for what may be
 #: cited. Exercises share it with the chapters so the keys agree.
 BIB_PATH = Path(__file__).resolve().parents[2] / "article" / "references.bib"
 
@@ -51,7 +51,7 @@ class Reference(NamedTuple):
 
     @property
     def author_text(self) -> str:
-        """``Ester et al.``, ``Cover and Hart``, ``Lloyd`` — citation style."""
+        """``Ester et al.``, ``Cover and Hart``, ``Lloyd``: citation style."""
         names = self.authors
         if not names:
             return self.key.split(":")[0]
@@ -69,7 +69,7 @@ class Reference(NamedTuple):
 
     @property
     def bare(self) -> str:
-        """``Ester et al. 1996`` — no brackets at all.
+        """``Ester et al. 1996``, no brackets at all.
 
         For use *inside* an existing parenthesis, where both bracketed forms
         would nest: ``(Ester et al. 1996, S 6.3)`` rather than the doubled
@@ -105,7 +105,7 @@ def _detex(text: str) -> str:
 
     Answers are printed to a terminal, not typeset, so ``\\url{...}``,
     brace-protection around corporate authors and accent macros have to come
-    out — otherwise a student reads ``{Tutte Institute}`` or a raw ``\\url``.
+    out: otherwise a student reads ``{Tutte Institute}`` or a raw ``\\url``.
     """
     text = re.sub(r"\\url\{([^}]*)\}", r"\1", text)
     text = re.sub(r"\\[a-zA-Z]+\{([^}]*)\}", r"\1", text)
@@ -197,7 +197,7 @@ def reference_list(*keys: str) -> dict[str, str]:
     """``{'Ester:96': 'Ester et al. (1996), KDD-96, doi:...'}`` for an answer.
 
     Exercises put this under a ``"references"`` entry so the student sees the
-    full pointer — journal and DOI — rather than only an author-year tag.
+    full pointer (journal and DOI) rather than only an author-year tag.
     """
     bib = bibliography()
     unknown = [key for key in keys if key not in bib]

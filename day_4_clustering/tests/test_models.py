@@ -1,4 +1,4 @@
-"""The vendored neural networks — and the published checkpoints they must load.
+"""The vendored neural networks, and the published checkpoints they must load.
 
 Needs the optional ``torch`` extra (``uv sync --extra torch``); the rest of the
 package must stay importable without it, which the first test pins down. The
@@ -61,9 +61,7 @@ def test_models_package_is_lazy() -> None:
     assert module.MaskedSpectralAE is MaskedSpectralAE
     assert module.CnnLstmAttention is CnnLstmAttention
     with pytest.raises(AttributeError):
-        module.does_not_exist  # noqa: B018 — the point is that it raises
-
-
+        module.does_not_exist  # noqa: B018 (the point is that it raises)
 def test_block_mask_marks_contiguous_blocks() -> None:
     mask = make_block_mask(2, 1000, 0.5, 200, generator=torch.Generator().manual_seed(0))
     assert mask.shape == (2, 1, 1000)

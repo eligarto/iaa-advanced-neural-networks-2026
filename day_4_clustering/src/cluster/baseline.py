@@ -1,7 +1,7 @@
 """Paper baseline (Garcia-Dias et al. 2019): multiclass separation of
 cluster-only stars.
 
-Re-creates the 2019 setup — take *only* the known cluster members (no field
+Re-creates the 2019 setup: take *only* the known cluster members (no field
 stars), cluster them in abundance space (optionally extended with
 kinematics), and score how well each star is assigned back to its own
 cluster. Scoring uses the paper's own merit functions: homogeneity,
@@ -25,7 +25,7 @@ from .config import Settings
 from .data import PreparedData
 
 # Kinematic feature block: distance + space motion (position is deliberately
-# excluded — RA/DEC is not kinematics and would trivially separate clusters).
+# excluded: RA/DEC is not kinematics and would trivially separate clusters).
 KINEMATIC_COLUMNS = [
     "GAIAEDR3_PARALLAX", "GAIAEDR3_PMRA", "GAIAEDR3_PMDEC", "VHELIO_AVG",
 ]

@@ -1,4 +1,4 @@
-"""Masked spectral autoencoder (MAE-style) — self-supervised foundation model.
+"""Masked spectral autoencoder (MAE-style): self-supervised foundation model.
 
 Masks contiguous wavelength blocks, encodes the *visible* pixels through a
 conv stack into a latent ``z``, and reconstructs the masked pixels through
@@ -7,7 +7,7 @@ the circularity of the supervised embeddings (a supervised latent cannot carry
 more chemical information than the elements it regresses).
 
 The latent ``z`` is the embedding for chemical tagging. Pretrain on the full
-DR19 sample, then cluster on ``z`` — no re-training, no labels.
+DR19 sample, then cluster on ``z``, no re-training, no labels.
 
 Loss: MSE on the masked pixels only (the model must predict what it cannot see).
 

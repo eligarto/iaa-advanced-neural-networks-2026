@@ -1,4 +1,4 @@
-"""Chapter 5, exercise 1 — the core distance as a density estimate.
+"""Chapter 5, exercise 1: the core distance as a density estimate.
 
     Derive the density estimate of \\S 5.2 from the volume of a ball
     containing k points. Then compute, for the DR19 abundance matrix, the
@@ -21,7 +21,7 @@ import pandas as pd
 from exercises.citations import cite, reference_list
 from exercises.utils import member_field
 
-#: Neighbour count used for the core distance — the pipeline's graph k
+#: Neighbour count used for the core distance. The pipeline's graph k
 #: (\S 5.3: UMAP and EVoC both build 15-NN graphs).
 K = 15
 
@@ -113,7 +113,7 @@ def solve(k: int = K) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Overlaid kappa histograms for members and field."""
     import matplotlib.pyplot as plt
 
@@ -144,14 +144,14 @@ ANSWER: dict[str, object] = {
         "with c_d = pi^(d/2)/Gamma(d/2+1) a constant that does not depend on "
         "the data. The fraction of the sample inside it is k/n, so the mean "
         "density over the ball is (k/n)/V, giving rho-hat(x) = k / (n c_d "
-        "kappa_k(x)^d), i.e. rho-hat proportional to k/(n kappa_k^d) — "
+        "kappa_k(x)^d), i.e. rho-hat proportional to k/(n kappa_k^d): "
         "equation 5.1. Inverting it, kappa is proportional to rho^(-1/d): the "
         "distance is a density estimate, and the exponent is the dimension."
     ),
     "why d ruins the leverage": (
         "kappa ~ rho^(-1/d) means the *sensitivity* of the measured distance "
         "to the underlying density falls as 1/d. In d=16, doubling the density "
-        "shrinks kappa by only 2^(1/16) - 1 = 4.4% — the figure quoted in "
+        "shrinks kappa by only 2^(1/16) - 1 = 4.4%: the figure quoted in "
         "S 5.2, confirmed here by density_sensitivity(). In 2-D the same "
         "density contrast would move kappa by 41%. So a density difference "
         "that would be glaringly obvious on a 2-D scatter plot is, in C-space, "
@@ -162,7 +162,7 @@ ANSWER: dict[str, object] = {
         "Measured on the 25 000-star APOGEE DR19 member+field matrix "
         f"({cite('Majewski:17', 'Almeida:23', bare=True)}) with k=15 "
         "(solve() reproduces it): members have median kappa_15 = 0.484, field "
-        "stars 0.506 — members are denser, but by 4.4%, which is exactly one "
+        "stars 0.506: members are denser, but by 4.4%, which is exactly one "
         "'factor of two in density' worth of signal and nothing more. The "
         "distributions overlap almost entirely: the member spread (p05-p95 = "
         "0.302-0.746) sits inside the field spread (0.227-0.738), and 44.8% of "
@@ -171,19 +171,19 @@ ANSWER: dict[str, object] = {
     ),
     "is the signal visible in kappa alone": (
         "No. The ROC AUC for separating members from field using kappa_15 "
-        "alone is 0.509 — chance is 0.500. Take the 1 002 stars with the "
+        "alone is 0.509: chance is 0.500. Take the 1 002 stars with the "
         "smallest core distance, exactly as many as there are members, and "
         "0.2% of them are members, *below* the 4.0% base rate: the rule is "
         "worse than picking at random, because the very densest parts of the "
         "16-D matrix are field stars in the crowded thin-disc locus, not "
-        "clusters. Per cluster the picture is only slightly better — 16 of the "
+        "clusters. Per cluster the picture is only slightly better: 16 of the "
         "25 have a median kappa below the field median, so nine are literally "
         "sparser than their own background. M 15 (0.670), M 92 (0.638) and "
         "Berkeley 17 (0.652) are the sparsest; M 71 (0.313) and M 107 (0.320) "
         "the densest."
     ),
     "why this is the chapter's real lesson": (
-        "The core distance is the substrate of everything that follows — "
+        "The core distance is the substrate of everything that follows: "
         f"DBSCAN's epsilon test (S 6, {cite('Ester:96', bare=True)}), "
         "HDBSCAN's mutual reachability "
         f"(S 7, {cite('Campello:13', bare=True)}), "
@@ -200,8 +200,8 @@ ANSWER: dict[str, object] = {
         "kappa is measured here on the row-normalised, standardised matrix "
         "(the pipeline default of S 2), so it is an angular density on the "
         "unit sphere rather than a density in raw abundance units. The "
-        "conclusion is not sensitive to that choice — the overlap is far too "
-        "large — but the absolute numbers are, and a kappa quoted without the "
+        "conclusion is not sensitive to that choice. The overlap is far too "
+        "large, but the absolute numbers are, and a kappa quoted without the "
         "normalisation recipe is meaningless. Note also that the field here is "
         "the 25 000-star sample, not all 357 056 field stars; a larger field "
         "would shrink every kappa (more points, same volume) without changing "

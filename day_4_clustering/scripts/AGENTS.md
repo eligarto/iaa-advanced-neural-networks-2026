@@ -1,4 +1,4 @@
-# AGENTS.md — scripts
+# AGENTS.md: scripts
 
 Research scripts, artifact generators, and re-run tooling. Unlike `src/`, this
 tree is **not** a library: nothing here is imported by the pipeline or the
@@ -18,14 +18,14 @@ committing the result.
 | `make_teaching_assets.py` | Didactic plots + GIFs for the lecture deck |
 | `make_masked_ae_figures.py` | Teaching figures for the masked spectral autoencoder |
 | `make_sky_images.py` | DSS2 colour composites for cluster slides, via SkyView |
-| `reference_run.py` | `docs/reference_runs/<name>_<date>.json` — the readings the docs quote |
+| `reference_run.py` | `docs/reference_runs/<name>_<date>.json`: the readings the docs quote |
 
 ```bash
 uv run python scripts/make_exercise_notebooks.py --check   # what CI runs
 ```
 
 `teaching_assets/` is the support package for `make_teaching_assets.py`
-(`common.py`, `embeddings.py`, `iterative.py`, `steps.py`) — the one place here
+(`common.py`, `embeddings.py`, `iterative.py`, `steps.py`): the one place here
 that is importable code rather than a script.
 
 ## 2. Runners and diagnostics
@@ -59,7 +59,7 @@ build_dr19_*_list.py  →  download_apstar_dr19.py / parallel_download.py  →  
 | `embed_dr19_rerun.py` | Re-embed into one uniform product |
 | `baseline_uniform.py`, `field_retrieval_uniform.py`, `headtohead_extras.py` | Re-score on the uniform common population |
 
-`build_dr17_missing_list.py` is **deprecated and built on a false premise** —
+`build_dr17_missing_list.py` is **deprecated and built on a false premise**,
 its own docstring says so. Use `build_dr19_rerun_list.py`. Do not revive it
 because it looks like it fits; mixing DR17 and DR19 products is precisely the
 batch effect `cluster provenance` exists to detect.
@@ -72,8 +72,8 @@ batch effect `cluster provenance` exists to detect.
 `two_stage_pipeline.py`.
 
 These back specific claims in `docs/` and the workbook. A script here that
-disagrees with a published number is usually the *interesting* result — the
-workbook's subject is reproducibility — so report the discrepancy rather than
+disagrees with a published number is usually the *interesting* result: the
+workbook's subject is reproducibility, so report the discrepancy rather than
 tuning until it matches.
 
 ## Conventions
@@ -81,4 +81,4 @@ tuning until it matches.
 - Run through uv: `uv run python scripts/<name>.py`.
 - **Heavy by design.** Several read the full catalogue or hit archives; check what a script does before running it casually, and prefer running it in the background.
 - Scripts write to `results/` and `data/`, both gitignored. Only the generators above produce committed artifacts.
-- A number that lands in `docs/` must come with the environment fingerprint that produced it — that is what `reference_run.py` is for.
+- A number that lands in `docs/` must come with the environment fingerprint that produced it. That is what `reference_run.py` is for.

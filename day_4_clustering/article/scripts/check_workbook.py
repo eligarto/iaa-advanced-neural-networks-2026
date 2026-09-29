@@ -91,13 +91,13 @@ def check(verbose: bool = False) -> int:
             problems.append(f"{name}: odd number of $ delimiters (math mode left open)")
 
     if problems:
-        print(f"FAIL — {len(problems)} problem(s):")
+        print(f"FAIL: {len(problems)} problem(s):")
         for p in problems:
             print(f"  - {p}")
         return 1
 
     print(
-        f"OK — {len(files)} source files, {len(cited)} citations, "
+        f"OK: {len(files)} source files, {len(cited)} citations, "
         f"{len(refs)} cross-references, {len(figs)} figures, all consistent"
     )
     return 0

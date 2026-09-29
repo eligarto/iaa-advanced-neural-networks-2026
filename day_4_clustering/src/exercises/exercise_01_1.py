@@ -1,4 +1,4 @@
-"""Chapter 1, exercise 1 — why old metal-poor clusters should be easier.
+"""Chapter 1, exercise 1: why old metal-poor clusters should be easier.
 
     A cluster of 10^4 stars dissolves over a few hundred Myr; a globular
     cluster of 10^6 stars survives for more than 10 Gyr. Explain from that
@@ -99,7 +99,7 @@ def solve(k: int = K_NEIGHBOURS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """kNN purity against metallicity, coloured by cluster kind."""
     import matplotlib.pyplot as plt
 
@@ -146,13 +146,13 @@ ANSWER: dict[str, object] = {
         "Myr and its siblings are scattered over kiloparsecs. (2) Chemical "
         "contrast: metal-poor stars formed from gas that had been enriched "
         "by few generations, so the abundance pattern is further from the "
-        "crowded solar-metallicity locus where most field stars live — a "
+        "crowded solar-metallicity locus where most field stars live: a "
         "cluster at [Fe/H] = -2 has almost no field background to hide in, "
         "while a cluster at [Fe/H] = 0 sits in the middle of the disc "
         "distribution. (3) Internal spread: section 1.1 notes that efficient "
         "ISM mixing limits how *different* two clusters can be "
-        f"{cite('Kreckel:20')} — 0.02-0.03 dex of scatter in nearby spiral "
-        "discs, correlated below 600 pc — and the "
+        f"{cite('Kreckel:20')}. 0.02-0.03 dex of scatter in nearby spiral "
+        "discs, correlated below 600 pc, and the "
         "clusters most alike are the coeval solar-metallicity open ones. So "
         "the prediction is: globular and metal-poor should tag better."
     ),
@@ -160,19 +160,19 @@ ANSWER: dict[str, object] = {
         "Half right, and the half that is wrong is more interesting. "
         "Measured as kNN purity (k=15) in the raw 16-D C-space on the 1 002 "
         "member rows, the seven globulars average 0.451 and the eighteen "
-        "open clusters average 0.331 — the predicted direction, and both far "
+        "open clusters average 0.331: the predicted direction, and both far "
         "above the 0.04 chance floor of 25 equal clusters. Splitting on "
         "metallicity instead of kind gives 0.433 for the five clusters below "
         "[Fe/H] = -1 (M 3, M 5, M 13, M 15, M 92) against 0.348 for the "
         "other twenty. But the effect does not survive as a trend: "
         "Spearman's rho between median [Fe/H] and purity is +0.167 "
-        "(p = 0.43) — not significant, and *positive*, i.e. pointing the "
+        "(p = 0.43), not significant, and *positive*, i.e. pointing the "
         "wrong way. The metallicity story survives as a group mean and "
         "dissolves as a correlation."
     ),
     "the confound that actually drives the table": (
         "Sample size. Spearman's rho between the number of member rows and "
-        "kNN purity is +0.758 (p < 0.0001) — far stronger than anything "
+        "kNN purity is +0.758 (p < 0.0001): far stronger than anything "
         "metallicity does. A cluster with 230 rows has 230 chances to be "
         "somebody's neighbour; a cluster with 6 rows (NGC 2158) scores "
         "exactly 0.000 because five neighbours cannot outvote fifteen. "
@@ -184,7 +184,7 @@ ANSWER: dict[str, object] = {
     ),
     "the counterexample that breaks the story": (
         "The single best-tagged cluster in the sample is the Pleiades, at "
-        "kNN purity 0.864 — the *youngest* (~100 Myr) and most "
+        "kNN purity 0.864: the *youngest* (~100 Myr) and most "
         "solar-metallicity ([Fe/H] = +0.02) object on the list, and only 23 "
         "rows, so it is not a size artefact either. Meanwhile the two most "
         "metal-poor clusters, M 15 ([Fe/H] = -2.26, purity 0.271) and M 92 "
@@ -197,7 +197,7 @@ ANSWER: dict[str, object] = {
         "GALAH abundances, so its distinctiveness is not peculiar to this "
         "catalogue. This is exactly "
         "the caveat section 1.3 attaches to every negative result in the "
-        "field — the scope is *these abundances, these clusters*."
+        "field. The scope is *these abundances, these clusters*."
     ),
     "how to state the answer honestly": (
         "The argument is physically correct and the data is consistent with "
@@ -208,7 +208,7 @@ ANSWER: dict[str, object] = {
         "sample, but the dominant term is sampling and the trend with "
         "[Fe/H] is not significant (rho = 0.17, p = 0.43)'. To test the "
         "mechanism properly you would need to hold member count fixed and "
-        "vary metallicity — which this sample of 25 objects cannot do."
+        "vary metallicity, which this sample of 25 objects cannot do."
     ),
     "the other half of the story": (
         "kNN purity measures separation among *members only*. The field "
@@ -216,7 +216,7 @@ ANSWER: dict[str, object] = {
         "differently: from results/dr19_field_retrieval.txt, EVoC's "
         "per-cluster recall over 358 058 stars puts NGC 1245 at 0.76 and the "
         "Pleiades at 0.74 at the top, with M 15 at 0.16 and M 13 at 0.15 "
-        "near the bottom — so against a real field background the "
+        "near the bottom, so against a real field background the "
         "metal-poor globulars do *worse*, not better. Whether metal-poor is "
         "easier therefore depends on which question you asked, which is the "
         "whole reason section 13 reports the two tasks separately."

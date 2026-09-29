@@ -1,4 +1,4 @@
-"""Chapter 12, exercise 3 — the purity of the field-run groups.
+"""Chapter 12, exercise 3: the purity of the field-run groups.
 
     Take the EVoC labels on the all-sky field run and compute, for each
     returned group, the fraction of its members that are known field stars.
@@ -8,7 +8,7 @@
 This is the measurement behind \\S 12.4's third objection: "on the all-sky
 field-retrieval task, EVoC recovers 0.557 of the true members at a precision
 of 0.0033". The chapter states the conclusion; this module computes the
-per-group distribution it comes from, and answers the counting question — which
+per-group distribution it comes from, and answers the counting question, which
 turns out to have the least comfortable answer in the exercise set.
 
 The population is the 25 000-star field sample rather than the full
@@ -61,7 +61,7 @@ def count_needed(
 
     Dropping the *worst* groups first is the most favourable order there is,
     so the count reported here is the smallest number that could possibly
-    work — any other rejection order needs at least as many.
+    work: any other rejection order needs at least as many.
     """
     ordered = table.sort_values("precision", ascending=False).reset_index(
         drop=True,
@@ -143,7 +143,7 @@ def solve(seeds: tuple[int, ...] = SEEDS_USED) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The precision distribution, with the base rate and the target marked."""
     import matplotlib.pyplot as plt
 
@@ -183,21 +183,21 @@ ANSWER: dict[str, object] = {
     "the answer to the counting question": (
         "There is no such number. On the 25 000-star field sample, pooling "
         f"every group EVoC {cite('EVoC')} returned across the seven workbook "
-        "seeds — 28 "
-        "groups in total — **not one** reaches a precision of 0.5. The best "
+        "seeds: 28 "
+        "groups in total: **not one** reaches a precision of 0.5. The best "
         "single group reaches 0.288, the median group 0.022, and the "
         "membership base rate is 0.040. So you cannot 'ignore a few groups' "
         "and be left with a precise sample: you would have to ignore all 28. "
         "Even at the looser bar of precision >= 0.20, only 2 of the 28 groups "
         "qualify, together carrying 523 of the 1 002 member rows. §12.4's "
-        "headline — recall 0.557 at precision 0.0033 on the full field — is "
+        "headline (recall 0.557 at precision 0.0033 on the full field) is "
         "this distribution continued to ten times more field stars."
     ),
     "why these numbers are optimistic": (
         "The pipeline's real field run embeds 357 056 stars from the APOGEE "
         f"catalogue {cite('Majewski:17')}, of which 1 002 "
         "are members: a base rate of about 0.3%. This exercise uses the "
-        "25 000-star fast sample, whose base rate is 4.0% — thirteen times "
+        "25 000-star fast sample, whose base rate is 4.0%: thirteen times "
         "higher. Every precision in the table therefore overstates the "
         "full-field value by roughly that factor, and the honest reading is "
         "that the real run is *worse* than what is measured here, which is "
@@ -216,22 +216,22 @@ ANSWER: dict[str, object] = {
         "lift over base rate: the median group is 0.59x the base rate, i.e. "
         "*less* likely to contain a member than a random draw of the same "
         "size, while the best group is 7.2x. So the method is not producing "
-        "noise — it does find something — but the signal is confined to one "
+        "noise (it does find something) but the signal is confined to one "
         "or two groups per run and everything else is worse than chance. "
         "That is exactly the failure the chapter describes as the groups "
         "'mostly field stars, by two orders of magnitude', seen at a scale "
-        "where the individual groups are visible — the same difficulty the "
+        "where the individual groups are visible: the same difficulty the "
         "strong-tagging literature reports when chemically selected groups are "
         "matched back against known clusters "
         f"{cite('Casamiquela:21')}."
     ),
     "what the plot should show": (
         "Left panel: the per-group precision histogram with two vertical "
-        "lines — the base rate at 0.040 and the target at 0.5. The visual "
+        "lines: the base rate at 0.040 and the target at 0.5. The visual "
         "argument is that the entire distribution sits between the two "
         "lines near the bottom, with the target off in empty space. Right "
-        "panel: the 'best case' rejection curve — keep the best groups first "
-        "and plot the worst remaining group's precision — which is the most "
+        "panel: the 'best case' rejection curve. Keep the best groups first "
+        "and plot the worst remaining group's precision, which is the most "
         "generous possible reading of the counting question, and it still "
         "never crosses 0.5. Drawing the curve rather than just stating the "
         "answer matters here, because a reader who doubts the count can see "
@@ -244,7 +244,7 @@ ANSWER: dict[str, object] = {
         "to propose candidate groups; a supervised or threshold-based stage "
         "then scores individual stars and recovers precision. That is the "
         "same division of labour as §11.4's UMAP bullet "
-        f"({cite('McInnes:18', bare=True)}) — a method can be a "
+        f"({cite('McInnes:18', bare=True)}). A method can be a "
         "useful *proposer* while being a hopeless *classifier*, and the "
         "benchmark table is measuring it as a classifier. The honest "
         "presentation is to say which role is under test, because 'EVoC gets "
@@ -255,7 +255,7 @@ ANSWER: dict[str, object] = {
         "For any clustering used as a *proposal* step, report four numbers "
         "per group, not one: size, member count, precision, and the sample's "
         "base rate. Precision alone is uninterpretable without the base rate "
-        "— 0.288 sounds respectable until you know the field is 4% members, "
+        ", 0.288 sounds respectable until you know the field is 4% members, "
         "and 0.0033 sounds catastrophic until you know the field is 0.3% "
         "members. The lift column is the one that generalises across samples, "
         "and it is the column the workbook's own field table should carry. "

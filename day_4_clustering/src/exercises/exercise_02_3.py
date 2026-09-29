@@ -1,4 +1,4 @@
-"""Chapter 2, exercise 3 — how much of the summary is one cluster?
+"""Chapter 2, exercise 3: how much of the summary is one cluster?
 
     M 67 contributes 230 of 1,002 members. Recompute a macro-average metric
     over clusters with and without M 67 in the pool. How much of the
@@ -45,7 +45,7 @@ def _macro_scores(
 
 
 def _knn_macro(X: np.ndarray, labels: np.ndarray, k: int = 15) -> float:
-    """Macro-averaged kNN purity — the parameter-free half of the pair."""
+    """Macro-averaged kNN purity: the parameter-free half of the pair."""
     from exercises.utils import knn_purity_raw
 
     purity = knn_purity_raw(X, labels, k=k)
@@ -91,7 +91,7 @@ def solve(seeds: tuple[int, ...] = SEEDS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Bar chart of homogeneity with and without the target cluster."""
     import matplotlib.pyplot as plt
 
@@ -118,12 +118,12 @@ ANSWER: dict[str, object] = {
         "The sample is the 23 open and globular clusters of "
         f"{cite('GarciaDias:19', parenthetical=False)} plus the Pleiades of "
         f"{cite('Kos:17', parenthetical=False)}, and it is badly skewed. "
-        "M 67 is 230 of the 1 002 member rows — 23% of the sample, and the "
+        "M 67 is 230 of the 1 002 member rows: 23% of the sample, and the "
         "largest single contributor (M 3 is next at 154, 15%). Two clusters "
         "are therefore 38% of every macro average in the workbook. Note these "
         "are row counts, not star counts: section 9.3 shows M 67 also carries "
         "~90 duplicate rows, so its weight in the average is inflated twice "
-        "over — once by being large, once by being repeated."
+        "over: once by being large, once by being repeated."
     ),
     "what happens when you drop it": (
         "Measured on the 7-seed protocol (solve() reproduces it), with t-SNE "
@@ -138,27 +138,27 @@ ANSWER: dict[str, object] = {
         "effect would be reporting noise."
     ),
     "why t-SNE moves most": (
-        "M 67 is 230 rows of one chemically coherent, well-populated cluster — "
+        "M 67 is 230 rows of one chemically coherent, well-populated cluster: "
         "the easiest large blob in the sample, and the one a neighbourhood "
         "embedding most reliably keeps together. Remove it and t-SNE is left "
         "with smaller, sparser groups that its perplexity-30 neighbourhoods "
         "smear into each other. Note also that t-SNE's std is 0.000 here: "
         "with `init='pca'` the embedding is deterministic given the data, so "
-        "its seed spread understates its true instability — §9.3 shows the "
+        "its seed spread understates its true instability: §9.3 shows the "
         "same matrix moves between 0.218 and 0.560 under *row permutation*, "
         "which is the variation the seed loop cannot see."
     ),
     "the methodological answer": (
         "A macro average over clusters weights every cluster equally by "
         "construction, which is what makes it preferable to a micro average "
-        "here — a micro average over *stars* would give M 67 and M 3 almost "
+        "here: a micro average over *stars* would give M 67 and M 3 almost "
         "40% of the vote outright. But macro averaging does not protect the "
         "number from a cluster that is easy: drop one easy cluster and the "
         "mean moves even though nothing about the method changed. So: report "
         "the per-cluster table next to the macro number, always, and quote "
         "the leave-one-out spread when one cluster dominates the population. "
         "A 0.20 swing from deleting 23% of the rows is not a small print "
-        "detail — it is larger than most of the method gaps the workbook "
+        "detail. It is larger than most of the method gaps the workbook "
         "compares."
     ),
     "the general rule": (

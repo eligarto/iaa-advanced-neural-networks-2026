@@ -1,17 +1,17 @@
-"""Chapter 16, exercise 1 — write the methods paragraph first.
+"""Chapter 16, exercise 1. Write the methods paragraph first.
 
     Write the one-paragraph methods section of your report before you run
     anything: the population, the cuts, the method, the seed, the metrics, the
     referees. If you cannot write it, you are not ready to run.
 
-This is a writing exercise, so the answer is a worked paragraph — and, because
+This is a writing exercise, so the answer is a worked paragraph, and, because
 "write it before you run" is only useful if something can tell you whether you
 did, a runnable audit that reads a draft and reports which of the brief's
 required elements it is missing. The audit is checked against two inputs: the
 worked example (which must pass every element) and a plausible half-finished
 draft (which must fail on a known count). The template is filled from
 ``settings()``, so the parameters in it are the ones the code will actually
-use — the commonest way a methods paragraph goes wrong is that it describes a
+use: the commonest way a methods paragraph goes wrong is that it describes a
 configuration the author never ran.
 """
 
@@ -30,7 +30,7 @@ REQUIRED: tuple[tuple[str, str, str], ...] = (
     ("population",
      r"\b\d{2,5}[\s-]*(?:member\s+)?(?:stars|objects|members)\b",
      "without a population count the reader cannot tell what the number was "
-     "computed on — the same code on 982 and on 30 107 stars gives different "
+     "computed on: the same code on 982 and on 30 107 stars gives different "
      "metrics"),
     ("cluster list",
      r"\b(\d{1,2})\s*clusters\b",
@@ -46,7 +46,7 @@ REQUIRED: tuple[tuple[str, str, str], ...] = (
      "reproducible"),
     ("parameters",
      r"(perplexity|n[_\s-]?neighbors|min[_\s-]?cluster[_\s-]?size|epsilon)",
-     "the method's hyperparameters are levers — §16.3 lists them, and a score "
+     "the method's hyperparameters are levers: §16.3 lists them, and a score "
      "without them cannot be interpreted"),
     ("seed",
      r"(seed|random[_ ]state|randomly seeded)",
@@ -59,7 +59,7 @@ REQUIRED: tuple[tuple[str, str, str], ...] = (
     ("both metric halves",
      r"(recall|completeness|precision|homogeneity)",
      "a precision without a recall (or a completeness without a homogeneity) "
-     "is unfalsifiable — either half alone can be gamed"),
+     "is unfalsifiable: either half alone can be gamed"),
     ("degenerate cases",
      r"(largest[- ]group|dominant group|degenerate|noise fraction|all in one)",
      "if one group holds everything, every metric looks fine; printing the "
@@ -164,20 +164,20 @@ def solve() -> dict[str, object]:
 ANSWER: dict[str, object] = {
     "what this exercise is testing": (
         "Not prose. The rubric gives 40% for reproducibility, and the methods "
-        "paragraph is where reproducibility is either asserted or impossible — "
+        "paragraph is where reproducibility is either asserted or impossible: "
         "§16.1's claim is that writing it *first* is a readiness test, because "
         "a paragraph that cannot be written is a run that cannot be scored. The "
         "practical form of the test: name the population, the cuts, the method "
         "and its parameters, the seed and the seed count, both halves of every "
         "metric, both referees, and the config provenance. If any of those is "
         "still unknown, the run would have produced a number the author cannot "
-        "defend — so the paragraph is written first, then the code is run, then "
+        "defend, so the paragraph is written first, then the code is run, then "
         "only the numbers in it are updated."
     ),
     "the audit, and what it measured": (
         "The module ships a lexical audit over the twelve required elements. "
         "Run on the generated template it flags 0 of 12. Run on a plausible "
-        "half-finished draft — the kind that reads well as a first draft — it "
+        "half-finished draft (the kind that reads well as a first draft) it "
         "flags 10 of 12, passing only the two elements it names explicitly "
         "('25 clusters', and 't-SNE and HDBSCAN' for the method). Flagged: "
         "population, cuts, hyperparameters, seed, seed count, both metric "
@@ -188,7 +188,7 @@ ANSWER: dict[str, object] = {
     ),
     "the template is generated, not typed": (
         "The paragraph is assembled from settings() and the shared population, "
-        "so it quotes the values the code will use — the SNR floor, the "
+        "so it quotes the values the code will use: the SNR floor, the "
         f"t-SNE perplexity {cite('vanderMaaten:08')}, the HDBSCAN* floor "
         f"{cite('Campello:13')}, the seed list, the population counts. "
         "This is a deliberate choice over a hand-written example: a template "
@@ -199,7 +199,7 @@ ANSWER: dict[str, object] = {
     "how to use it on your own cluster": (
         "Fill in the population count and cluster count for your sample, the "
         "cuts you actually applied (including the ones you applied by accident "
-        f"— dropping rows with blank APOGEE_ID {cite('Majewski:17')} is a "
+        f", dropping rows with blank APOGEE_ID {cite('Majewski:17')} is a "
         "cut), the embeddings you "
         "compared, the parameters, the seeds, and both referees' scores before "
         "you look at which one is higher. Then keep the paragraph in the report "
@@ -209,7 +209,7 @@ ANSWER: dict[str, object] = {
     ),
     "the honest caveat": (
         "A lexical check cannot detect a paragraph that names a cut it did not "
-        "apply, or a seed it did not use — the failure mode of 'written before "
+        "apply, or a seed it did not use: the failure mode of 'written before "
         "the run' is that the run then changes and the paragraph does not. The "
         "audit is therefore re-run at submission time on the final text, not "
         "just at the start, and the numbers in the template are regenerated "

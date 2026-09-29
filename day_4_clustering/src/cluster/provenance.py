@@ -5,7 +5,7 @@ DR19 ``apStar`` spectra (raw flux, median ~5.8e3) and DR17 ``aspcapStar``
 spectra (continuum-normalised, median ~1.01) for the members that were absent
 from the APO-North star list used at the time. Three orders of magnitude
 apart, and ``apStar`` is 2-D (row 0 = combined) where ``aspcapStar`` is
-already 1-D — so the masked autoencoder sees a systematic offset between them.
+already 1-D, so the masked autoencoder sees a systematic offset between them.
 
 That offset is a *batch effect*. It matters because the split is not random:
 essentially every field star comes from ``apStar`` while ~91% of cluster
@@ -17,7 +17,7 @@ spectrum" rather than "is this star chemically a cluster member".
 *includes* DR17 (``astraAllStarASPCAP-0.6.0`` carries 717,689 rows with
 ``release='dr17'``), and DR19 serves a uniform ``mwmStar`` spectrum for every
 backfilled member. The real fix is to re-download and re-embed from one
-product — see ``scripts/build_dr19_rerun_list.py`` — and to verify the offset
+product (see ``scripts/build_dr19_rerun_list.py``) and to verify the offset
 with the paired control in ``scripts/diagnose_product_mismatch.py``. The
 helpers here quantify the damage while that re-run is pending; the ``DR17`` /
 ``DR19`` labels are retained as the shorthand for "which product".
@@ -106,7 +106,7 @@ def attach_source(
 
 
 def provenance_crosstab(df: pd.DataFrame) -> pd.DataFrame:
-    """Member/field counts by data release — the shape of the confound."""
+    """Member/field counts by data release: the shape of the confound."""
     if SOURCE_COLUMN not in df.columns:
         raise ValueError("call attach_source() first")
     role = np.where(df["cluster"] != "field", "member", "field")

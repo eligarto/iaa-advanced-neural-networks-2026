@@ -1,4 +1,4 @@
-"""Chapter 15, exercise 1 — the two-survey fit, on a second cluster.
+"""Chapter 15, exercise 1: the two-survey fit, on a second cluster.
 
     Reproduce the two-survey fit for one of the other clusters in the combined
     sample. Report age, distance and their posterior widths, with and without
@@ -7,7 +7,7 @@
 
 Collinder 261 is the cluster to try: it is the workbook's track-C sweet spot
 and it has 213 kinematic GALAH members with Gaia photometry, against 27 APOGEE
-members in the region. Four fits are run — APOGEE giants alone, GALAH main
+members in the region. Four fits are run: APOGEE giants alone, GALAH main
 sequence alone, both together, and both plus the red-clump distance prior.
 
 The answer is a partial reproduction and says so. The distance prior does what
@@ -184,9 +184,9 @@ def posterior_chain(
 ) -> dict[str, object]:
     """Sample the (met, loga, dm, Av) posterior and return the flat chain.
 
-    The same likelihood as :func:`cluster.isochrone.fit_isochrone` — ASteCA's
+    The same likelihood as :func:`cluster.isochrone.fit_isochrone`. ASteCA's
     distance on the (G, BP-RP) CMD against the PARSEC grid, with the same
-    priors — but returning the samples rather than only the mode and the
+    priors, but returning the samples rather than only the mode and the
     marginal widths, because this exercise needs the posterior pairs.
     ``cluster.isochrone.fit_isochrone`` is called instead wherever the chain
     is not needed.
@@ -345,7 +345,7 @@ def solve(seeds: tuple[int, ...] = DEFAULT_SEEDS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Age and distance-modulus posterior widths, arm by arm."""
     import matplotlib.pyplot as plt
 
@@ -377,10 +377,10 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 
 ANSWER: dict[str, object] = {
     "what was run": (
-        "Collinder 261 — the workbook's track-C cluster — with four arms, five "
+        "Collinder 261 (the workbook's track-C cluster) with four arms, five "
         "seeds each (42, 0, 1, 2, 7), 32 walkers and 600 steps per fit, on the "
         "PARSEC solar grid with the same likelihood and priors as "
-        f"cluster.isochrone — ASteCA's synthetic-CMD likelihood "
+        f"cluster.isochrone: ASteCA's synthetic-CMD likelihood "
         f"{cite('Perren:15')} sampled with emcee {cite('ForemanMackey:13')}. "
         "The samples are 27 APOGEE kinematic members "
         f"{cite('Majewski:17')} from "
@@ -390,7 +390,7 @@ ANSWER: dict[str, object] = {
         "logg median 2.23 and no dwarf at all, G = 12.0-15.3 (median 13.4); the "
         "GALAH arm is 213 mostly faint main-sequence stars, G = 11.3-16.8 with a "
         "median of 16.2, so its turnoff is barely sampled by the bright limit. "
-        "Literature: age 8.91 Gyr, dm 11.70, [Fe/H] -0.03 — the open-cluster "
+        "Literature: age 8.91 Gyr, dm 11.70, [Fe/H] -0.03. The open-cluster "
         f"catalogue values {cite('Dias:02')} the repository caches."
     ),
     "the age, and where it comes from": (
@@ -420,16 +420,16 @@ ANSWER: dict[str, object] = {
     ),
     "the part that does not reproduce, stated plainly": (
         "§15.3's NGC 2243 sequence works because the giant-only fit is wrong by "
-        "half — 1.59 Gyr against a literature 1.07 — and adding the main "
+        "half (1.59 Gyr against a literature 1.07) and adding the main "
         "sequence pulls it up to 0.98. On Collinder 261 the giants-only fit is "
         "the *closest* arm to the literature (6.00 against 8.91) and the main "
         "sequence pulls the fit away from it, because the GALAH members are "
         "overwhelmingly faint main-sequence stars (median G = 16.2) whose turnoff "
         "is at the faint end of the sampled range. Two candidate explanations, "
         "both testable and neither settled here: (a) the clump distance is "
-        "biased — dm = 12.31 against 11.70, from 11 giants with K_clump = "
+        "biased: dm = 12.31 against 11.70, from 11 giants with K_clump = "
         "10.707, [Fe/H] = +0.008 and the script's M_K = -1.6 + 0.25[Fe/H] = "
-        "-1.598 — so the prior pulls the fit to the wrong distance; (b) the "
+        "-1.598, so the prior pulls the fit to the wrong distance; (b) the "
         "APOGEE arm has only 27 members (against 220-260 for M 67), so the "
         "giant-only fit is Poisson-limited and its apparent agreement with the "
         "literature may be luck. The honest report is: the distance-width "
@@ -444,18 +444,18 @@ ANSWER: dict[str, object] = {
         "3.73 → 3.30 Gyr without ever leaving the 'wrong by a factor of 1.5-1.6' "
         "regime. In the uncertainty budget the split is different again: adding "
         "the main sequence *widens* σ_loga from 0.884 to 1.003 dex (it does not "
-        "help — at this sample size the age is prior-dominated, and 213 fainter "
+        "help: at this sample size the age is prior-dominated, and 213 fainter "
         "stars whose turnoff is barely sampled add scatter rather than "
         "constraint), while the clump prior collapses σ_dm by 13.6x. So the "
         "answer to the exercise's question: the main sequence moves the age "
-        "mode and the prior fixes the distance — and neither fixes the age "
+        "mode and the prior fixes the distance, and neither fixes the age "
         "*uncertainty*, which is §15.2's degeneracy doing its work."
     ),
     "the transferable lesson": (
         "A two-survey fit improves what the second survey is sensitive to. "
         "GALAH reaches the turnoff, so it moves the age mode; APOGEE's giants "
         "reach the clump, so a prior built from them pins the distance. Neither "
-        "survey is redundant, and neither is a fix for the other's bias — which "
+        "survey is redundant, and neither is a fix for the other's bias, which "
         "is why §15.5 lists 'one cluster, one pipeline' as the thing that is "
         "not established. Before quoting any of these numbers as a measurement "
         "of Collinder 261, re-measure the clump distance on a deeper giant "

@@ -1,15 +1,14 @@
-% 06 · DBSCAN — density, and the trouble with one threshold
+% 06 · DBSCAN: density, and the trouble with one threshold
 \section{DBSCAN: FOLLOWING THE DENSITY}
 \label{sec:dbscan}
 
 \deckslides{slides 13--17, with slide 21 for the single-threshold problem.}
 
-K-means asks how far a star is from a centre. DBSCAN --- density-based
-spatial clustering of applications with noise \citep{Ester:96} --- asks a
-different question: how many neighbours does a star have within a fixed
-radius? That single change buys three things K-means cannot offer: clusters of
-arbitrary shape, an explicit notion of noise, and no need to know $K$ in
-advance.
+K-means asks how far a star is from a centre. DBSCAN (density-based spatial
+clustering of applications with noise \citep{Ester:96}) asks a different
+question: how many neighbours does a star have within a fixed radius? That
+single change buys three things K-means cannot offer: clusters of arbitrary
+shape, an explicit notion of noise, and no need to know $K$ in advance.
 
 \subsection{Definitions}
 
@@ -64,28 +63,28 @@ are $d+1$ for $d$ dimensions, or $\ln n$.}
     \fig[0.44]{dbscan_step4.png}
   \end{tabular}
   \caption{The algorithm in four panels: \panel{a} the two knobs, drawn as
-  circles of radius $\varepsilon$ with a count of neighbours --- one point
-  passes the \texttt{minPts} test, the other does not; \panel{b} every point
+  circles of radius $\varepsilon$ with a count of neighbours (one point passes
+  the \texttt{minPts} test, the other does not; \panel{b} every point
   classified as core (circles), border (triangles) or noise (crosses);
   \panel{c} core points within $\varepsilon$ of each other are chained
   (double-headed arrows), border points hang off the chain (single-headed);
-  \panel{d} the result on two interleaved half-moons with uniform noise ---
-  both crescents recovered whole, the scattered points discarded.}
+  \panel{d} the result on two interleaved half-moons with uniform noise) both
+  crescents recovered whole, the scattered points discarded.}
   \label{fig:dbscansteps}
 \end{figure}
 
 \subsection{The algorithm}
 
-The plain version is short enough to write out. For each point not yet
-visited: if it is not a core point, mark it noise for now and move on; if it
-is, start a new cluster and grow it by breadth-first search --- every core
-point inside the current frontier's $\varepsilon$-neighbourhood joins the
-cluster and becomes part of the frontier, and border points are attached as
-they are met. The growth stops when the frontier is exhausted. The result does
-not depend on the order in which points are visited, except for the assignment
-of border points that are within $\varepsilon$ of two different clusters --- an
-ambiguity the original paper leaves to the implementation, and a real
-reproducibility hazard when comparing libraries.
+The plain version is short enough to write out. For each point not yet visited:
+if it is not a core point, mark it noise for now and move on; if it is, start a
+new cluster and grow it by breadth-first search (every core point inside the
+current frontier's $\varepsilon$-neighbourhood joins the cluster and becomes
+part of the frontier, and border points are attached as they are met. The
+growth stops when the frontier is exhausted. The result does not depend on the
+order in which points are visited, except for the assignment of border points
+that are within $\varepsilon$ of two different clusters) an ambiguity the
+original paper leaves to the implementation, and a real reproducibility hazard
+when comparing libraries.
 
 Cost: with a spatial index, $O(n \log n)$ on average; without one, $O(n^2)$.
 The clustering itself is single-pass and cheap; the work is in the
@@ -101,21 +100,21 @@ deliberately permissive: it keeps small clusters such as the Pleiades
 candidates in play, at the cost of admitting noise-driven groups.
 
 $\varepsilon$ is the harder one, and the standard data-driven recipe is a
-$k$-distance plot: sort every point's distance to its $k$-th nearest
-neighbour, plot the sorted values, and look for the knee --- the point where
-the curve leaves the bulk of the data and starts to climb. The knee is where
-the density threshold should sit. It is a heuristic, and it is exactly the
-step that fails in this project:
+$k$-distance plot: sort every point's distance to its $k$-th nearest neighbour,
+plot the sorted values, and look for the knee. The point where the curve leaves
+the bulk of the data and starts to climb. The knee is where the density
+threshold should sit. It is a heuristic, and it is exactly the step that fails
+in this project:
 
-\begin{issues}[THE SINGLE-THRESHOLD PROBLEM]
-DBSCAN has one density threshold for the whole dataset. Our data have two
-populations at very different densities: 357\,056 field stars forming a broad,
-dense, chemically smooth background, and 25 clusters of 6--230 members each
-sitting inside it. Set $\varepsilon$ for the clusters and the field becomes one
-enormous cluster containing everything; set it for the field and the clusters
-fragment into noise. There is no middle value that works, and the failure is
-not a tuning problem --- it is the assumption of \textbf{Table~\ref{tab:assumptions}}
-being false. The next two chapters exist because of it.
+\begin{issues}[THE SINGLE-THRESHOLD PROBLEM] DBSCAN has one density threshold
+for the whole dataset. Our data have two populations at very different
+densities: 357\,056 field stars forming a broad, dense, chemically smooth
+background, and 25 clusters of 6--230 members each sitting inside it. Set
+$\varepsilon$ for the clusters and the field becomes one enormous cluster
+containing everything; set it for the field and the clusters fragment into
+noise. There is no middle value that works, and the failure is not a tuning
+problem. It is the assumption of \textbf{Table~\ref{tab:assumptions}} being
+false. The next two chapters exist because of it.
 \end{issues}
 
 The scale of the effect is visible in the results: on our DR19 run, an

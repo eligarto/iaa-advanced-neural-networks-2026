@@ -1,4 +1,4 @@
-"""Chapter 1, exercise 2 — precision and recall at 300:1.
+"""Chapter 1, exercise 2: precision and recall at 300:1.
 
     The field-to-member ratio here is about 300:1. If a search returns 100
     candidates for a cluster with 20 true members, what are its precision and
@@ -62,9 +62,9 @@ def tradeoff_table(
 ) -> pd.DataFrame:
     """Two ways to spend the budget, side by side.
 
-    ``fixed_list`` holds the candidate list at 100 and lets recall fall —
+    ``fixed_list`` holds the candidate list at 100 and lets recall fall,
     precision falls with it. ``fixed_recall`` insists on finding every member
-    and lets the list grow — the number of wasted follow-ups is what grows.
+    and lets the list grow: the number of wasted follow-ups is what grows.
     """
     rows: list[dict[str, object]] = []
     for recall in recalls:
@@ -109,7 +109,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Precision against recall for a fixed 100-candidate list."""
     import matplotlib.pyplot as plt
     import numpy as np
@@ -144,7 +144,7 @@ ANSWER: dict[str, object] = {
         "recall = 20/20 = 1.00 and precision = 20/100 = 1/5 = 0.20, giving "
         "F1 = 2PR/(P+R) = 1/3 = 0.333. There are 80 false positives and 0 "
         "false negatives. If instead only, say, 10 of the 20 are in the "
-        "list, recall = 0.50 and precision = 0.10 — precision cannot exceed "
+        "list, recall = 0.50 and precision = 0.10: precision cannot exceed "
         "recall x 20/100 here, so the two move together as long as the list "
         "length is fixed. The worst case the question permits is 0 overlap: "
         "precision 0.00, recall 0.00, and a search that returned 100 stars "
@@ -155,7 +155,7 @@ ANSWER: dict[str, object] = {
         "stars per member, a blind draw of 100 stars contains 100/301 = 0.33 "
         "members, i.e. chance precision is 1/301 = 0.0033. Precision 0.20 is "
         "therefore 60x the chance rate. In this workbook's own sample the "
-        "ratio is 357 056 field to 1 002 members — 356:1 — and the measured "
+        "ratio is 357 056 field to 1 002 members (356:1) and the measured "
         "field-retrieval precisions in section 13 are 0.240 for abundances "
         "with t-SNE and 0.631 for the PCA-64 latent, so 0.20 is squarely in "
         "the range a real method reaches. Quoting precision without the base "
@@ -169,8 +169,8 @@ ANSWER: dict[str, object] = {
         f"{cite('Freeman:02', 'BlandHawthorn:16')}, so a star you did not "
         "flag will not be "
         "looked at again, and the information is gone. A false positive is "
-        "an extra star on a follow-up list, and follow-up — a Gaia proper "
-        f"motion {cite('Gaia:23')}, a radial velocity, a second spectrum — "
+        "an extra star on a follow-up list, and follow-up: a Gaia proper "
+        f"motion {cite('Gaia:23')}, a radial velocity, a second spectrum. "
         "is cheap and "
         f"available for every APOGEE target {cite('Majewski:17')}. The "
         "asymmetry only holds while "
@@ -180,12 +180,12 @@ ANSWER: dict[str, object] = {
     "what that choice costs downstream": (
         "Follow-up budget, and it scales badly. Holding recall at 1.00, the "
         "candidate list needed to contain all 20 members is 20/precision: "
-        "100 stars at P=0.20, 200 at P=0.10, 400 at P=0.05 — so the wasted "
+        "100 stars at P=0.20, 200 at P=0.10, 400 at P=0.05, so the wasted "
         "follow-ups go 80, 180, 380. Each halving of precision doubles the "
         "spectroscopy bill. It also costs *statistics*: a group that is 80% "
         "contaminated has an abundance dispersion and a mean metallicity set "
         "mostly by the field, so any physical parameter you fit to the group "
-        "(age, distance, [Fe/H] spread — section 15's questions) is biased "
+        "(age, distance, [Fe/H] spread: section 15's questions) is biased "
         "toward the field, not merely noisy. Low precision is survivable "
         "when a referee follows; it is fatal when the group itself is the "
         "measurement."
@@ -194,7 +194,7 @@ ANSWER: dict[str, object] = {
         "Never quote one of the pair. A recall of 1.00 is trivially "
         "achievable by returning the whole catalogue, and section 13 shows "
         "exactly that failure in the wild: UMAP on abundances scores recall "
-        "1.000 with precision 0.001 — a single degenerate blob containing "
+        "1.000 with precision 0.001: a single degenerate blob containing "
         "every star, reported as perfect recall. Section 9 adds the "
         "companion rule: quote the chance level too, because at 300:1 a "
         "precision that sounds terrible can be 60x better than random, and "

@@ -1,13 +1,13 @@
 # iaa-advanced-neural-networks-2026
 SO-IAA school on Advanced Neural Networks 
 
-# Day 4 — Clustering and chemical tagging
+# Day 4: Clustering and chemical tagging
 
 Hands-on session: benchmark **t-SNE / UMAP / EVoC** on the 16-D APOGEE abundance
 space and decide which stars in a field belong to a star cluster, scored against
 kinematic ground truth.
 
-Everything runs in Docker — section B of the School Software Installation Guide,
+Everything runs in Docker: section B of the School Software Installation Guide,
 so it is already on your laptop. `uv` and all the Python live inside the image:
 
 ```bash
@@ -24,9 +24,9 @@ docker run --rm -it $DAY4 $IMG uv run cluster run --fast       # ~2 min smoke te
 ```
 
 Windows (PowerShell): use `$Day4 = @("-v","$($PWD.Path)/data:/app/data", …)` and
-splat it with `@Day4` — see
+splat it with `@Day4`. See
 [`day_4_clustering/docs/docker.md`](day_4_clustering/docs/docker.md).
-Prefer native Python? `uv sync && uv run cluster …` — identical flags and
+Prefer native Python? `uv sync && uv run cluster …`: identical flags and
 commands.
 
 - Instructions and full walk-through: [`README.md`](README.md)
@@ -35,7 +35,7 @@ commands.
 
 
 
-# Chemical Tagging of Star Clusters — t-SNE vs UMAP vs EVoC
+# Chemical Tagging of Star Clusters: t-SNE vs UMAP vs EVoC
 
 Hands-on module for the **IAA-SO School on AI/ML in Astronomy 2026**
 (Unsupervised Learning pillar). Reproduces and extends
@@ -45,16 +45,16 @@ star clusters and new members in the Pleiades"*.
 The original paper tagged clusters with **t-SNE** on GALAH abundances. This
 workshop benchmarks **t-SNE vs UMAP vs [EVoC](https://github.com/TutteInstitute/evoc)**
 on **APOGEE SDSS-V DR19 + Gaia DR3**, over the **25 clusters** of
-Garcia-Dias et al. (2019, A&A 629, A34) — 23 from the paper, plus the Pleiades
-(Kos et al. 2017) and the two southern sweet-spots NGC 2243 and Collinder 261 —
+Garcia-Dias et al. (2019, A&A 629, A34): 23 from the paper, plus the Pleiades
+(Kos et al. 2017) and the two southern sweet-spots NGC 2243 and Collinder 261,
 and scores each method's cluster recovery against **kinematic ground truth**.
 
-Contributing a change? Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first — it
+Contributing a change? Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first: it
 covers the fork/branch/draft-PR flow, the four checks CI enforces, and where
 your change belongs among the pipeline, the workbook, the exercise notebooks
 and the separately-hosted slide deck.
 
-## Quick start (Docker — all you need is Docker and git)
+## Quick start (Docker: all you need is Docker and git)
 
 Docker is section B of the School Software Installation Guide, so it is already
 on every laptop in the room. Nothing is installed on your machine: `uv`, Python
@@ -87,7 +87,7 @@ The guide was verified against the `day4-v10` release (manifest list digest
 you want the environment recorded in `docs/reproducibility.md` to the byte, and
 `:latest` follows the newest workshop tag.
 
-**Windows (PowerShell)** — same commands, different mount syntax:
+**Windows (PowerShell)**: same commands, different mount syntax:
 
 ```powershell
 $Day4 = @("-v","$($PWD.Path)/data:/app/data","-v","$($PWD.Path)/results:/app/results","-v","$($PWD.Path)/notebooks:/app/notebooks")
@@ -101,7 +101,7 @@ and the alternatives (building it yourself, adding the optional torch extra).
 
 **Reading the rest of this README:** every example is written as
 `uv run cluster <flags>`. In Docker the same command is
-`docker run --rm -it $DAY4 $IMG uv run cluster <flags>` — the flags never change.
+`docker run --rm -it $DAY4 $IMG uv run cluster <flags>`: the flags never change.
 
 ## Alternative: native Python with uv
 
@@ -114,7 +114,7 @@ uv run cluster download --all
 uv run cluster run --fast
 ```
 
-Identical commands and flags — the container simply removes the possibility of a
+Identical commands and flags: the container simply removes the possibility of a
 mismatched Python, library or JIT environment.
 
 ## How it works
@@ -138,13 +138,13 @@ astraAllStarASPCAP-0.6.0.fits.gz  (1.17 GB, one file)
    precision / recall per cluster, per method
 ```
 
-Key point: **EVoC is not a projector** — it fuses a UMAP-style graph embedding
+Key point: **EVoC is not a projector**. It fuses a UMAP-style graph embedding
 with HDBSCAN/PLSCAN-style density clustering and returns labels directly.
 t-SNE and UMAP only *embed*; a separate clustering step (HDBSCAN) is needed.
 
 ## Install
 
-With Docker there is nothing to install — see **Quick start** above.
+With Docker there is nothing to install. See **Quick start** above.
 Natively:
 
 ```bash
@@ -156,19 +156,19 @@ Python ≥ 3.13.
 ## Download the data
 
 Commands from here on are shown in the `uv run cluster …` form; under Docker
-(Quick start) each one is `docker run --rm -it $DAY4 $IMG uv run cluster …` — the
+(Quick start) each one is `docker run --rm -it $DAY4 $IMG uv run cluster …`: the
 flags are identical, `$DAY4`/`$IMG` just carry the mounts and image name.
 
 ```bash
 uv run cluster download            # the 1.17 GB DR19 catalogue (resumable)
 uv run cluster download --assets   # embeddings + checkpoints, ~1.0 GB (Hugging Face)
-uv run cluster download --all      # both — the one-liner for a fresh checkout
+uv run cluster download --all      # both: the one-liner for a fresh checkout
 ```
 
 The catalogue comes from SDSS, the embeddings/checkpoints from the published
 Hugging Face dataset
 [`RafaelDias/iaa-chemical-tagging-2026`](https://huggingface.co/datasets/RafaelDias/iaa-chemical-tagging-2026)
-(public — no account needed; the dataset card documents every file's provenance);
+(public, no account needed; the dataset card documents every file's provenance);
 both land under `data/`. Useful flags:
 
 ```bash
@@ -182,11 +182,11 @@ image; the same two downloads run inside the container).
 
 The catalogue is SDSS-V DR19
 `https://dr19.sdss.org/sas/dr19/spectro/astra/0.6.0/summary/astraAllStarASPCAP-0.6.0.fits.gz`
-(the DR17 `allStar` successor — see `docs/data_releases.md`).
+(the DR17 `allStar` successor. See `docs/data_releases.md`).
 
 ## The FAST tag
 
-Everything is driven by `src/cluster/config.py` — a single file of flags.
+Everything is driven by `src/cluster/config.py`: a single file of flags.
 
 - `FAST = True`  → subsample the **field** to `MAX_STARS` (default 25 000) while
   keeping **every** cluster member. The all-sky fast run takes **≈2 minutes
@@ -194,7 +194,7 @@ Everything is driven by `src/cluster/config.py` — a single file of flags.
   2026-09-24 (`docs/reproducibility.md`).
 - `FAST = False` → drop the cap; the DR19 quality cuts leave **358 058** stars
   (16 elements), not the ~183 000 of the DR17 era. The full all-sky run takes
-  **≈57 minutes** on the reference laptop (3418 s, measured 2026-09-24 — see
+  **≈57 minutes** on the reference laptop (3418 s, measured 2026-09-24. See
   `docs/dr19_rerun_results.md`), so budget for it rather than running it in a
   coffee break.
 
@@ -234,7 +234,7 @@ score, and saves `results/benchmark_grid.png`.
 ## Notebooks
 
 The material ships as **JupyterLab notebooks** over the same library the CLI uses
-— same calls, same seeds, same numbers.
+, same calls, same seeds, same numbers.
 
 ```bash
 uv run jupyter lab                                   # on your own machine, from this folder
@@ -245,15 +245,15 @@ docker run --rm -it -p 8889:8889 $DAY4 $IMG \       # inside the workshop contai
 ```
 
 `8889`, not Jupyter's usual `8888`: on a machine that already serves something on
-8888 (glance, say) the default collides. To move it, change the left number —
-`-p 18889:8889` — and browse to that port.
+8888 (glance, say) the default collides. To move it, change the left number,
+`-p 18889:8889`, and browse to that port.
 
 Two ship with the day:
 
-- `chemical_tagging.ipynb` — the end-to-end demo. The abundance benchmark in
-  §2–§3, the **published spectral latent vs the abundances on the same stars** in
+- `chemical_tagging.ipynb`: the end-to-end demo. The abundance benchmark in
+  §2, §3, the **published spectral latent vs the abundances on the same stars** in
   §0c (via `cluster head-to-head`), then the HR / isochrone / Gaia-age material.
-- `tuning_template.ipynb` — the knob-turning lab for the student activities.
+- `tuning_template.ipynb`: the knob-turning lab for the student activities.
 
 Run the cells top to bottom; a widget cell re-renders in place when you change a
 control, and repeated configurations come back from the notebook's own memo.
@@ -264,7 +264,7 @@ the embeddings/checkpoints bundle.
 ### The workbook exercise decks
 
 Alongside the two demo notebooks, every exercise in the clustering workbook
-(`article/workbook.tex`) ships as a runnable answer — 56 exercises over 16
+(`article/workbook.tex`) ships as a runnable answer: 56 exercises over 16
 chapters:
 
 ```bash
@@ -273,7 +273,7 @@ docker compose up            # JupyterLab on http://localhost:9999
 
 Compose mounts `./data`, `./results` and `./notebooks` into the container, so
 the catalogue stays on the host and the cells you edit are saved in your
-checkout. Create the three folders first (`mkdir -p data results notebooks`) —
+checkout. Create the three folders first (`mkdir -p data results notebooks`),
 Docker would otherwise create them as root. Any other command runs in the same
 image:
 
@@ -287,7 +287,7 @@ from `notebooks/exercises/chapter_NN_*.ipynb`.
 The notebooks **present**; they never compute. Every number comes from
 `src/exercises/exercise_<chapter>_<n>.py`, so a figure quoted in a deck and the
 same figure in the workbook cannot drift apart. Theory answers cite the
-literature through `article/references.bib` — an unknown key raises rather than
+literature through `article/references.bib`: an unknown key raises rather than
 printing a dead reference.
 
 ```bash
@@ -303,7 +303,7 @@ deck 824 s, the 16 chapter decks 934 s), timings in `report.json`.
 ## Development
 
 ```bash
-uv run pyrefly check            # strict type checking (currently reports errors — see below)
+uv run pyrefly check            # strict type checking (currently reports errors. See below)
 uv run pytest                   # 229 tests (1 skipped without `--extra torch`); CI runs a subset without the data bundle
 uv run coverage run -m pytest && uv run coverage report   # 90% (branch coverage)
 uv run mlflow ui                # inspect experiment runs (mlruns/)
@@ -344,9 +344,9 @@ Full list (with `TSNE`, `UMAP`, `EVOC`, `HDBSCAN` hyperparameters) is in
 
 > ⚠️ **The two tables below are DR17-era numbers.** They were produced on
 > `allStar-dr17-synspec_rev1.fits` and **do not reproduce on a current checkout**
-> (the project moved to SDSS-V DR19 — `docs/data_releases.md`). A run of
+> (the project moved to SDSS-V DR19: `docs/data_releases.md`). A run of
 > `cluster run --fast` gives t-SNE ≈0.21/0.22, UMAP ≈0.22/0.13, EVoC ≈0.48/0.002
-> (24 clusters, 829 members scored — the field-retrieval row of
+> (24 clusters, 829 members scored: the field-retrieval row of
 > `docs/spectral_benchmark_results.md`). Scores move by ~±0.02 across machines;
 > the exact reading and the machine it came from are in `docs/reproducibility.md`.
 > Current numbers live in `docs/dr19_rerun_results.md` and
@@ -362,7 +362,7 @@ Recall/precision are macro-averages over the clusters.
 | fast all-sky | 25k | 0.20 / **0.17** | 0.26 / 0.11 | 0.54 / 0.01 |
 | region (M 67, 30°) | 14k | 0.05 / **0.47** | 0.61 / 0.05 | 0.49 / 0.05 |
 
-Full per-cluster table: `docs/region_sweep_results.md` (**DR17, historical** —
+Full per-cluster table: `docs/region_sweep_results.md` (**DR17, historical**,
 see the warning at the top of that file). The current-region-mode table has to be
 regenerated from the frozen student config (`scripts/region_sweep.py`);
 `docs/region_sweep_results.md` is where the result lands.
@@ -372,7 +372,7 @@ regenerated from the frozen student config (`scripts/region_sweep.py`);
 > ⚠️ Also DR17-era (see the warning in `docs/baseline_results.md`). The current
 > numbers are in `docs/dr19_rerun_results.md`.
 
-Before pulling clusters out of the field, re-create Garcia-Dias et al. 2019 —
+Before pulling clusters out of the field, re-create Garcia-Dias et al. 2019,
 cluster *only* the known members and ask whether they separate from each
 other (`uv run cluster baseline`):
 
@@ -388,9 +388,9 @@ chemically pre-clipped membership); kinematics carry the separation.
 What it teaches:
 
 1. **Full-sky collapses.** The target paper never ran one giant all-sky
-   t-SNE — it ran t-SNE on **30–45° regions** around each cluster
+   t-SNE: it ran t-SNE on **30 to 45° regions** around each cluster
    (Kos et al. Fig. 3). The `--region` flag reproduces that setup. On the DR17
-   data precision jumped to 0.47 for M 67 (vs 0.17 all-sky) — that 0.47 is a
+   data precision jumped to 0.47 for M 67 (vs 0.17 all-sky): that 0.47 is a
    DR17-era value: re-measured on 2026-09-24 with DR19 data, the same command
    scores M 67 at t-SNE recall/precision **≈0.03/0.02** (1 cluster, 456
    referee members), because the region now holds a much larger capped field
@@ -399,16 +399,16 @@ What it teaches:
    buries every cluster in field stars.
 2. **L2-normalisation is the precision lever.** Without `NORMALIZE_ROWS`
    HDBSCAN merges the whole field into one blob (recall ≈ 1, precision ≈
-   0.03 everywhere). Normalising makes Euclidean equal cosine — EVoC's
-   native metric — and breaks the blob. Flip the flag and watch the
+   0.03 everywhere). Normalising makes Euclidean equal cosine: EVoC's
+   native metric, and breaks the blob. Flip the flag and watch the
    precision/recall trade-off.
-3. **Precision stays low for open clusters** even in region mode (≈0.1–0.5).
+3. **Precision stays low for open clusters** even in region mode (≈0.1 to 0.5).
    The field is chemically similar to solar-metallicity open clusters; the
-   globulars (M 5 / M 3 / M 15) are the clean showcase (purity ≈ 0.4–0.5).
+   globulars (M 5 / M 3 / M 15) are the clean showcase (purity ≈ 0.4 to 0.5).
    This is the paper's own caveat (47 Tuc untaggable). Kinematics *confirm*
-   membership — exactly the paper's conclusion.
+   membership: exactly the paper's conclusion.
 4. **Chemical cohesion (kNN purity)** is the cleaner, parameter-free score:
-   it asks "after embedding, do known members sit together?" — the paper's
+   it asks "after embedding, do known members sit together?": the paper's
    visual-polygon test, automated.
 5. **Imputation decides who you study.** Strict complete-case silently
    deletes metal-poor globulars (M 15 / M 92 have `NaN` abundances from
@@ -419,7 +419,7 @@ What it teaches:
 ## Target clusters
 
 **25 clusters**: 23 from Garcia-Dias et al. (2019, Table 1) + the Pleiades
-(Kos et al. 2017) + the two southern sweet-spots NGC 2243 and Collinder 261 —
+(Kos et al. 2017) + the two southern sweet-spots NGC 2243 and Collinder 261,
 **18 open clusters** (Pleiades, King 7, Berkeley 71, IC 166, NGC 2158, NGC 1245,
 King 5, NGC 7789, NGC 1798, NGC 2420, NGC 6819, M 67, Berkeley 66, NGC 188,
 NGC 6791, Berkeley 17, NGC 2243, Collinder 261) and **7 globulars** (M 5, M 3,
@@ -454,5 +454,5 @@ hf/              # asset-bundle manifest, dataset card, publisher
 .github/         # (in the repo root) multi-arch docker image + test workflows
 ```
 
-Reference papers used during development are **not** redistributed here — the
+Reference papers used during development are **not** redistributed here: the
 citations in each doc link to the published versions.

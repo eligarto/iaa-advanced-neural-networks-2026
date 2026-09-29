@@ -1,4 +1,4 @@
-"""Chapter 14, exercise 4 — what each latent encodes.
+"""Chapter 14, exercise 4: what each latent encodes.
 
     The masked latent and PCA-64 tie on field retrieval. Working from the two
     latents, characterise what each one encodes: fit a linear model from each
@@ -61,7 +61,7 @@ def common_population() -> tuple[pd.DataFrame, dict[str, pd.DataFrame]]:
 def _ridge() -> Any:
     """The estimator used for every probe: standardise, then ridge with CV.
 
-    Linear by design — the exercise asks what a *linear* probe recovers, which
+    Linear by design: the exercise asks what a *linear* probe recovers, which
     is the fair comparison between a linear representation (PCA) and a
     nonlinear one (the autoencoder). A boosted or kernel probe would confound
     "more capacity in the probe" with "more chemistry in the latent".
@@ -218,7 +218,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Cross-validated error per arm, normalised by the target's own spread."""
     import matplotlib.pyplot as plt
 
@@ -266,7 +266,7 @@ ANSWER: dict[str, object] = {
         "0.404 / 0.308 dex, [Fe/H] 0.166 / 0.207 / 0.162 dex. The masked "
         "latent beats PCA-64 on Teff by a clear margin and on [Fe/H] by a "
         "narrower one, and the two are level on logg. PCA-256 beats both "
-        "everywhere — which is the control that matters, because it says the "
+        "everywhere, which is the control that matters, because it says the "
         "PCA deficit is a *dimension* effect as much as a representation "
         "effect."
     ),
@@ -275,7 +275,7 @@ ANSWER: dict[str, object] = {
         "shared trend: the residual's s.d. is 0.383 dex against 0.474 dex for "
         "raw [Fe/H], so about a third of the apparent metallicity spread is "
         "atmospheric. On that residual the masked latent reaches RMSE 0.146 "
-        "dex (R² 0.856) and PCA-64 reaches 0.182 dex (R² 0.776) — a 20% "
+        "dex (R² 0.856) and PCA-64 reaches 0.182 dex (R² 0.776): a 20% "
         "advantage to the autoencoder on the quantity cluster separation "
         "actually uses. PCA-256 reaches 0.134 dex (R² 0.877), so again the "
         "masked latent is ahead of PCA-64 but behind the wider PCA."
@@ -291,7 +291,7 @@ ANSWER: dict[str, object] = {
         "latent too. Note the direction this cuts against the naive "
         "expectation: PCA's leading components are dominated by parameters "
         "(0.079 of variance is Teff+logg for the first 64 components), but its "
-        "256-dimensional version explains *less* of the parameters, not more — "
+        "256-dimensional version explains *less* of the parameters, not more: "
         "the extra components are not continuum, they are noise, which is why "
         "PCA-256 is the best regressor here and the worst retrieval arm in "
         "§13."
@@ -300,7 +300,7 @@ ANSWER: dict[str, object] = {
         "On field retrieval the masked AE (256-d) and PCA-64 tie at "
         "0.418/0.619 and 0.417/0.631. On 'what does the latent know about the "
         "star', they do not tie: the autoencoder recovers more chemistry per "
-        "dimension. The reconciliation is the one §14.4 states — if a linear "
+        "dimension. The reconciliation is the one §14.4 states: if a linear "
         "64-dimensional projection reaches the same field-retrieval precision "
         "as an 8.6-million-parameter convolutional latent, the limit is not "
         "the model's capacity, it is the information the retrieval metric "
@@ -312,8 +312,8 @@ ANSWER: dict[str, object] = {
     "the methodological caveat": (
         "Every number here is a *linear* probe, and the difference between the "
         "arms is a difference measured by a linear map. A representation can "
-        "hold information a linear probe cannot reach — that is the case for "
-        "adding layers to a decoder — so 'the masked latent encodes more "
+        "hold information a linear probe cannot reach. That is the case for "
+        "adding layers to a decoder, so 'the masked latent encodes more "
         "chemistry' should be read as 'more chemistry is linearly decodable "
         "from it'. The comparison is still the right one for this workbook, "
         "because everything downstream (HDBSCAN, EVoC, the recovery fraction) "

@@ -1,4 +1,4 @@
-"""Chapter 16, exercise 2 — score a published result with this protocol.
+"""Chapter 16, exercise 2: score a published result with this protocol.
 
     Take a published tagging result in the field --- a table of members, or a
     claimed purity --- and try to score it with this workbook's protocol. What
@@ -8,8 +8,8 @@
 The published result scored here is Casamiquela et al. (2021, A&A 654, A151):
 their high-precision sample of 175 stars in 31 open clusters (their Table 1)
 and the clustering metrics they quote for it (their Table 2). It is the right
-target because the workbook already reproduces two of their numbers — the
-recovery fraction RF40 = 29% and RF70 = 3% — from their own published tables,
+target because the workbook already reproduces two of their numbers: the
+recovery fraction RF40 = 29% and RF70 = 3%: from their own published tables,
 which makes it possible to separate three different things: a *definition*
 check (does our metric implementation agree with theirs?), a *chance-level*
 check (is their metric score above what a random partition of the same shape
@@ -196,7 +196,7 @@ def field_present_arm() -> pd.DataFrame:
 
     Computed from the cached per-cluster sweep tables: for each cluster, the
     method is said to recover it at a threshold when its recall *and* its
-    precision against that cluster's members both exceed it — the workbook's
+    precision against that cluster's members both exceed it: the workbook's
     recovery-fraction definition, applied to the columns the sweep writes. The
     sweep itself (three embeddings, seven seeds, a 30-degree field around each
     cluster) is not re-run here; these are the workbook's cached numbers, read
@@ -290,7 +290,7 @@ def solve(n_perm: int = N_PERM) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Their published metrics against the chance floor of their sample shape."""
     import matplotlib.pyplot as plt
 
@@ -325,10 +325,10 @@ ANSWER: dict[str, object] = {
         "*definition* check reconstructs their partition from their own two "
         "tables and runs this workbook's metric implementations on it: the star "
         "and cluster totals match exactly (175, 31), and the recovery fractions "
-        "reproduce — RF40 = 0.290 against their 29%, RF70 = 0.032 against their "
+        "reproduce: RF40 = 0.290 against their 29%, RF70 = 0.032 against their "
         "3%. The *metric-treatment* check then fails, and that failure is the "
-        "answer to 'what is missing'. The *data* check — does the claimed "
-        "recovery survive with the field present? — needs their member table "
+        "answer to 'what is missing'. The *data* check: does the claimed "
+        "recovery survive with the field present?: needs their member table "
         "and their pipeline, neither of which is in this repository; what is "
         "computed instead is the same question asked of this workbook's own "
         "25-cluster field sweep."
@@ -345,7 +345,7 @@ ANSWER: dict[str, object] = {
         f"three metrics, {cite('Pedregosa:11', bare=True)}). "
         "Their published 0.49, 0.63, 0.55 "
         "matches none of the three, and it sits between the first and second. "
-        "So this workbook cannot verify their h/c/V from the published tables — "
+        "So this workbook cannot verify their h/c/V from the published tables: "
         "not because the numbers are wrong, but because the assignment they were "
         "computed over is not stated. That is a reporting gap of exactly the kind "
         "the rubric is written against, and it is invisible until someone tries "
@@ -362,7 +362,7 @@ ANSWER: dict[str, object] = {
         "recall *and* precision both exceed 40%' is a question a random "
         "partition essentially never answers yes to. Their RF40 = 0.29 therefore "
         "means something at this sample size, while their h and V cannot be "
-        "distinguished from chance — which is the reason this workbook's "
+        "distinguished from chance, which is the reason this workbook's "
         "headline metric is the recovery fraction, and the reason any reported "
         "mutual-information score should be printed with the sample shape beside "
         "it."
@@ -371,12 +371,12 @@ ANSWER: dict[str, object] = {
         "The workbook's DR19 30-degree region sweep puts 25 clusters against a "
         "field of ~28 000 stars each and scores them per cluster. Recovery at "
         "40% with the default row normalisation: 0 of 25 for t-SNE, 0 of 25 for "
-        "UMAP, 0 of 25 for EVoC — RF40 = 0.000. With row normalisation off, "
+        "UMAP, 0 of 25 for EVoC: RF40 = 0.000. With row normalisation off, "
         "UMAP recovers 1 of 25 (RF40 = 0.040) and the others none. Their "
         "field-present arm reports RF40 = 0.29 on the same kind of task. The "
         "median columns show why the two cannot be the same operating point: "
         "with normalisation on, UMAP's median recall is 0.740 against a median "
-        "precision of 0.008 — it is finding the members and burying them in "
+        "precision of 0.008. It is finding the members and burying them in "
         "field stars, which the recovery fraction refuses to call a recovery "
         "while a recall-only table would report 74%. That is the whole argument "
         "for printing both halves, made concrete on this repository's own data. "
@@ -389,10 +389,10 @@ ANSWER: dict[str, object] = {
     "what is missing from the paper": (
         "In order of how much they block a reproduction: the per-star member "
         "table (identifiers, cluster label, group label, membership "
-        "probability) — their Table 1 gives counts, not stars; the treatment of "
+        "probability): their Table 1 gives counts, not stars; the treatment of "
         "unassigned stars in the metrics, which the exercise just showed decides "
         "h/c/V by 0.5 or more; the field population's selection function (which "
-        "stars, over what area and magnitude range, and how drawn) — without it "
+        "stars, over what area and magnitude range, and how drawn): without it "
         "the field-present arm is uninterpretable; the abundance uncertainties "
         "and whether they entered the clustering as weights; the survey data "
         "release, since the workbook's own DR16/DR17/DR19 comparison "
@@ -407,7 +407,7 @@ ANSWER: dict[str, object] = {
     "what to ask the authors for": (
         "Six things: (1) the per-star member table in a machine-readable "
         "format, with the group assignments; (2) the code that computes h, c, V "
-        "and RF, or just a statement of how unassigned stars are counted — the "
+        "and RF, or just a statement of how unassigned stars are counted: the "
         "one-line answer that makes the exercise's first check pass; (3) the "
         "field sample's selection function; (4) the scores for the untuned "
         "clustering operating point, if the grid was tuned on the labels; (5) "
@@ -423,7 +423,7 @@ ANSWER: dict[str, object] = {
         "transcribed in tests/test_baseline.py (including the documented "
         "mislabelled NGC 752 row) and reused here, and the groups of Table 2 are "
         "taken as printed. The workbook reproduces their RF definitions, which "
-        "is a check on this repository's code — not a check on their stars, "
+        "is a check on this repository's code, not a check on their stars, "
         "which are not available. And the field-present comparison is between "
         "two different pipelines on two different samples: it establishes that "
         "the workbook cannot reproduce their field-present recovery, not that "

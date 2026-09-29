@@ -1,6 +1,6 @@
 """Region-mode sweep: benchmark t-SNE / UMAP / EVoC on every cluster.
 
-Reproduces the target paper's setup — for each cluster, restrict to a sky
+Reproduces the target paper's setup: for each cluster, restrict to a sky
 region (default 30 deg) around it, embed the abundances, cluster, and score
 recovery against the kinematic ground truth. Prints and saves a per-cluster
 comparison table.

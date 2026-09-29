@@ -1,4 +1,4 @@
-# AGENTS.md — hf
+# AGENTS.md: hf
 
 Publishing the data bundle to Hugging Face. The workshop's embeddings,
 baselines and checkpoints are too large for git (~1.29 GB across 32 files), so
@@ -29,12 +29,12 @@ Default target is `RafaelDias/iaa-chemical-tagging-2026`, overridable with
 (checkpoints), and one `optional/` entry.
 
 `optional/mwmstar.tar` (~240 MB, 736 raw DR19 spectra) is **excluded unless
-asked for** — `cluster download --assets` skips anything under `optional/`, and
+asked for**: `cluster download --assets` skips anything under `optional/`, and
 `--with-optional` includes it. It also arrives as a tar that nothing unpacks
 automatically (`tar -xf data/mwmstar.tar -C data/`).
 
 **Derived results are not published here.** `results/casamiquela_comparison.csv`
-and `data/galah_apogee_*.parquet` are computed by scripts, not downloaded —
+and `data/galah_apogee_*.parquet` are computed by scripts, not downloaded,
 they are cheap to regenerate from the catalogue and would go stale against the
 code that produces them. An exercise needing one must say *build it*, not
 *download it*; getting that wrong strands the student.
@@ -50,7 +50,7 @@ against those hashes**. So the order is fixed:
 
 Publishing a file without regenerating the manifest gives every student a hash
 mismatch on download. Regenerating the manifest without publishing gives them a
-404. Neither fails on your machine, where the files are already present — so
+404. Neither fails on your machine, where the files are already present, so
 **verify with `--dry-run`, then verify the download path**, not just the upload.
 
 ## Conventions
@@ -63,5 +63,5 @@ mismatch on download. Regenerating the manifest without publishing gives them a
 - The card in `README.md` is public-facing: it states the license and
   provenance of the data, so keep it accurate about what the bundle contains
   and where it came from.
-- `total_bytes` and `n_files` in the manifest are generated, not hand-edited —
+- `total_bytes` and `n_files` in the manifest are generated, not hand-edited,
   they are how a partial upload is detected.

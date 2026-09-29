@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-"""Write ``docs/reference_runs/<name>_<date>.json`` — the readings docs quote.
+"""Write ``docs/reference_runs/<name>_<date>.json``: the readings docs quote.
 
 Student docs quote *ranges*, because the scores move by ~±0.02 across machines
 (see ``docs/reproducibility.md``). This script is the other half of that policy:
 it records the exact reading behind a quoted range, together with the
-environment that produced it — a score without its machine, thread setting and
+environment that produced it: a score without its machine, thread setting and
 image digest is not a measurement.
 
 It makes the same calls ``cluster run`` makes (prepare → referee → benchmark),
@@ -37,7 +37,7 @@ def _parse() -> argparse.Namespace:
     ap.add_argument("--fast", dest="fast", action="store_true", default=True,
                     help="25 000-star sample (the documented student command).")
     ap.add_argument("--full", dest="fast", action="store_false",
-                    help="No star cap (slow: 10–20 min).")
+                    help="No star cap (slow: 10 to 20 min).")
     ap.add_argument("--allstar", default=config.ASTRA_ASPCAP_PATH)
     ap.add_argument("--spectral", default=None,
                     help="Score a spectral embedding instead of the abundances.")

@@ -1,4 +1,4 @@
-"""DEPRECATED — built on a false premise. Use ``build_dr19_rerun_list.py``.
+"""DEPRECATED: built on a false premise. Use ``build_dr19_rerun_list.py``.
 
 This script assumed DR19 did not contain these stars, so it backfilled their
 spectra from DR17. That assumption is wrong: DR19 *reanalyses and includes*
@@ -9,7 +9,7 @@ this script targeted.
 Worse, the backfill mixed data *products*: DR17 ``aspcapStar`` is
 continuum-normalised (median flux ~1.01) while the DR19 arm used raw
 ``apStar`` (~5.8e3). Feeding both to one autoencoder made the latent encode
-the product, not the chemistry — see ``scripts/diagnose_product_mismatch.py``
+the product, not the chemistry. See ``scripts/diagnose_product_mismatch.py``
 and the § Provenance section of ``docs/spectral_benchmark_results.md``.
 
 Kept only for provenance of the published numbers. Do not run it.

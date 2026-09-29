@@ -1,4 +1,4 @@
-"""Chapter 10, exercise 4 — a Student-t kernel with nu = 5.
+"""Chapter 10, exercise 4: a Student-t kernel with nu = 5.
 
     The low-dimensional kernel is q_ij ∝ (1 + ||y_i - y_j||^2)^{-1}. Replace
     it with a Student-t kernel of nu = 5 degrees of freedom, re-derive the
@@ -47,7 +47,7 @@ def kl_and_gradient(
     Derivation. With ``w_ij = (1 + d_ij^2/nu)^{-(nu+1)/2}`` and
     ``Q_ij = w_ij / Z``, ``Z = sum_{k!=l} w_kl``, the standard SNE argument
     gives ``dC/dy_i = sum_j (P_ij - Q_ij) * (-d log w_ij / d d_ij^2) * 4 ...``
-    — concretely, since
+: concretely, since
 
         d log w_ij / d d_ij^2 = -((nu+1)/(2 nu)) * (1 + d_ij^2/nu)^{-1},
 
@@ -136,7 +136,7 @@ def descend(
     are not cosmetic here: without them a learning rate that converges at
     nu = 1 diverges at nu >= 2, because the prefactor 2(nu+1)/nu and the
     shorter-range repulsion change the gradient's scale. A diverging run
-    still produces a picture, which is precisely the trap — the KL is checked
+    still produces a picture, which is precisely the trap. The KL is checked
     at the end so a failed descent cannot be quoted as a result.
     """
     rng = np.random.default_rng(seed)
@@ -161,7 +161,7 @@ def descend(
 def synthetic_clusters(
     n_per: int = 40, seed: int = 0,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Three well-separated Gaussian blobs in 8-D — a controlled test bed.
+    """Three well-separated Gaussian blobs in 8-D: a controlled test bed.
 
     Two blobs are placed close together and the third far away, so the map's
     *long-range* behaviour (the thing nu controls) has something to get right
@@ -240,7 +240,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The kernel's tail, and the layouts it produces."""
     import matplotlib.pyplot as plt
 
@@ -276,7 +276,7 @@ ANSWER: dict[str, object] = {
         "A Student-t density with nu degrees of freedom gives unnormalised map "
         "weights w_ij = (1 + d_ij^2/nu)^{-(nu+1)/2}, with "
         "q_ij = w_ij / sum_{k!=l} w_kl. At nu = 1 the exponent is -1 and the "
-        "1/nu is 1, so this is exactly Equation (qlow) — t-SNE's kernel "
+        "1/nu is 1, so this is exactly Equation (qlow): t-SNE's kernel "
         f"{cite('vanderMaaten:08')} is the "
         "nu = 1 member of the family. As nu -> infinity the expression tends "
         "to exp(-d^2/2), the Gaussian map kernel of the original SNE "
@@ -303,7 +303,7 @@ ANSWER: dict[str, object] = {
         "check_gradient() compares the analytic gradient with central finite "
         "differences on a 12-point random problem at every nu in the sweep. "
         "The maximum absolute discrepancy is ~1.1e-10 at nu = 5 and between "
-        "1.0e-10 and 1.5e-10 for nu = 1, 2 and 30 — consistent with the "
+        "1.0e-10 and 1.5e-10 for nu = 1, 2 and 30: consistent with the "
         "O(epsilon^2) truncation error of the difference quotient at "
         "epsilon = 1e-6, i.e. the derivation is right. Re-deriving a gradient "
         "without numerically checking it is how sign errors reach publication."
@@ -319,7 +319,7 @@ ANSWER: dict[str, object] = {
         "(2) Well-separated groups stop being pushed apart once moderately "
         "separated, so the layout contracts. A third, practical consequence "
         "surfaced in the experiment: the gradient's scale changes with nu, and "
-        "a learning rate tuned at nu = 1 diverges at nu >= 2 — the run still "
+        "a learning rate tuned at nu = 1 diverges at nu >= 2: the run still "
         "produces a plausible-looking picture with a KL twenty times worse."
     ),
     "measured on a controlled problem": (
@@ -329,15 +329,15 @@ ANSWER: dict[str, object] = {
         "each nu at three seeds. The map contracts monotonically as the tail "
         "lightens: mean map radius 32.4 (nu=1) -> 20.6 (nu=2) -> 11.4 (nu=5) "
         "-> 7.7 (nu=30), and the mean within-cluster spread falls the same way "
-        "(3.01 -> 2.13 -> 1.57 -> 1.29). The separation-to-spread ratio — how "
-        "cleanly a clusterer could cut the map — collapses from 12.5 at nu = 1 "
+        "(3.01 -> 2.13 -> 1.57 -> 1.29). The separation-to-spread ratio: how "
+        "cleanly a clusterer could cut the map: collapses from 12.5 at nu = 1 "
         "to 7.1, 4.9 and 4.2: the clusters stay distinguishable but the empty "
         "space between them shrinks by a factor of three. Final KL is "
         "essentially flat (0.405, 0.402, 0.407) until nu = 30, where it "
         "degrades to 0.435, so nu = 5 fits P about as well as nu = 1 does; it "
         "simply draws the answer smaller. Note the scale of the experiment: "
         "this is an exact O(n^2) gradient on a few hundred points, which is "
-        "why it can be written in twenty lines — production t-SNE reaches "
+        "why it can be written in twenty lines: production t-SNE reaches "
         "survey sizes only through the tree-based approximation of "
         f"{cite('vanderMaaten:14', parenthetical=False)}."
     ),
@@ -348,20 +348,20 @@ ANSWER: dict[str, object] = {
         "ordering across nu is not even monotone within that scatter. That is "
         "caveat (i) of 'How to read a t-SNE map' quantified: inter-cluster "
         "distances are not readable, and changing the tail does not make them "
-        "readable — it changes how badly they are wrong, not whether."
+        "readable: it changes how badly they are wrong, not whether."
     ),
     "would you use nu = 5": (
         "For visualisation, no, and the reason is the crowding argument of "
         "§10.2 rather than taste: a 2-D map of 16-D data needs the fattest "
         "tail it can get, because the volume mismatch between a shell at "
         "radius r in 2-D (grows as r) and in 16-D (grows as r^15) is exactly "
-        "what the heavy tail compensates — this is the crowding problem the "
+        "what the heavy tail compensates. This is the crowding problem the "
         f"heavy-tailed kernel was introduced to solve {cite('vanderMaaten:08')}. "
         "Lightening the tail re-imports the "
         "problem t-SNE was invented to solve. For clustering, though, the "
         "answer is less obvious: a more compact map with shorter-range "
         "repulsion may give HDBSCAN* denser, better-defined blobs. That is a "
-        "measurable question and not a matter of opinion — and it would have "
+        "measurable question and not a matter of opinion, and it would have "
         "to be answered with the row-order and seed protocol of §9.4, because "
         "the effect size is plausibly smaller than the instability of §9.3."
     ),

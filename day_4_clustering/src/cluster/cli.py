@@ -13,7 +13,7 @@ from .doctor import fingerprint, format_fingerprint, mlflow_params
 
 @click.group()
 def main() -> None:
-    """Chemical tagging of star clusters — t-SNE vs UMAP vs EVoC."""
+    """Chemical tagging of star clusters: t-SNE vs UMAP vs EVoC."""
 
 
 @main.command()
@@ -102,7 +102,7 @@ def download(
 @click.option("--max-stars", type=int, default=None, help="Override config.MAX_STARS.")
 @click.option(
     "--region", type=float, default=None,
-    help="Restrict to stars within this many degrees of the selected cluster(s) — the paper's per-region approach.",
+    help="Restrict to stars within this many degrees of the selected cluster(s): the paper's per-region approach.",
 )
 @click.option(
     "--region-scaled", is_flag=True,
@@ -370,7 +370,7 @@ def baseline(
             path = out / f"baseline_confusion_{name.replace('-', '').lower()}_{tag}.png"
             plot_confusion(
                 cm, path,
-                title=f"{name} — "
+                title=f"{name}: "
                 f"{'abundances + kinematics' if kinematics else 'abundances only'}",
             )
             click.echo(f"🖼  Confusion matrix saved to {path}")
@@ -481,7 +481,7 @@ def provenance(spectral_path: str, allstar: str) -> None:
     """Batch-effect check: does the latent encode DR17 vs DR19?
 
     ``masked_latent_all.parquet`` merges two reductions, and the merge is not
-    random — nearly all field stars are DR19 while most cluster members are
+    random: nearly all field stars are DR19 while most cluster members are
     the DR17 backfill. This command measures how much of a member-vs-field
     score could be explained by that split alone.
     """
@@ -603,7 +603,7 @@ def ablate(
     spectral_path: str | None, allstar: str, exclude: tuple[str, ...],
     min_members: int, seeds: str,
 ) -> None:
-    """Re-score with clusters removed — e.g. drop the globular M 3.
+    """Re-score with clusters removed: e.g. drop the globular M 3.
 
     The flagship sample is 44% one globular cluster, so "we separate clusters"
     could just mean "we separate a globular from open clusters". Dropping it
@@ -657,7 +657,7 @@ def ablate(
 def doctor(as_json: bool, deep: bool) -> None:
     """Print the environment fingerprint a quoted number belongs to.
 
-    Scores move by ~±0.02 across machines — a different CPU (or thread count)
+    Scores move by ~±0.02 across machines: a different CPU (or thread count)
     changes the order of the floating-point reductions inside sklearn's
     Barnes-Hut t-SNE, numba (UMAP, EVoC, HDBSCAN) and BLAS. This command records
     everything needed to read a number in context; `--json` is the format

@@ -1,4 +1,4 @@
-"""Chapter 15, exercise 4 — who are the 22 stars?
+"""Chapter 15, exercise 4, who are the 22 stars?
 
     Table 12 removes 22 stars from the kinematic list and improves the age.
     Inspect those 22 stars: what are their abundances, their kinematics and
@@ -8,14 +8,14 @@
 The 22 stars are identified here by running the workbook's own two-stage
 pipeline on M 67 (``scripts/two_stage_pipeline.py``: kinematic candidates, then
 rejection of latent-space outliers at median + 2.5 x 1.4826 MAD) and taking the
-difference between the stage-1 list and the stage-2 list — 259 candidates, 22
+difference between the stage-1 list and the stage-2 list: 259 candidates, 22
 rejected, 237 kept, which is the chapter's own 259 -> 22 -> 237. The module
 then characterises the 22 against the 237 on the quantities the chapter's
 claims rest on: abundances (all 16), kinematics (parallax, proper motions,
 radial velocity), and position (angular separation from the cluster centre).
 
-The answer is written as the exercise asks — the case for and the case against,
-three sentences each — but every adjective in it is a measured number, because
+The answer is written as the exercise asks: the case for and the case against,
+three sentences each, but every adjective in it is a measured number, because
 "these stars look like field stars" is exactly the kind of claim this workbook
 exists to make someone prove.
 """
@@ -225,7 +225,7 @@ def removal_recoverability(result: dict[str, object] | None = None, seed: int = 
 
     Cross-validated logistic regression on each block of features separately.
     An AUC near 0.5 means the rejections are not explained by the block at all;
-    high AUC means the stage-2 rule is effectively a threshold on that block —
+    high AUC means the stage-2 rule is effectively a threshold on that block,
     which matters, because a rejection rule that is really a metallicity cut
     would be removing chemistry, not contamination.
     """
@@ -277,7 +277,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Separation from the cluster centre and the [Fe/H] distributions."""
     import matplotlib.pyplot as plt
 
@@ -314,8 +314,8 @@ ANSWER: dict[str, object] = {
         "members plus 40 region stars it labels as field; the rejection removes "
         "15 of those 219 member-labelled stars and 7 of the 40 field-labelled "
         "ones, and leaves 33 field-labelled stars in the kept list. The "
-        "rejection cut sits at latent distance 15.98 — median 9.70 plus 2.5 x "
-        "1.4826 x MAD(1.69) — so the 22 stars are between roughly 3.7 and 12 "
+        "rejection cut sits at latent distance 15.98: median 9.70 plus 2.5 x "
+        "1.4826 x MAD(1.69), so the 22 stars are between roughly 3.7 and 12 "
         "robust standard deviations from the candidate centroid."
     ),
     "their abundances": (
@@ -336,7 +336,7 @@ ANSWER: dict[str, object] = {
         f"fact in the exercise. On the Gaia astrometry {cite('Gaia:23')}, "
         "medians, removed against kept: parallax 1.141 "
         "against 1.163 mas, PM_RA -11.084 against -10.990 mas/yr, PM_DEC "
-        "-2.912 against -2.890 mas/yr, V_helio 34.22 against 34.29 km/s — "
+        "-2.912 against -2.890 mas/yr, V_helio 34.22 against 34.29 km/s: "
         "every offset is a few per cent of the quantity itself and smaller "
         "than the typical uncertainty of a single star. A logistic probe on the "
         "four kinematic columns returns AUC 0.473, i.e. indistinguishable from "
@@ -347,21 +347,21 @@ ANSWER: dict[str, object] = {
     "their position and their spectra": (
         "The removed stars sit slightly farther from the cluster centre: median "
         "angular separation 0.284 degrees against 0.218 for the kept stars, and "
-        "a 90th percentile of 1.541 degrees against 0.530 — so the removal is "
+        "a 90th percentile of 1.541 degrees against 0.530, so the removal is "
         "concentrated in the outer tail of the region, though 18 of the 22 are "
         "still within 1 degree of the centre. They are also cooler and noisier: "
         "median Teff 4750 K against 5105 K, logg 3.94 against 4.00, SNR 156 "
         "against 168. A probe on those three atmospheric columns recovers the "
-        "flag at AUC 0.671, higher than the abundances manage — which is the "
+        "flag at AUC 0.671, higher than the abundances manage, which is the "
         "first hint that what stage 2 is really selecting on is 'cool, "
         "faint, and therefore spectrally atypical', rather than 'not a member'."
     ),
     "the case for calling them contaminants (three sentences)": (
         "They are chemically distinct from the cluster in the direction that "
-        "matters — median [Fe/H] -0.09 against +0.00, with nitrogen 0.17 dex "
-        "lower and four more elements 0.03-0.06 dex lower — and the flag is 66% "
+        "matters: median [Fe/H] -0.09 against +0.00, with nitrogen 0.17 dex "
+        "lower and four more elements 0.03-0.06 dex lower, and the flag is 66% "
         "recoverable from those abundances alone, so this is a population "
-        "difference rather than scatter — and a 0.1 dex offset is the scale on "
+        "difference rather than scatter, and a 0.1 dex offset is the scale on "
         f"which chemical tagging claims to work at all {cite('Freeman:02')}. "
         "They are cooler (4750 against 5105 K) "
         "at slightly lower SNR and sit systematically farther from the centre "
@@ -369,8 +369,8 @@ ANSWER: dict[str, object] = {
         "a superposed field population looks like in colour, magnitude and "
         "radius simultaneously. And the decisive external evidence is that "
         "removing them improves the fitted age from 1.89 to 2.65 Gyr against a "
-        f"literature 2.82 ({cite('Dias:02', bare=True)}) — a factor of five in "
-        "residual — which would be a "
+        f"literature 2.82 ({cite('Dias:02', bare=True)}). A factor of five in "
+        "residual, which would be a "
         "coincidence if they were ordinary members."
     ),
     "the case against (three sentences)": (
@@ -388,12 +388,12 @@ ANSWER: dict[str, object] = {
         "a member'. The chemistry is the honest middle: a 0.1 dex [Fe/H] offset "
         "is real but small, and without an independent membership assessment "
         "the defensible statement is that these are the 22 stars whose removal "
-        "makes the fit agree with the literature — a statement about the fit, "
+        "makes the fit agree with the literature: a statement about the fit, "
         "not yet about the stars."
     ),
     "what would settle it": (
         "Three tests, none of them run here. (1) Cross-match the 22 against "
-        "Simbad's M 67 membership list — the workbook's §13 kinematic-versus-"
+        "Simbad's M 67 membership list: the workbook's §13 kinematic-versus-"
         "Simbad comparison exists exactly for this arbitration, and the 22 "
         "should be enriched in Simbad non-members if the contamination reading "
         "is right. (2) Re-fit the age with the 22 restored and weighted by Gaia "
@@ -410,7 +410,7 @@ ANSWER: dict[str, object] = {
         "rejects is therefore set by the threshold, not by the data: lower k "
         "removes more, higher k fewer, and nothing in the rule is calibrated to "
         "'contaminant'. That is why the exercise asks for the case for *and* "
-        "against — a rejection rule with a tunable threshold can always be "
+        "against: a rejection rule with a tunable threshold can always be "
         "tuned to improve a downstream fit, and the improvement is not evidence "
         "for what the rule claims to be removing."
     ),

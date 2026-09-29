@@ -1,4 +1,4 @@
-# AGENTS.md — docs
+# AGENTS.md: docs
 
 Result write-ups and the recorded runs that back them. This is where a number
 goes once it has actually been measured.
@@ -36,8 +36,8 @@ holds those runs as JSON, written by `../scripts/reference_run.py`:
 ```
 
 The `environment` block is the point. Results in this project depend on
-configuration that defaults *away* from the full run — `CLUSTER_FAST` is `True`
-by default — so a bare number without its fingerprint is not reproducible and
+configuration that defaults *away* from the full run. `CLUSTER_FAST` is `True`
+by default, so a bare number without its fingerprint is not reproducible and
 not quotable. `uv run cluster doctor` prints the same fingerprint for a run
 you are doing now.
 
@@ -56,11 +56,11 @@ whether the environment changed.
   reference run. A hand-adjusted figure is indistinguishable from a fabricated
   one, in a project whose subject is that published numbers are hard to trust.
 - **Report discrepancies rather than reconciling them.** Several documents state
-  that a published result does not reproduce — including the §9.3 row-order
+  that a published result does not reproduce: including the §9.3 row-order
   range and the §2.3 NaN claim. Those findings are the material; tuning until
   they agree would destroy the lesson.
 - Reference-run JSON is append-only in spirit: add a new dated file rather than
   overwriting an old reading, so the history of what was measured survives.
-  Environment *metadata* may be corrected — a package that never touched the
-  numbers was dropped from the recorded version list — but a measured value
+  Environment *metadata* may be corrected: a package that never touched the
+  numbers was dropped from the recorded version list, but a measured value
   never is: re-run and record a new file instead.

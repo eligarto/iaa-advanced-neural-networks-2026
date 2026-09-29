@@ -6,7 +6,7 @@ iterative robust sigma clipping (same idea as Spina et al. 2025).
 
 Kinematics come from the Gaia EDR3 cross-match already embedded in the
 APOGEE allStar file, so no external catalogue is needed. Kinematics are
-independent of the chemical abundances — the labels never leak into the
+independent of the chemical abundances: the labels never leak into the
 embedding.
 """
 
@@ -185,8 +185,8 @@ def label_clusters(
 
     ``membership_method`` selects the labelling strategy:
 
-    - ``"kinematic"`` — the strict Gaia + RV box / sigma-clip members.
-    - ``"combined"`` — kinematic core expanded by abundance agreement
+    - ``"kinematic"``: the strict Gaia + RV box / sigma-clip members.
+    - ``"combined"``: kinematic core expanded by abundance agreement
       (requires ``X``, the abundance matrix aligned to ``df``).
     """
     out = df.copy()

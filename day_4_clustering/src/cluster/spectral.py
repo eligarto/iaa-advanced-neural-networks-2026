@@ -1,14 +1,14 @@
 """Spectral-embedding feature source for chemical tagging.
 
 The lightsurf repo (the spectrum → abundance RNN) exports the trained model's
-latent layer as a data artifact — a parquet/CSV with an identifier column plus
+latent layer as a data artifact: a parquet/CSV with an identifier column plus
 one column per latent dimension. This module reads that artifact, aligns it to
 the allStar rows, and post-processes it into a clustering-ready matrix with
 the same treatment as the abundance matrix (standardise + L2-normalise).
 
 Keeping TensorFlow out of this repo is deliberate: embedding *extraction* is a
 forward pass done once in lightsurf (on the GPU machine), and this repo only
-*consumes* the exported matrix — so the clustering benchmark stays TF-free.
+*consumes* the exported matrix, so the clustering benchmark stays TF-free.
 """
 
 from __future__ import annotations
@@ -62,7 +62,7 @@ def embedding_matrix(
 ) -> np.ndarray:
     """Standardise (zero median, unit std) + L2-normalise the embeddings.
 
-    Mirrors the abundance path in ``data.make_matrix`` (without imputation —
+    Mirrors the abundance path in ``data.make_matrix`` (without imputation,
     embeddings are complete by construction). L2-normalisation keeps Euclidean
     distance equal to cosine, so t-SNE/UMAP compare fairly with EVoC.
     """

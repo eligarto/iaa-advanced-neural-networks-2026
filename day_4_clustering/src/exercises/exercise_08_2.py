@@ -1,4 +1,4 @@
-"""Chapter 8, exercise 2 — a size floor and a lifetime are different rules.
+"""Chapter 8, exercise 2: a size floor and a lifetime are different rules.
 
     In HDBSCAN* terms, what is the difference between "this branch is shorter
     than min_cluster_size" and "this branch is shorter-lived than the
@@ -23,8 +23,8 @@ import pandas as pd
 from exercises.citations import cite, reference_list
 
 #: The dataset: a tiny, tight, isolated clump plus two large diffuse blobs
-#: that barely separate from each other. The clump has 8 points — below a
-#: min_cluster_size of 10 and above one of 5 — and by far the longest
+#: that barely separate from each other. The clump has 8 points. Below a
+#: min_cluster_size of 10 and above one of 5, and by far the longest
 #: lifetime; the 400-point pair is 50x more populous and short-lived.
 TINY_N = 8
 BLOB_N = 200
@@ -144,7 +144,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(min_cluster_size: int = 5):  # pragma: no cover — figure
+def plot(min_cluster_size: int = 5):  # pragma: no cover (figure)
     """The dataset with the labels one min_cluster_size produces."""
     import matplotlib.pyplot as plt
 
@@ -167,7 +167,7 @@ ANSWER: dict[str, object] = {
     "the difference between the two rules": (
         "'Shorter than min_cluster_size' is a statement about the branch "
         "alone: count its points, compare with a constant fixed before any "
-        "data was seen, collapse it into its parent if it loses — the "
+        "data was seen, collapse it into its parent if it loses: the "
         f"condensation step of HDBSCAN* {cite('Campello:13')}. 'Shorter-"
         "lived than the others' is a *comparative* statement about the "
         "branch's position in the tree: how far it survives above its own "
@@ -189,13 +189,13 @@ ANSWER: dict[str, object] = {
         f"Measured with the hdbscan library {cite('McInnes:17')}, sweeping "
         "min_cluster_size from 2 to 12: at "
         "mcs <= 7 the clump is recovered as its own cluster with persistence "
-        "0.93-0.99, against 0.21-0.46 for the 400-point blob — the clump is "
+        "0.93-0.99, against 0.21-0.46 for the 400-point blob. The clump is "
         "4.4x more persistent than a structure fifty times its size (at "
         "mcs=5: 0.9348 vs 0.2147). At mcs = 8 it vanishes: all 8 points are "
         "labelled noise, and the algorithm instead reports 5 fragments of "
         "the blob pair with persistences of 0.01-0.10. At mcs=10 it reports "
         "2 clusters, persistences 0.0233 and 0.0592, and 280 of 408 points "
-        "as noise. So a size floor of 10 — a perfectly ordinary default — "
+        "as noise. So a size floor of 10 (a perfectly ordinary default) "
         "deletes the single highest-persistence object in the dataset and "
         "keeps structures forty times less persistent in its place."
     ),
@@ -205,8 +205,8 @@ ANSWER: dict[str, object] = {
         "be worth reporting?' when the question that matters is 'is this "
         "group separated enough from everything else to be real?'. Those "
         "coincide only when all your clusters have similar populations. The "
-        "counter-argument for the size floor is small-number statistics — "
-        "eight points really can be a coincidence — but note that "
+        "counter-argument for the size floor is small-number statistics: "
+        "eight points really can be a coincidence, but note that "
         "min_cluster_size does not test that either: it is a constant, not "
         "a significance calculation. If you want to guard against small-N "
         "flukes, calibrate the persistence against a null realisation "
@@ -220,7 +220,7 @@ ANSWER: dict[str, object] = {
         "cluster_persistence_ is a normalised lambda range, not the raw sum "
         "of Equation 5 (exercise 7.2), so ratios between the two "
         "quantities are not interchangeable. Third, and most importantly, "
-        "removing min_cluster_size does not remove the choice — PLSCAN "
+        "removing min_cluster_size does not remove the choice: PLSCAN "
         f"{cite('Bot:25')} still "
         "picks a cut through the leaf tree, by maximum total persistence "
         "(S 8.1 step 4). As S 8.2 puts it: 'the cut is still a choice'. What "
@@ -233,7 +233,7 @@ ANSWER: dict[str, object] = {
         "(exercise 8.3 does that arithmetic on the real counts). The "
         "workbook's pipeline uses min_cluster_size=5 precisely to avoid the "
         "failure demonstrated above, and S 13 reports that raising it to 10 "
-        "was the single largest recall improvement on the DR17 data — both "
+        "was the single largest recall improvement on the DR17 data: both "
         "are true, and that tension is exactly why a single global size "
         "floor is the wrong shape of knob."
     ),

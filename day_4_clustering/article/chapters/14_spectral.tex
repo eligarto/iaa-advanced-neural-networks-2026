@@ -1,4 +1,4 @@
-% 14 · Spectral representations — reading the whole spectrum
+% 14 · Spectral representations: reading the whole spectrum
 \section{SPECTRA INSTEAD OF ELEMENT RATIOS}
 \label{sec:spectral}
 
@@ -6,12 +6,12 @@
 
 Everything in \S\ref{sec:benchmark} treats a star as a 16-dimensional vector of
 abundances. That vector is a lossy summary of the observation it came from: a
-single APOGEE spectrum has 8\,575 wavelength pixels, and the abundance
-pipeline that turns those pixels into 16 numbers assumes a one-dimensional
-model atmosphere, a set of atomic and molecular line data, and a fitting
-procedure that was tuned on the Sun. This chapter asks the obvious question ---
-if the spectra are the data, why cluster the summary? --- and reports what
-happens when we do.
+single APOGEE spectrum has 8\,575 wavelength pixels, and the abundance pipeline
+that turns those pixels into 16 numbers assumes a one-dimensional model
+atmosphere, a set of atomic and molecular line data, and a fitting procedure
+that was tuned on the Sun. This chapter asks the obvious question (if the
+spectra are the data, why cluster the summary?) and reports what happens when
+we do.
 
 \begin{marginnote}[]
 \entry{Masked autoencoder}{A self-supervised model that hides part of its
@@ -26,26 +26,25 @@ cluster membership, so it cannot be circular.}
 
 \subsection{The baseline: PCA of the spectra}
 
-The honest first experiment is principal component analysis. \citet{GarciaDias:19}
-applied eight clustering algorithms to the 13 APOGEE abundances of each star
-under four dimensionality-reduction strategies, and this chapter asks the same
-question one level down: which representation of the observation keeps the
-cluster information. Reading spectra with
-learned models has a longer history in this field --- the Cannon builds a
-data-driven spectral model from labels \citep{Ness:15}, and convolutional
-networks do the same job without the labels' linearity assumption
-\citep{Ting:19} --- and the question this chapter asks is which of those
-representations keeps the cluster information. Keep 64 components and
-the classification results of \S\ref{sec:benchmark} already improve on the
-abundances; keep 256 and they get slightly worse. PCA is the right baseline and
-the wrong tool for one reason that is worth internalising: it maximises
-\emph{variance}, and in a stellar spectrum the variance is dominated by things
-that have nothing to do with chemistry --- the temperature-sensitive continuum
-shape, gravity-sensitive line profiles, interstellar reddening, and the
-signal-to-noise of the observation. A principal component that encodes
-$T_{\rm eff}$ is useful for almost every other problem in stellar
-spectroscopy and actively unhelpful here, because a hot field star and a hot
-cluster member will share it.
+The honest first experiment is principal component analysis.
+\citet{GarciaDias:19} applied eight clustering algorithms to the 13 APOGEE
+abundances of each star under four dimensionality-reduction strategies, and
+this chapter asks the same question one level down: which representation of the
+observation keeps the cluster information. Reading spectra with learned models
+has a longer history in this field (the Cannon builds a data-driven spectral
+model from labels \citep{Ness:15}, and convolutional networks do the same job
+without the labels' linearity assumption \citep{Ting:19}) and the question this
+chapter asks is which of those representations keeps the cluster information.
+Keep 64 components and the classification results of \S\ref{sec:benchmark}
+already improve on the abundances; keep 256 and they get slightly worse. PCA is
+the right baseline and the wrong tool for one reason that is worth
+internalising: it maximises \emph{variance}, and in a stellar spectrum the
+variance is dominated by things that have nothing to do with chemistry. The
+temperature-sensitive continuum shape, gravity-sensitive line profiles,
+interstellar reddening, and the signal-to-noise of the observation. A principal
+component that encodes $T_{\rm eff}$ is useful for almost every other problem
+in stellar spectroscopy and actively unhelpful here, because a hot field star
+and a hot cluster member will share it.
 
 \subsection{The model: a masked spectral autoencoder}
 
@@ -55,12 +54,12 @@ predict the spectrum's hidden parts:
 \begin{enumerate}
 \item Take the continuum-normalised spectrum, 8\,575 pixels.
 \item Mask 50\% of the wavelength axis, in \emph{contiguous blocks} of 200
-  pixels --- roughly a spectral line region at APOGEE's resolution.
+pixels: roughly a spectral line region at APOGEE's resolution.
 \item Encode the visible pixels with five convolutional blocks, each halving
   the wavelength axis, with channel widths from 1\,024 down to 64, ending in a
   global average pool and a 256-dimensional linear bottleneck.
-\item Reconstruct the masked pixels with a mirrored decoder --- and compute the
-  loss \emph{only where the input was hidden}.
+\item Reconstruct the masked pixels with a mirrored decoder, and compute the
+loss \emph{only where the input was hidden}.
 \item Discard the decoder. Keep the encoder's 256-dimensional output and feed
   it to the clustering pipeline exactly as the abundances were.
 \end{enumerate}
@@ -84,26 +83,26 @@ the loss function mentions abundances, clusters, kinematics, or age.
 This is the one design decision in the chapter that a reader should be able to
 justify from first principles, and it is where a naive implementation fails.
 
-Mask single pixels at random and a convolutional network does not have to
-learn chemistry: the masked pixel's immediate neighbours are visible, and the
+Mask single pixels at random and a convolutional network does not have to learn
+chemistry: the masked pixel's immediate neighbours are visible, and the
 spectrum is smooth on the scale of a few pixels, so copying from the left and
 right solves the task. The reconstruction loss falls, the latent looks
 respectable, and the model has learned to interpolate. Mask \emph{contiguous
 200-pixel blocks} and the visible pixels adjacent to the hole are far enough
 away, in wavelength terms, to be in different lines; the model must use the
-global shape of the spectrum --- which line regions are present, and how deep
---- to fill in the gap. That is where element ratios live.
+global shape of the spectrum (which line regions are present, and how deep) to
+fill in the gap. That is where element ratios live.
 
 \begin{figure}[htbp]\centering
   \begin{tabular}{@{}c@{\hskip6pt}c@{}}
     \fig[0.45]{mae_why_blocks.png} &
     \fig[0.45]{mae_step1_mask.png}
   \end{tabular}
-  \caption{Left: why the masking is contiguous --- a single-pixel hole is
-  filled by interpolation from its immediate neighbours, while a 200-pixel
-  block removes a whole line region and forces the model to use context.
-  Right: the actual mask used (top) and the residual the model must predict
-  (bottom), with the masked region shaded.}
+  \caption{Left: why the masking is contiguous: a single-pixel hole is filled
+  by interpolation from its immediate neighbours, while a 200-pixel block
+  removes a whole line region and forces the model to use context. Right: the
+  actual mask used (top) and the residual the model must predict (bottom), with
+  the masked region shaded.}
   \label{fig:maemask}
 \end{figure}
 
@@ -115,9 +114,8 @@ global shape of the spectrum --- which line regions are present, and how deep
   \caption{Encoding and reconstruction. Left: only the visible 50\% of the
   spectrum enters the encoder. Right: the decoder's reconstruction of the
   hidden half, against the truth, with the loss computed only on the hidden
-  pixels. The model is never rewarded for the parts it can see --- which is
-  what makes its latent a description of the spectrum rather than a copy of
-  it.}
+  pixels. The model is never rewarded for the parts it can see, which is what
+  makes its latent a description of the spectrum rather than a copy of it.}
   \label{fig:maeenc}
 \end{figure}
 
@@ -125,8 +123,8 @@ global shape of the spectrum --- which line regions are present, and how deep
   \fig[0.55]{mae_step4_latent.png}
   \caption{The 256-dimensional latent, projected. The spectral latent carries
   the abundance structure of the members because it had to reconstruct the
-  lines those abundances are measured from --- not because anyone told it she
-  was looking at C, N, O or Fe.}
+  lines those abundances are measured from, not because anyone told it she was
+  looking at C, N, O or Fe.}
   \label{fig:maelatent}
 \end{figure}
 
@@ -137,7 +135,7 @@ On cluster-only separation it is the strongest signal we have
 $0.760 \pm 0.011$ (UMAP), $0.714 \pm 0.036$ (EVoC) on the 982-star population,
 against abundances $0.560$/$0.578$/$0.420$. In the single-run baseline it
 reaches $0.789$/$0.874$/$0.770$ on the full 1\,002-row matrix, and
-concatenating it with the abundances gives $0.879$ --- the highest cluster-only
+concatenating it with the abundances gives $0.879$. The highest cluster-only
 score measured anywhere in this project. It also has the most important
 non-empirical property: because it never saw an abundance label, it cannot be
 circular in the way a supervised latent is.
@@ -147,23 +145,21 @@ useful result in this chapter:
 
 \begin{itemize}
 \item \textbf{Facing the field, the masked latent does not beat PCA-64.} In
-  \textbf{Table~\ref{tab:field}} the two are
-  $0.418$/$0.619$ and $0.417$/$0.631$: a tie to within the third decimal.
-  Two very different representations of the same spectra --- one unsupervised
-  and linear, one self-supervised and deep --- land on the same operating
-  point.
+\textbf{Table~\ref{tab:field}} the two are $0.418$/$0.619$ and $0.417$/$0.631$:
+a tie to within the third decimal. Two very different representations of the
+same spectra (one unsupervised and linear, one self-supervised and deep) land
+on the same operating point.
 \item \textbf{The tie is the finding.} If a 64-dimensional linear projection
   reaches the same field-retrieval precision as a 8.6-million-parameter
   convolutional latent, then what is limiting the precision is not the
   representation capacity of the model. It is the information in the spectra
   themselves, or the way our metric uses it.
 \item \textbf{EVoC disagrees, and we report both.} On the same cluster-only
-  task with EVoC as the clusterer, the supervised CNN reaches
-  $0.80 \pm 0.03$ on the four-cluster sample against the masked latent's
-  $0.70 \pm 0.08$ --- the supervised model wins, and the two error bars
-  overlap. We described the self-supervised result as a
-  t-SNE/UMAP result, not as a universal one, and withdrew the stronger
-  sentence.
+task with EVoC as the clusterer, the supervised CNN reaches $0.80 \pm 0.03$ on
+the four-cluster sample against the masked latent's $0.70 \pm 0.08$: the
+supervised model wins, and the two error bars overlap. We described the
+self-supervised result as a t-SNE/UMAP result, not as a universal one, and
+withdrew the stronger sentence.
 \end{itemize}
 
 \begin{figure}[htbp]\centering
@@ -195,22 +191,21 @@ The consequences, all measured:
   \textbf{AUC 0.999} on members alone, using 223 of the 256 dimensions
   ($p < 10^{-6}$).
 \item A one-bit flag (``which product is this?'') separates members from field
-  stars at \textbf{AUC 0.957} --- essentially the whole latent score, with no
-  chemistry involved.
+stars at \textbf{AUC 0.957}: essentially the whole latent score, with no
+chemistry involved.
 \item The paired control of \textbf{Figure~\ref{fig:paired}} is decisive: for
-  253 stars embedded through both pipelines, a star sits $1.70\times$ further
-  from its own other-product embedding than from a random different star
-  within one product (cosine distance $0.389$, with $75\%$ of the offset in
-  one shared direction --- the signature of a single global nuisance axis).
+253 stars embedded through both pipelines, a star sits $1.70\times$ further
+from its own other-product embedding than from a random different star within
+one product (cosine distance $0.389$, with $75\%$ of the offset in one shared
+direction. The signature of a single global nuisance axis).
 \end{itemize}
 
 We first diagnosed this as a data-release effect (DR17 members, DR19 field).
 That was wrong, and the check that disproved it is worth repeating: DR19
-reanalyses and includes DR17 --- 717\,689 rows carry
-\texttt{release=`dr17'} --- and DR19 serves a uniform \texttt{mwmStar}
-spectrum for \textbf{738 of 738} members in the backfilled list. The mismatch
-was between two products on the same sky, at the same epoch, from the same
-spectrograph.
+reanalyses and includes DR17 (717\,689 rows carry \texttt{release=`dr17'}) and
+DR19 serves a uniform \texttt{mwmStar} spectrum for \textbf{738 of 738} members
+in the backfilled list. The mismatch was between two products on the same sky,
+at the same epoch, from the same spectrograph.
 
 So the field-retrieval row for the mixed latent is not interpretable, and the
 ``twice as pure'' precision claim that depended on it is withdrawn. What
@@ -219,8 +214,8 @@ between members and therefore within one product, holds on a single-product
 subsample ($0.612$/$0.686$/$0.575$ against the abundances' $0.484$/$0.550$/
 $0.488$ on the same stars). The fix is not a caveat but a re-run: download
 uniform \texttt{mwmStar} spectra for every member and field star, re-embed, and
-repeat the benchmark. That run is staged in the repository --- 736
-\texttt{mwmStar} spectra are already downloaded and waiting --- and its results
+repeat the benchmark. That run is staged in the repository (736
+\texttt{mwmStar} spectra are already downloaded and waiting) and its results
 belong in the next version of this workbook rather than in this one.
 
 \begin{issues}[EXERCISES]

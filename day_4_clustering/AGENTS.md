@@ -1,11 +1,11 @@
-# AGENTS.md — day_4_clustering
+# AGENTS.md: day_4_clustering
 
 ## Project Overview
 
 Day 4 of the IAA advanced neural networks school: **unsupervised chemical
 tagging of open clusters**. Given stellar abundances from SDSS-V DR19 Astra
 ASPCAP, can clustering recover the birth clusters without ever being told the
-labels? The answer the material builds towards is *partly* — and the interesting
+labels? The answer the material builds towards is *partly*, and the interesting
 teaching is in *why* the honest number is lower than the published one.
 
 The repository is three things at once, and a change to one usually implies the
@@ -20,7 +20,7 @@ others:
 **The golden rule: every number asserted anywhere comes from a real run.** Not
 from the paper, not from memory, not from a plausible estimate. The workbook's
 own subject is that published numbers are hard to reproduce, so a fabricated
-number here would be self-refuting. If you cannot run it, say so — do not
+number here would be self-refuting. If you cannot run it, say so. Do not
 approximate.
 
 ## Repository Structure
@@ -53,9 +53,9 @@ day 4; each tree's own `AGENTS.md` carries the rest:
 | `docs/AGENTS.md` | Result documents and the recorded reference runs |
 | `hf/AGENTS.md` | Dataset publishing to the Hub |
 
-Human-facing contribution rules — the fork/branch/draft-PR flow, what CI
+Human-facing contribution rules: the fork/branch/draft-PR flow, what CI
 enforces, and the four-way split between pipeline, workbook, exercises and the
-separately-hosted slide deck — are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+separately-hosted slide deck: are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 Follow it when opening a PR; it is the same set of gates described above,
 written for a person rather than an agent.
 
@@ -64,7 +64,7 @@ written for a person rather than an agent.
 | Layer | Technology |
 |---|---|
 | Language | Python 3.13 |
-| Package mgmt | **uv** (`uv sync`, `uv run`) — never bare `pip` |
+| Package mgmt | **uv** (`uv sync`, `uv run`): never bare `pip` |
 | Data | astropy, pandas, numpy, pyarrow |
 | ML | scikit-learn, UMAP, EVoC, HDBSCAN, PyTorch (optional extra) |
 | Plotting | matplotlib (shipped figures), plotly (interactive, exploration only) |
@@ -129,7 +129,7 @@ naming the command that would fetch it.
 
 ### What a student can actually get
 
-Three tiers, and they are not equal — this matters when an exercise fails:
+Three tiers, and they are not equal: this matters when an exercise fails:
 
 | Tier | Command | What it gets |
 |---|---|---|
@@ -144,7 +144,7 @@ uv run cluster download --assets --with-optional
 tar -xf data/mwmstar.tar -C data/        # yields data/mwmstar/ (736 spectra)
 ```
 
-**Some results are not downloadable at all** — they are *computed* by a script
+**Some results are not downloadable at all**. They are *computed* by a script
 and land in `results/`. Exercise 13.4 needs
 `results/casamiquela_comparison.csv`, which is not in the HF bundle and never
 will be: it is a derived scoring table, regenerated with
@@ -156,16 +156,16 @@ uv run python scripts/casamiquela_comparison.py     # needs the catalogue; slow
 Likewise `data/galah_apogee_Collinder_261.parquet` (exercise 15.1) is built by
 `scripts/build_galah_apogee.py`. When you add an exercise that reads a file,
 decide which tier it belongs to and make the `DataNotAvailable` message say so
-exactly — a message naming the wrong command is worse than no message, because
+exactly: a message naming the wrong command is worse than no message, because
 the student cannot tell the difference.
 
 Never commit anything under `data/` or `results/`, and never add the published
-PDFs in `ref/` — they are copyright, and git history is permanent and public.
+PDFs in `ref/`. They are copyright, and git history is permanent and public.
 
 ## Conventions
 
 - **uv for everything.** `uv run <cmd>`, never a bare `python` against system site-packages.
-- **Seed every stochastic step** through `cluster.seeding` — a number that moves between runs cannot be taught.
+- **Seed every stochastic step** through `cluster.seeding`: a number that moves between runs cannot be taught.
 - **matplotlib for anything shipped.** Plotly is fine for exploration but renders as an empty div in a committed notebook, so it never reaches a deck or the workbook.
 - **Cite by bibliography key**, never a hand-typed author-year string. An unknown key must raise, not silently render.
 - **Real runs only.** Recording a number in `docs/` means it came out of a run whose environment fingerprint (`cluster doctor`) is recorded alongside it.
@@ -174,7 +174,7 @@ PDFs in `ref/` — they are copyright, and git history is permanent and public.
 ## CI
 
 `.github/workflows/day4-tests.yml` runs the suite, gated on `day_4_clustering/**`
-and its own path, **without the catalogue** — so anything data-dependent must
+and its own path, **without the catalogue**, so anything data-dependent must
 carry the skip guard or CI goes red on a machine that can never have the data.
 It also runs `scripts/make_exercise_notebooks.py --check`, which fails if the
 shipped decks have drifted from the exercise modules.

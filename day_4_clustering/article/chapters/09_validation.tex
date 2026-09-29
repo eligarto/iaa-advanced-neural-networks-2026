@@ -1,4 +1,4 @@
-% 09 · Validation — how to know whether any of this is real
+% 09 · Validation: how to know whether any of this is real
 \section{VALIDATION: KNOWING WHEN A SCORE LIES}
 \label{sec:validation}
 
@@ -7,7 +7,7 @@
 In a supervised problem, validation is arithmetic: hold out labels, count
 mistakes. In clustering there is nothing to hold out, and the score you report
 is chosen by you. This chapter is therefore the most important one in the
-workbook, and the one in which we report the most unflattering numbers ---
+workbook, and the one in which we report the most unflattering numbers,
 including two of our own that forced us to withdraw a published claim.
 
 \subsection{Internal indices: is the partition tidy?}
@@ -20,11 +20,11 @@ Three classical measures, all computed from the data and the partition alone.
   Monotone in the number of groups, so it is only useful as a curve against
   $K$, never as a score.
 \item \textbf{Silhouette} \citep{Rousseeuw:87}. For a point $i$, let $a(i)$ be
-  its mean distance to the other members of its own group and $b(i)$ its mean
-  distance to the members of the nearest other group. Then
-  $s(i) = (b(i)-a(i))/\max\{a(i),b(i)\} \in [-1,1]$, and the silhouette is the
-  mean over points. It rewards compact, well-separated groups --- which is a
-  statement about geometry, not about truth.
+its mean distance to the other members of its own group and $b(i)$ its mean
+distance to the members of the nearest other group. Then $s(i) =
+(b(i)-a(i))/\max\{a(i),b(i)\} \in [-1,1]$, and the silhouette is the mean over
+points. It rewards compact, well-separated groups, which is a statement about
+geometry, not about truth.
 \item \textbf{Dip test} \citep{Hartigan:85}. A significance test for
   unimodality of a one-dimensional distribution. Its role here is upstream of
   clustering: it answers whether a variable (or a projection) shows any
@@ -87,7 +87,7 @@ per-cluster study actually asks: how many of the known clusters came back? For
 each true cluster, take the predicted group that holds most of its stars (the
 best-overlap rule above). The cluster counts as \emph{recovered} at a threshold
 $\theta$ when that group holds at least $\theta$ of the cluster \emph{and} at
-least $\theta$ of the group is the cluster --- their per-cluster completeness and
+least $\theta$ of the group is the cluster. Their per-cluster completeness and
 homogeneity, our recall and precision, both at once:
 
 \begin{equation}
@@ -113,14 +113,14 @@ the method rank the member as more plausible? It is used in
 \S\ref{sec:benchmark} to show that the rejection power of spectra grows with
 cluster age.
 
-\begin{issues}[THE ``BEST OVERLAP'' IS A BEST CASE]
-The protocol above scores a method by its single best-matching predicted
-group per cluster. That is deliberately generous --- it is the only fair way to
-compare algorithms that return different numbers of groups --- but it means a
-method can look good by returning many groups, only one of which overlaps each
-cluster. It also cannot be gamed into positive precision: the denominator is
-the size of the predicted group, so a group with 3 true members in it and 300
-field stars scores 0.01 however well it ``recovered'' those three.
+\begin{issues}[THE ``BEST OVERLAP'' IS A BEST CASE] The protocol above scores a
+method by its single best-matching predicted group per cluster. That is
+deliberately generous (it is the only fair way to compare algorithms that
+return different numbers of groups) but it means a method can look good by
+returning many groups, only one of which overlaps each cluster. It also cannot
+be gamed into positive precision: the denominator is the size of the predicted
+group, so a group with 3 true members in it and 300 field stars scores 0.01
+however well it ``recovered'' those three.
 \end{issues}
 
 \subsection{Five ways a score lies}
@@ -130,51 +130,51 @@ recent, and the fourth is the reason the validation chapter is in the middle
 of the workbook rather than at the end.
 
 \paragraph{1 · The degenerate partition.} A clustering that returns two groups
-with two thirds of the stars in one of them produces a homogeneity of
-$0.269$ --- a floor set by the collapse, not a measurement of the method. Two
-of our PCA rows sat on that floor, and a first draft of this work described
-the spectral latent as ``three times better than PCA''. It was three times
-better than a crash. The check that catches it is a column nobody prints by
-default: the fraction of stars in the largest predicted group. We now print
-it, and \texttt{cluster head-to-head} flags degenerate rows automatically.
+with two thirds of the stars in one of them produces a homogeneity of $0.269$,
+a floor set by the collapse, not a measurement of the method. Two of our PCA
+rows sat on that floor, and a first draft of this work described the spectral
+latent as ``three times better than PCA''. It was three times better than a
+crash. The check that catches it is a column nobody prints by default: the
+fraction of stars in the largest predicted group. We now print it, and
+\texttt{cluster head-to-head} flags degenerate rows automatically.
 
-\paragraph{2 · Comparing different populations.} The abundance arm of our
-first head-to-head was scored on 25 clusters and 1\,215 stars, while every
-other arm was scored on 5 clusters and 55 stars. The abundance row therefore
-looked worse than the others for a reason that had nothing to do with
-abundances: it was being asked a harder question. The fix is structural, not
-statistical --- intersect the sets of stars before scoring, so every row of
-the table describes the same 982 stars and the same 25 clusters. Two tables in
-this workbook have been rebuilt that way, and the rebuilt numbers are the ones
-quoted.
+\paragraph{2 · Comparing different populations.} The abundance arm of our first
+head-to-head was scored on 25 clusters and 1\,215 stars, while every other arm
+was scored on 5 clusters and 55 stars. The abundance row therefore looked worse
+than the others for a reason that had nothing to do with abundances: it was
+being asked a harder question. The fix is structural, not statistical.
+Intersect the sets of stars before scoring, so every row of the table describes
+the same 982 stars and the same 25 clusters. Two tables in this workbook have
+been rebuilt that way, and the rebuilt numbers are the ones quoted.
 
 \paragraph{3 · Row order, and duplicate stars.} Two checks on the same member
 matrix, both of which should have been run before any of it was published.
 
-\emph{Row order.} Permuting the rows of the abundance matrix --- a
-transformation that leaves every pairwise distance exactly unchanged --- moves
-the t-SNE homogeneity between $0.218$ and $0.560$, and the number of predicted
-groups between 2 and 22. The sorted order gives $0.560$; the mean over eight
-random orders is $0.268 \pm 0.100$. The geometry is identical in all nine
-runs; what changes is the optimiser's path, which depends on initialisation
-and on the order in which the Barnes--Hut approximation accumulates
-interactions. Every other arm is stable to a few hundredths: UMAP on the same
-abundances $0.579 \pm 0.009$, and the masked-AE latent $0.740 \pm 0.003$ under
-t-SNE. The lesson is not ``t-SNE is broken'' but ``report the row-order spread
-of any embedding with a stochastic initialisation'', because on small samples
-it can exceed the effect you are claiming.
+\emph{Row order.} Permuting the rows of the abundance matrix (a transformation
+that leaves every pairwise distance exactly unchanged) moves the t-SNE
+homogeneity between $0.218$ and $0.560$, and the number of predicted groups
+between 2 and 22. The sorted order gives $0.560$; the mean over eight random
+orders is $0.268 \pm 0.100$. The geometry is identical in all nine runs; what
+changes is the optimiser's path, which depends on initialisation and on the
+order in which the Barnes--Hut approximation accumulates interactions. Every
+other arm is stable to a few hundredths: UMAP on the same abundances $0.579 \pm
+0.009$, and the masked-AE latent $0.740 \pm 0.003$ under t-SNE. The lesson is
+not ``t-SNE is broken'' but ``report the row-order spread of any embedding with
+a stochastic initialisation'', because on small samples it can exceed the
+effect you are claiming.
 
 \emph{Duplicates.} An audit of the same matrix found that it contains repeat
 entries for the same star: of 1\,002 member rows, 807 carry distinct
 \texttt{APOGEE\_ID}s and 34 carry none, so 332 rows share an identifier with
-another row (\texttt{scripts/population\_counts.py}). The copies are not identical --- the median spread between two
-rows of the same star is $0.04$ dex per element, comparable to the abundance
-differences we are trying to measure --- and they are concentrated: M~3
-contributes 102 duplicate rows, M~67 ninety. This inflates the member counts
-of \textbf{Table~\ref{tab:clusters}} (they are row counts, not star counts),
-double-weights those clusters in every macro average, and is the most likely
-explanation for the fragility of the abundances-only t-SNE row above. The
-clean fix is to collapse each star's rows before clustering.
+another row (\texttt{scripts/population\_counts.py}). The copies are not
+identical (the median spread between two rows of the same star is $0.04$ dex
+per element, comparable to the abundance differences we are trying to measure)
+and they are concentrated: M~3 contributes 102 duplicate rows, M~67 ninety.
+This inflates the member counts of \textbf{Table~\ref{tab:clusters}} (they are
+row counts, not star counts), double-weights those clusters in every macro
+average, and is the most likely explanation for the fragility of the
+abundances-only t-SNE row above. The clean fix is to collapse each star's rows
+before clustering.
 
 \paragraph{4 · Tuning on the score.} The lever sweep of
 \S\ref{sec:benchmark} chose element weights by maximising the very metric it
@@ -185,10 +185,10 @@ on the DR17 data ($0.09 \rightarrow 0.44$) lowers precision on the DR19 data
 ($0.83 \rightarrow 0.24$). A lever is a hypothesis; only a re-run on the
 current data, quoted with both recall and precision, turns it into a result.
 
-\paragraph{5 \textperiodcentered\ The chance level of a mutual-information score moves
-with the sample.} Small groups inflate $h$, $c$ and $V$. Shuffle
+\paragraph{5 \textperiodcentered\ The chance level of a mutual-information
+score moves with the sample.} Small groups inflate $h$, $c$ and $V$. Shuffle
 \citet{Casamiquela:21}'s 175 stars at random into groups with the sizes they
-observe --- 31 clusters, most of them tiny --- and the V-measure is $0.51$; do the
+observe (31 clusters, most of them tiny) and the V-measure is $0.51$; do the
 same on our 982 stars in 25 clusters and it is $0.06$--$0.12$. Their published
 $V = 0.55$ therefore sits $0.04$ above its null, and our $V = 0.58$ sits about
 $0.47$ above ours. The two numbers are not comparable, and a table that prints
@@ -228,7 +228,7 @@ Out of all that, six rules, which the numbers in
   \end{tabular}
   \caption{The confusion matrix of a t-SNE clustering of the members, with the
   true cluster on one axis and the predicted group on the other
-  (\textbf{Equation~\ref{eq:merits}} visualised). Left: abundances only --- one
+  (\textbf{Equation~\ref{eq:merits}} visualised). Left: abundances only. One
   predicted group absorbs most of the true clusters, which is the
   completeness-rich, homogeneity-poor blob described above. Right: adding
   kinematics. The blocks along the diagonal are what ``the clusters are
@@ -262,8 +262,8 @@ Out of all that, six rules, which the numbers in
   cluster-only table. Which rows of \textbf{Table~\ref{tab:honest}} move, and
   does M~3's share of the sample change the conclusion of the ablation?
 \item Design a $\sigma$-clipped chemical membership and use it to score a
-  kinematic clustering. Based on \S\ref{sec:data}, explain in three sentences
-  why the resulting number would be meaningless --- and what the equivalent
-  mistake would look like in your own field.
+kinematic clustering. Based on \S\ref{sec:data}, explain in three sentences why
+the resulting number would be meaningless, and what the equivalent mistake
+would look like in your own field.
 \end{enumerate}
 \end{issues}

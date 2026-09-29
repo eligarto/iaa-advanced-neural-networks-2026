@@ -57,7 +57,7 @@ def test_no_stray_exercise_modules() -> None:
 
 @pytest.mark.parametrize(("chapter", "number"), ALL_EXERCISES)
 def test_module_imports(chapter: int, number: int) -> None:
-    """Every exercise module imports cleanly — no data access at import time."""
+    """Every exercise module imports cleanly, no data access at import time."""
     module = load(chapter, number)
     assert module.__doc__, f"{module.__name__} has no docstring"
 
@@ -165,7 +165,7 @@ def test_every_notebook_cell_is_valid_python(deck: Path) -> None:
 
     The decks are *generated* source. A scratch cell is assembled from another
     module's import statements, and that assembly can produce nonsense even
-    when the module it came from is perfectly good — which is how an exercise
+    when the module it came from is perfectly good, which is how an exercise
     once shipped telling students to ``import as``. Nothing else in this suite
     looks at the text a student is asked to run, so this compiles it.
     """
@@ -230,7 +230,7 @@ def _exercise_statements() -> list[tuple[int, int, str]]:
 
 #: LaTeX commands that are *not* maths: if one of these reaches a student's
 #: cell, the converter missed it. Maths (``\sigma``, ``\kappa``, ``\mathbf``…)
-#: is expected — the notebooks render ``$…$`` through MathJax.
+#: is expected. The notebooks render ``$…$`` through MathJax.
 NON_MATH_COMMANDS = re.compile(
     r"\\[a-zA-Z]+",
 )
@@ -256,7 +256,7 @@ def test_references_resolve_to_workbook_numbers() -> None:
     """``\\ref`` targets become the number the compiled workbook prints.
 
     The table the exercises point at is the cluster table, which is Table 1
-    in the workbook — not a number the converter may invent.
+    in the workbook, not a number the converter may invent.
     """
     numbers = _generator().reference_numbers()
     assert numbers.get("sec:fundamentals") == 3
@@ -264,7 +264,7 @@ def test_references_resolve_to_workbook_numbers() -> None:
     assert numbers.get("tab:clusters") == 1
     # The workbook numbers floats with a single arabic counter per kind (the
     # class redefines \thetable/\thefigure/\theequation), and chapter 5 holds
-    # two *unlabelled* numbered equations — which is why these are counted
+    # two *unlabelled* numbered equations: which is why these are counted
     # from environments and not from labels.
     assert numbers.get("tab:honest") == 4
     assert numbers.get("fig:dbscansteps") == 11
@@ -385,13 +385,13 @@ def test_citation_import_is_actually_used(chapter: int, number: int) -> None:
     names = imported.group(1)
     if "cite" in names:
         assert re.search(r"\bcite\(", source), (
-            f"exercise {chapter}.{number} imports cite but never calls it — "
+            f"exercise {chapter}.{number} imports cite but never calls it: "
             f"an unfinished citation edit"
         )
     if "reference_list" in names:
         assert re.search(r"\breference_list\(", source), (
             f"exercise {chapter}.{number} imports reference_list but never "
-            f"calls it — an unfinished citation edit"
+            f"calls it: an unfinished citation edit"
         )
 
 
@@ -474,7 +474,7 @@ def test_every_plot_reaches_a_notebook_cell(chapter: int, number: int) -> None:
         if wanted in deck.read_text(encoding="utf-8")
     }
     assert hits, (
-        f"exercise {chapter}.{number} defines plot() but no deck calls it — "
+        f"exercise {chapter}.{number} defines plot() but no deck calls it: "
         f"re-run scripts/make_exercise_notebooks.py"
     )
     # Both decks, not either: a student working through one chapter must get
@@ -487,7 +487,7 @@ def test_every_plot_reaches_a_notebook_cell(chapter: int, number: int) -> None:
     )
     assert chapter_decks, (
         f"exercise {chapter}.{number} plot() reaches only the master deck, "
-        f"not its chapter deck — re-run scripts/make_exercise_notebooks.py"
+        f"not its chapter deck: re-run scripts/make_exercise_notebooks.py"
     )
 
 
@@ -495,7 +495,7 @@ def test_every_plot_reaches_a_notebook_cell(chapter: int, number: int) -> None:
 def test_scripts_an_exercise_names_actually_exist(chapter: int, number: int) -> None:
     """A module that tells you to run a script must name one that is here.
 
-    Exercise error messages double as instructions — ``DataNotAvailable``
+    Exercise error messages double as instructions: ``DataNotAvailable``
     tells the student which command regenerates the missing file. Two such
     scripts were left behind when this work was migrated between repositories,
     so the advice pointed at nothing: the exercise failed, named a fix, and the
@@ -507,7 +507,7 @@ def test_scripts_an_exercise_names_actually_exist(chapter: int, number: int) -> 
         root / "src" / "exercises" / f"{module_name(chapter, number)}.py"
     ).read_text()
     # The path usually sits mid-string, after a runner: "uv run python
-    # scripts/foo.py" or ".venv/bin/python scripts/foo.py" — so anchor on the
+    # scripts/foo.py" or ".venv/bin/python scripts/foo.py": so anchor on the
     # directory, not on a quote.
     named = set(re.findall(r"((?:article/)?scripts/[a-z0-9_]+\.py)", source))
     missing = sorted(path for path in named if not (root / path).is_file())
@@ -523,7 +523,7 @@ def test_no_source_file_hardcodes_an_absolute_home_path() -> None:
     ``scripts/casamiquela_comparison.py`` arrived from another repository with
     ``REPO = Path("/home/<user>/git/…-draft")`` baked in. It imported fine on
     the machine that still had that checkout and would have failed for every
-    student — the worst kind of defect, because it is invisible to the author.
+    student: the worst kind of defect, because it is invisible to the author.
     Resolve paths from ``Path(__file__)`` instead.
     """
     root = Path(__file__).resolve().parents[1]
@@ -545,8 +545,8 @@ def test_no_source_file_hardcodes_an_absolute_home_path() -> None:
 def test_solve_cells_reset_result_before_computing(deck: Path) -> None:
     """A failed ``solve()`` must not leave the previous exercise's result bound.
 
-    The decks run top to bottom in one kernel. When ``solve()`` raises —
-    routinely, for exercises whose data is not on disk — a bare
+    The decks run top to bottom in one kernel. When ``solve()`` raises,
+    routinely, for exercises whose data is not on disk: a bare
     ``result = solve()`` leaves ``result`` holding the *previous* exercise's
     dict, and the plot cell below then draws the wrong exercise's data and dies
     with a meaningless ``KeyError: 'scatter'`` instead of the
@@ -567,7 +567,7 @@ def test_solve_cells_reset_result_before_computing(deck: Path) -> None:
     ]
     assert not missing, (
         f"{deck.name}: {len(missing)} solve cell(s) bind result without "
-        f"resetting it first — a raising solve() would leak the previous "
+        f"resetting it first: a raising solve() would leak the previous "
         f"exercise's result into the plot cell: {missing[:3]}"
     )
 

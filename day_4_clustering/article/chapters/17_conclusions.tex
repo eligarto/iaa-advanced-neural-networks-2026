@@ -1,8 +1,8 @@
-% 17 · Conclusions — the eight lessons, and what comes next
+% 17 · Conclusions: the eight lessons, and what comes next
 \section{CONCLUSIONS}
 \label{sec:conclusions}
 
-\deckslides{slides 48--49 --- the eight lessons and the take-away.}
+\deckslides{slides 48--49: the eight lessons and the take-away.}
 
 This chapter collects the eight lessons the benchmark produced, each with the
 number that supports it and the section that demonstrates the mechanism. They
@@ -11,53 +11,52 @@ the evidence allows.
 
 \subsection{Eight lessons from the benchmark}
 
-\textbf{1 · All-sky collapses; cut a region.} One embedding of every clean
-star in the survey buries each cluster in the field: the field is 357\,056
-stars of chemically smooth background, and 25 clusters of a few dozen members
-each are not density peaks in that space. The published answer, and the one
-that works, is to restrict the sky --- \citet{Kos:17} used $40^\circ$ around
-the Pleiades, and our region runs use a cone scaled to the cluster,
-$\max(3^\circ, 10\times$ diameter$)$. The cost of ignoring this is measurable:
-in the uniform all-sky run the abundance-only t-SNE arm reaches recall $0.201$
-at precision $0.240$ (\textbf{Table~\ref{tab:field}}), while the same
-pipeline in region mode on the DR17 data reached recall $0.73$ at precision
-$0.47$ (\textbf{Table~\ref{tab:curse}}). Same methods, same clusters; the
-difference is the contrast between the cluster and its immediate
-neighbourhood.
+\textbf{1 · All-sky collapses; cut a region.} One embedding of every clean star
+in the survey buries each cluster in the field: the field is 357\,056 stars of
+chemically smooth background, and 25 clusters of a few dozen members each are
+not density peaks in that space. The published answer, and the one that works,
+is to restrict the sky. \citet{Kos:17} used $40^\circ$ around the Pleiades, and
+our region runs use a cone scaled to the cluster, $\max(3^\circ, 10\times$
+diameter$)$. The cost of ignoring this is measurable: in the uniform all-sky
+run the abundance-only t-SNE arm reaches recall $0.201$ at precision $0.240$
+(\textbf{Table~\ref{tab:field}}), while the same pipeline in region mode on the
+DR17 data reached recall $0.73$ at precision $0.47$
+(\textbf{Table~\ref{tab:curse}}). Same methods, same clusters; the difference
+is the contrast between the cluster and its immediate neighbourhood.
 
-\textbf{2 · Precision is the hard part.} Read across the region-by-region
-sweep and the macro precision is $0.28$ for t-SNE, $0.08$ for UMAP and $0.01$
-for EVoC (25 clusters, DR19). The field is chemically similar to the clusters
---- that is what it means for a cluster to be dissolved in it --- so a method
-that recovers members also recovers their look-alikes. We can now put a number
-on the mechanism that \citet{Casamiquela:21} report: they find that more than
-70\,\% of the groups in their best-case solution are statistical mixtures, and
-our own cluster-only runs give $64$--$72\,\%$ of groups that recover no cluster
-at all (\texttt{stat40} in \S\ref{sec:literature}). Their negative result is
-about cluster-to-cluster separation and ours about field contamination, but both
-say the same thing: at survey precision, the chemical differences between
-clusters of the same age are comparable to the differences between a cluster and
-the field.
+\textbf{2 · Precision is the hard part.} Read across the region-by-region sweep
+and the macro precision is $0.28$ for t-SNE, $0.08$ for UMAP and $0.01$ for
+EVoC (25 clusters, DR19). The field is chemically similar to the clusters (that
+is what it means for a cluster to be dissolved in it) so a method that recovers
+members also recovers their look-alikes. We can now put a number on the
+mechanism that \citet{Casamiquela:21} report: they find that more than 70\,\%
+of the groups in their best-case solution are statistical mixtures, and our own
+cluster-only runs give $64$--$72\,\%$ of groups that recover no cluster at all
+(\texttt{stat40} in \S\ref{sec:literature}). Their negative result is about
+cluster-to-cluster separation and ours about field contamination, but both say
+the same thing: at survey precision, the chemical differences between clusters
+of the same age are comparable to the differences between a cluster and the
+field.
 
-\textbf{3 · Recall $\approx 1$ is usually a blob.} HDBSCAN$^*$ on the
-abundance space swallows the dense field into a single cluster, after which any
+\textbf{3 · Recall $\approx 1$ is usually a blob.} HDBSCAN$^*$ on the abundance
+space swallows the dense field into a single cluster, after which any
 best-overlap scorer reports that the true members are inside it: recall $1.000$
 at precision $0.0013$ (UMAP on abundances, \textbf{Table~\ref{tab:field}}, and
-note that this run has row-normalisation \emph{on} --- it is the configuration
-default, and it does not prevent the collapse). Two defences are built into this
-workbook: report kNN purity, which cannot be gamed by a group's size; and never
-quote recall without its precision. The third defence we tried ---
-row-normalisation --- is the subject of the quiet lesson below.
+note that this run has row-normalisation \emph{on} (it is the configuration
+default, and it does not prevent the collapse). Two defences are built into
+this workbook: report kNN purity, which cannot be gamed by a group's size; and
+never quote recall without its precision. The third defence we tried)
+row-normalisation. Is the subject of the quiet lesson below.
 
-\textbf{4 · Globulars tag cleanly; open clusters do not.} The kNN purity of
-the metal-poor globulars reaches $0.4$--$0.5$ while solar-metallicity open
-clusters stay below $0.2$. Three effects push the same way: globulars are
-older, more metal-poor, and formed from gas that no longer resembles the
-present-day interstellar medium, so their chemistry is distinct from the field
-they sit in. The Pleiades are the limiting case --- $100$ Myr old, formed from
-gas the field still resembles --- and the prediction that chemistry fails there
-is part of the assignment (\S\ref{sec:assignment}), to be reported as a null
-result when it does.
+\textbf{4 · Globulars tag cleanly; open clusters do not.} The kNN purity of the
+metal-poor globulars reaches $0.4$--$0.5$ while solar-metallicity open clusters
+stay below $0.2$. Three effects push the same way: globulars are older, more
+metal-poor, and formed from gas that no longer resembles the present-day
+interstellar medium, so their chemistry is distinct from the field they sit in.
+The Pleiades are the limiting case ($100$ Myr old, formed from gas the field
+still resembles) and the prediction that chemistry fails there is part of the
+assignment (\S\ref{sec:assignment}), to be reported as a null result when it
+does.
 
 \textbf{5 · t-SNE isolates, UMAP over-merges, EVoC is fast but coarse.} Three
 sets of assumptions, three answers, and no winner. t-SNE produces the most
@@ -71,16 +70,16 @@ methods.
 
 \textbf{6 · Levers are fragile, and read them in pairs.} On the DR17 data,
 weighting each element by $1/\sigma$ \emph{after} standardising lifted M~67's
-t-SNE recall from $0.09$ to $0.44$ --- the largest single effect in the sweep,
-and the fix for a bug that had made the same switch a no-op. On the DR19 data
-the same switch moves recall from $0.10$ to $0.96$ while precision falls from
-$0.14$ to $0.05$: t-SNE's cluster grows until it swallows the field. The
-region sweep agrees, with precision falling $0.83 \rightarrow 0.24$. A lever
-selected on one metric, one cluster and one seed is a hypothesis; it becomes a
-result only when it is re-run on the current data with both halves of the
-metric pair reported.
+t-SNE recall from $0.09$ to $0.44$: the largest single effect in the sweep, and
+the fix for a bug that had made the same switch a no-op. On the DR19 data the
+same switch moves recall from $0.10$ to $0.96$ while precision falls from
+$0.14$ to $0.05$: t-SNE's cluster grows until it swallows the field. The region
+sweep agrees, with precision falling $0.83 \rightarrow 0.24$. A lever selected
+on one metric, one cluster and one seed is a hypothesis; it becomes a result
+only when it is re-run on the current data with both halves of the metric pair
+reported.
 
-\textbf{7 · Spectra beat abundances --- and not PCA.} A self-supervised masked
+\textbf{7 · Spectra beat abundances, and not PCA.} A self-supervised masked
 autoencoder on the raw spectrum separates the 25 clusters better than the 16
 ASPCAP abundances ($0.760$ vs $0.578$ homogeneity, UMAP, the same 982 stars),
 and a plain PCA of the same spectra does about as well ($0.754$). Two very
@@ -94,10 +93,10 @@ we made for the spectral latent has been withdrawn for the reason given in
 \textbf{8 · Two surveys, two parameters.} APOGEE sees giants: the red clump
 gives distances, and NGC~6819 comes out within $0.01$ mag of the literature
 value (\textbf{Table~\ref{tab:dm}}). GALAH sees the main sequence and turnoff:
-that is where age sensitivity lives. The joint fit is not there yet --- the
-age posterior ($\sigma_{\log a} \approx 0.97$) is close to the width of the
-flat prior, so the age half of the promise needs a better likelihood before it
-shows anything --- but the distance half works, and the NGC~2243 experiment
+that is where age sensitivity lives. The joint fit is not there yet (the age
+posterior ($\sigma_{\log a} \approx 0.97$) is close to the width of the flat
+prior, so the age half of the promise needs a better likelihood before it shows
+anything) but the distance half works, and the NGC~2243 experiment
 (\S\ref{sec:physics}) shows what the combination can do when the distance is
 pinned and the main sequence is added: an age residual improving from $0.52$ to
 $0.09$.
@@ -119,9 +118,8 @@ choice about which error you can live with, made explicit.
 
 \begin{summary}[SUMMARY POINTS]
 \begin{enumerate}
-\item Clustering is a decision problem: which space, which metric, which
-  notion of ``cluster'', which scale --- and every choice belongs in the
-  write-up.
+\item Clustering is a decision problem: which space, which metric, which notion
+of ``cluster'', which scale, and every choice belongs in the write-up.
 \item Geometry beats algorithm. The largest improvements in this project came
   from changing the representation (spectra instead of abundances,
   row-normalisation, 64 components instead of 256), not from changing the
@@ -156,10 +154,10 @@ choice about which error you can live with, made explicit.
   \texttt{APOGEE\_ID} with another row. Until the sample is deduplicated, every
   macro average over clusters is weighted by something that is not a star.
 \item \textbf{Benchmark against \citet{Spina:25}.} \S\ref{sec:literature}
-  covers the published negative result --- their clustering step on our stars,
-  their metric triple on our scores --- but a common-population comparison with
-  the graph-attention autoencoder, on the same clusters and the same two tasks,
-  is still the experiment this work is missing.
+covers the published negative result (their clustering step on our stars, their
+metric triple on our scores) but a common-population comparison with the
+graph-attention autoencoder, on the same clusters and the same two tasks, is
+still the experiment this work is missing.
 \item \textbf{Test the strong-tagging claim.} Everything here is measured with
   a kinematic prior available. Recovering a dispersed cluster from the field
   alone remains the open problem, and the honest current status is

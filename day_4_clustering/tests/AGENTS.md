@@ -1,4 +1,4 @@
-# AGENTS.md — tests
+# AGENTS.md: tests
 
 One pytest suite over both packages: `src/cluster/` (the pipeline) and
 `src/exercises/` (the workbook exercises). ~812 tests, ~5 minutes.
@@ -16,7 +16,7 @@ One `test_<module>.py` per module in `src/cluster/`, plus:
 
 | File | Covers |
 |---|---|
-| `conftest.py` | Shared synthetic fixtures — `make_allstar_frame()` and friends |
+| `conftest.py` | Shared synthetic fixtures: `make_allstar_frame()` and friends |
 | `test_exercises.py` | All 56 exercise modules: the contract, citations, figures, deck sync |
 | `test_reproducibility.py` | That a seeded run reproduces |
 | `test_models.py` | Torch-dependent; skipped unless `uv sync --extra torch` |
@@ -26,7 +26,7 @@ One `test_<module>.py` per module in `src/cluster/`, plus:
 **No test downloads or reads the real 1.17 GB catalogue.** Fixtures build
 minimal schema-valid frames instead. An autouse fixture sets `CLUSTER_NO_CACHE=1`
 so the prepared-sample cache cannot leak state between tests or quietly satisfy
-a "did `prepare()` actually run?" assertion — tests that exercise the cache opt
+a "did `prepare()` actually run?" assertion: tests that exercise the cache opt
 back in explicitly.
 
 This is not a stylistic preference. CI runs with **no catalogue at all**, so a
@@ -57,7 +57,7 @@ modules and 17 generated decks in agreement:
 
 - every workbook exercise has a module, and no module invents an exercise the workbook does not set;
 - each `ANSWER` is a non-empty dict of real prose, with no LaTeX left in it;
-- `solve()` and `plot()` take no *required* arguments — the decks call them bare;
+- `solve()` and `plot()` take no *required* arguments: the decks call them bare;
 - no module touches data at import time (deck generation imports every module);
 - every citation key resolves against `article/references.bib`;
 - every notebook cell is valid Python;
@@ -67,7 +67,7 @@ modules and 17 generated decks in agreement:
 - every script an exercise tells the student to run actually exists in this repository.
 
 The deck-cell guard exists because 52 `plot()` functions were once written, committed,
-and called by nothing — no cell, no test, all `# pragma: no cover` — and five
+and called by nothing (no cell, no test, all `# pragma: no cover`) and five
 had rotted undetected, two of them badly enough to break their `solve()` as
 well. A test that only asked "does it return a figure?" would not have caught
 it, and neither would a test that accepted a hit in *either* deck.
@@ -76,7 +76,7 @@ it, and neither would a test that accepted a hit in *either* deck.
 
 A guard is worth what it catches, not what it claims. Both of the above were
 verified by deliberately breaking the thing they watch and confirming a red
-test — and the first version of the deck guard **passed** a mutation it should
+test, and the first version of the deck guard **passed** a mutation it should
 have caught (a plot removed from its chapter deck, still present in the master),
 which is how the both-decks requirement came about.
 
@@ -97,7 +97,7 @@ This work was migrated from another repository, and three times the exercises
 came across while what they depend on did not:
 
 - `cluster.baseline.recovery_fraction` was never copied, which broke `solve()`
-  for two exercises — not just their plots;
+  for two exercises, not just their plots;
 - `scripts/casamiquela_comparison.py` was never copied, so exercise 13.4's
   error told the student to run a script that did not exist;
 - that script, once copied, still carried `REPO = Path("/home/<user>/git/…")`
@@ -117,5 +117,5 @@ cross-repository move.
 
 Figure tests force the `Agg` backend and must not require a network. The
 SkyView-backed figure is tested through its offline fallback by monkeypatching
-`figures.NO_NETWORK` — never by making a real request, which would make the
+`figures.NO_NETWORK`, never by making a real request, which would make the
 suite flaky and slow.

@@ -3,13 +3,13 @@
 Reproducibility in this workshop has three tiers (full detail in
 ``docs/reproducibility.md``):
 
-* **exact** — data identity, the sampled population, run-to-run determinism on
+* **exact**: data identity, the sampled population, run-to-run determinism on
   one machine, native <-> container parity on one machine;
-* **tolerance** — method scores *across* machines: sklearn's Barnes-Hut t-SNE
+* **tolerance**: method scores *across* machines: sklearn's Barnes-Hut t-SNE
   (OpenMP), numba (UMAP, EVoC, HDBSCAN) and BLAS all reduce in
   environment-dependent orders, so identical code gives slightly different
   floats on different CPUs;
-* **illustrative** — exact per-cluster tables on other hardware.
+* **illustrative**: exact per-cluster tables on other hardware.
 
 :func:`seed_everything` is the tier-one half; :func:`thread_report` records the
 environment the tier-two tolerance is measured against, so a quoted number can
@@ -29,7 +29,7 @@ def seed_everything(seed: int) -> None:
     """Seed the global RNGs the pipeline draws from.
 
     ``PYTHONHASHSEED`` is only read while the interpreter starts, so setting it
-    here cannot affect the current process — it is set (when unset) for child
+    here cannot affect the current process. It is set (when unset) for child
     processes, and it is exported before Python starts in the container and in
     ``run.sh``. Where it matters, the run-to-run guarantee comes from the two
     library RNGs below, and every model call also takes an explicit
@@ -44,7 +44,7 @@ def thread_report() -> dict[str, Any]:
     """Effective thread configuration: env knobs plus what the libraries use.
 
     ``unset`` means the library default was in force (usually every core), which
-    is the recommended student setting — it is faster, and pinning threads only
+    is the recommended student setting. It is faster, and pinning threads only
     buys cross-machine stability when the machines are otherwise identical.
     """
     report: dict[str, Any] = {

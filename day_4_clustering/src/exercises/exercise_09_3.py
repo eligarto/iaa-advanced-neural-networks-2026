@@ -1,4 +1,4 @@
-"""Chapter 9, exercise 3 — collapsing the duplicate rows.
+"""Chapter 9, exercise 3: collapsing the duplicate rows.
 
     Collapse the duplicate rows of the member matrix (for example by taking
     the median abundance vector per APOGEE_ID) and re-run the cluster-only
@@ -10,7 +10,7 @@
 repeats are concentrated in the two clusters that already dominate every macro
 average. This module verifies the audit's counts on the current frame,
 collapses the matrix by median per identifier, re-runs the seven-seed
-cluster-only table, and repeats the M 3 ablation on both populations — where
+cluster-only table, and repeats the M 3 ablation on both populations: where
 it turns up a degenerate partition that the score alone would have hidden.
 """
 
@@ -79,7 +79,7 @@ def collapse(df: pd.DataFrame, elements: list[str]) -> pd.DataFrame:
     """One row per star: median abundance vector per ``APOGEE_ID``.
 
     Rows with no identifier cannot be matched to anything, so each is kept as
-    its own star — the conservative choice, and the one that keeps the 34
+    its own star: the conservative choice, and the one that keeps the 34
     anonymous rows in the sample rather than silently merging them. The
     result is left in groupby order (sorted by star key); exercise 9.2's
     lesson applies, so the row order is re-randomised explicitly downstream
@@ -157,7 +157,7 @@ def solve(seeds: tuple[int, ...] = SEEDS) -> dict[str, object]:
     merged = before.merge(after, on="method", suffixes=("_rows", "_stars"))
     merged["delta"] = (merged["mean_stars"] - merged["mean_rows"]).round(4)
 
-    # The ablation, on both populations and under three row orders — because
+    # The ablation, on both populations and under three row orders: because
     # \\S 9.3's other failure mode is still live here, and it shows up.
     cfg = settings()
     params = {k: v for k, v in cfg.tsne.items() if k != "method"}
@@ -219,7 +219,7 @@ def solve(seeds: tuple[int, ...] = SEEDS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Homogeneity before and after collapsing rows to stars."""
     import matplotlib.pyplot as plt
 
@@ -244,17 +244,17 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 ANSWER: dict[str, object] = {
     "the audit reproduces": (
         "Every count in §9.3 checks out on the current frame. Of 1 002 member "
-        "rows, 34 carry no APOGEE_ID — the per-star identifier APOGEE "
-        f"{cite('Majewski:17')} assigns — and the remaining 968 resolve to "
+        "rows, 34 carry no APOGEE_ID: the per-star identifier APOGEE "
+        f"{cite('Majewski:17')} assigns, and the remaining 968 resolve to "
         "806 "
         "distinct stars (the workbook's 807 counts the empty identifier as one "
         "more value), so exactly 332 rows share an identifier with another row "
-        "— and the concentration is as reported: M 3 contributes 105 of those "
+        ", and the concentration is as reported: M 3 contributes 105 of those "
         "rows and M 67 ninety, with NGC 6819 (32), IC 166 (23) and NGC 2243 "
         "(23) next. One star appears four times. The copies are not identical: "
         "the median peak-to-peak spread between two rows of the same star is "
         "0.036 dex across elements, ranging from 0.015 dex in FE_H to 0.22 dex "
-        "in V_FE — comparable to the abundance differences the whole exercise "
+        "in V_FE: comparable to the abundance differences the whole exercise "
         "is trying to resolve."
     ),
     "what collapsing does to the population": (
@@ -274,7 +274,7 @@ ANSWER: dict[str, object] = {
         "(+0.016, inside its "
         "own noise). kNN purity, the parameter-free check, barely moves: 0.365 "
         "-> 0.355. So only the t-SNE row shifts by more than its neighbours' "
-        "noise, and it shifts *down* — the duplicates were helping it, by "
+        "noise, and it shifts *down*. The duplicates were helping it, by "
         "giving its two easiest clusters extra near-identical points to build "
         "dense neighbourhoods from. Nothing in the table is overturned; the "
         "ranking of the three methods is unchanged."
@@ -283,7 +283,7 @@ ANSWER: dict[str, object] = {
         "This is where the exercise earns its place. Dropping M 3 from the "
         "*row* matrix (848 rows) leaves t-SNE at homogeneity 0.512, a mild "
         "fall from 0.520, while UMAP rises to 0.527-0.538 and EVoC to "
-        "0.458-0.528 — the range is over the three row orders of exercise 9.2. "
+        "0.458-0.528. The range is over the three row orders of exercise 9.2. "
         "Dropping M 3 from the *collapsed* matrix (745 stars) collapses t-SNE "
         "to 0.029 in two of the three row orders, and the degeneracy check "
         "explains why: it returns 3 groups with 94% of the stars in one of "
@@ -294,26 +294,26 @@ ANSWER: dict[str, object] = {
         "on the same collapsed data, which is the tell: the collapse is a "
         "t-SNE optimisation failure on a smaller, less-redundant matrix, not "
         "a property of the sample. Note the third row order, where t-SNE "
-        "recovers to 0.444 — the collapse is not even stable in its own "
+        "recovers to 0.444. The collapse is not even stable in its own "
         "failure, which is exercise 9.2's lesson arriving from a third "
         "direction."
     ),
     "does M 3 change the conclusion": (
-        "No — and the reason it does not is the degeneracy column, not the "
+        "No, and the reason it does not is the degeneracy column, not the "
         "score. On the row matrix M 3's removal moves t-SNE by 0.008 and "
         "*raises* UMAP (0.521 -> 0.527-0.538) and EVoC (0.454 -> 0.458-0.528); "
         "on the collapsed matrix it raises UMAP and EVoC by similar amounts "
         "and "
         "crashes t-SNE into a flagged degenerate partition that must be "
         "discarded rather than quoted. Either way the workbook's published "
-        "conclusion — that abundances alone separate these clusters poorly, "
-        "around h ≈ 0.5, far below the kinematic ceiling — survives both "
+        "conclusion: that abundances alone separate these clusters poorly, "
+        "around h ≈ 0.5, far below the kinematic ceiling: survives both "
         "de-duplication and the ablation."
     ),
     "the lesson": (
         "Quote star counts, not row counts, and say which you mean. The "
         "duplicates inflated Table 'clusters', double-weighted the two largest "
-        "clusters in every macro average, and — as §9.3 suspected — propped up "
+        "clusters in every macro average, and (as §9.3 suspected) propped up "
         "the abundances-only t-SNE row. Collapsing them costs three lines of "
         "pandas and changes one number by 0.03, which is small; but the same "
         "three lines turn a quiet 0.51 in the ablation into a loud degenerate "

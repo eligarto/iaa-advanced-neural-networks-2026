@@ -1,11 +1,11 @@
-"""Chapter 13, exercise 3 — ablation beyond M 3.
+"""Chapter 13, exercise 3: ablation beyond M 3.
 
     The ablation of Table 6 removes M 3. Repeat it for the other clusters
     with more than 100 rows (M 67, NGC 6819, NGC 2243) and for the
     duplicates-cleaned matrix. How much of the instability survives cleaning?
 
 Two corrections to the premise, both measured. First, only two clusters in
-``utils.members()`` exceed 100 rows — M 67 (230) and M 3 (154); NGC 6819 has
+``utils.members()`` exceed 100 rows: M 67 (230) and M 3 (154); NGC 6819 has
 62 and NGC 2243 has 36, so the "more than 100 rows" list is a different
 population from the one this workbook's shared matrix holds, and all four are
 run anyway. Second, the published M 3 collapse does not reproduce here:
@@ -35,8 +35,8 @@ PUBLISHED_ABLATION_T_SNE = 0.199
 def deduplicated(data: MemberData) -> MemberData:
     """One row per ``APOGEE_ID`` (blank identifiers dropped), ≥5-members rule.
 
-    298 of the 1 002 member rows share an ``APOGEE_ID`` with another row —
-    the duplicate-star problem of §13's limitations list — so this is the
+    298 of the 1 002 member rows share an ``APOGEE_ID`` with another row,
+    the duplicate-star problem of §13's limitations list, so this is the
     "duplicates-cleaned matrix" the exercise asks about. Rows with a blank
     identifier cannot be collapsed and are dropped, which is why the cleaned
     count is well below 1 002 − 298.
@@ -63,8 +63,8 @@ def ablation_row(
     """Score one (possibly ablated) population over ``seeds``.
 
     Returns the per-method mean and s.d. of homogeneity plus, for each method,
-    the degeneracy report at seed 42 — largest-group fraction and cluster
-    count — because a collapsed partition still returns a finite score.
+    the degeneracy report at seed 42: largest-group fraction and cluster
+    count, because a collapsed partition still returns a finite score.
     """
     import copy
 
@@ -148,7 +148,7 @@ def solve(seeds: tuple[int, ...] = SEEDS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Leave-one-cluster-out and cleaned-matrix scores per method."""
     import matplotlib.pyplot as plt
 
@@ -179,7 +179,7 @@ ANSWER: dict[str, object] = {
     "the premise, corrected by measurement": (
         "The exercise asks for the clusters with more than 100 rows and names "
         "M 67, NGC 6819 and NGC 2243. In the matrix every other answer in this "
-        "chapter is computed on — utils.members(), 1 002 rows — only M 67 "
+        "chapter is computed on (utils.members(), 1 002 rows) only M 67 "
         "(230 rows) and M 3 (154) are that large; NGC 6819 has 62 and "
         "NGC 2243 has 36. Table 6's own populations (982 stars, M 3 "
         "contributing 98) are a *different* matrix from utils.members(), so "
@@ -190,7 +190,7 @@ ANSWER: dict[str, object] = {
     "the M 3 collapse does not reproduce here": (
         "Dropping M 3 (1 002 → 848 stars, 25 → 24 clusters) gives t-SNE "
         "0.5124 ± 0.0000, UMAP 0.5420 ± 0.0139, EVoC 0.5249 ± 0.0138 against "
-        "the baseline's 0.5199 / 0.5214 / 0.4536 — EVoC *improves* by 0.07, "
+        "the baseline's 0.5199 / 0.5214 / 0.4536: EVoC *improves* by 0.07, "
         "t-SNE is unchanged, and no method is flagged degenerate (t-SNE "
         "returns 22 groups with 22% in its largest). The published row "
         "reports the abundance arm collapsing to 0.199 with two groups and "
@@ -204,16 +204,16 @@ ANSWER: dict[str, object] = {
     ),
     "which cluster does the damage": (
         "M 67, by a wide margin. Dropping it (1 002 → 772 stars) takes t-SNE "
-        "from 0.5199 to 0.3215 — a loss of 0.20, an order of magnitude above "
-        "its own seed spread — and halves its cluster count, 31 groups to 10 "
+        "from 0.5199 to 0.3215: a loss of 0.20, an order of magnitude above "
+        "its own seed spread, and halves its cluster count, 31 groups to 10 "
         "with 48.8% of the stars in the largest. That is not yet the "
         "published collapse criterion (75% in one group) but it is the same "
         "failure forming: t-SNE's perplexity-30 neighbourhoods "
         f"({cite('vanderMaaten:08', bare=True)}) lose their "
         "largest coherent blob and smear the small clusters into one another. "
         "UMAP falls only 0.021 and EVoC rises 0.039 under the same removal, "
-        f"so the fragility is a property of the arm — UMAP {cite('McInnes:18')} "
-        f"and EVoC {cite('EVoC')} are affected far less — not of the method "
+        f"so the fragility is a property of the arm: UMAP {cite('McInnes:18')} "
+        f"and EVoC {cite('EVoC')} are affected far less, not of the method "
         "family."
     ),
     "the other two named clusters are not ablations at all": (
@@ -228,7 +228,7 @@ ANSWER: dict[str, object] = {
     "how much survives cleaning": (
         "The duplicates-cleaned matrix (803 rows, 24 clusters) is *more* "
         "t-SNE-fragile than the raw one: 0.4274 against 0.5199, with 30% in "
-        "the largest group. Cleaning does not rescue that arm — de-duplicating "
+        "the largest group. Cleaning does not rescue that arm: de-duplicating "
         "removes 199 rows concentrated in the large clusters, so the sample "
         "that remains is smaller and its t-SNE neighbourhoods are noisier. "
         "What cleaning does fix is the M 67 dependence: on the cleaned matrix, "
@@ -237,7 +237,7 @@ ANSWER: dict[str, object] = {
         "+0.09. Dropping M 3 after cleaning gives 0.5029. So the answer to "
         "'how much of the instability survives cleaning' is: the arm's "
         "absolute instability survives (and grows), while its dependence on "
-        "one cluster does not — the cleaned matrix has no single-cluster "
+        "one cluster does not: the cleaned matrix has no single-cluster "
         "lever left, which is what a duplicate-inflated population had been "
         "providing."
     ),

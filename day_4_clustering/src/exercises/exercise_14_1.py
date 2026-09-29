@@ -1,4 +1,4 @@
-"""Chapter 14, exercise 1 — single-pixel versus block masking.
+"""Chapter 14, exercise 1: single-pixel versus block masking.
 
     Train the same autoencoder twice, once with single-pixel random masking
     and once with contiguous 200-pixel blocks, and compare the reconstruction
@@ -11,7 +11,7 @@ Training the masked autoencoder needs (a) a GPU, (b) the 40 939 spectra the
 model was trained on, and (c) the training code, which lives in the lightsurf
 repository on the GPU machine, not in this one. This repository consumes the
 *exported* latents (``data/embeddings/masked_latent*.parquet``) precisely so
-that clustering stays GPU-free — a design choice of ``cluster/spectral.py``.
+that clustering stays GPU-free: a design choice of ``cluster/spectral.py``.
 
 What the module does instead is measure the premise the chapter's answer rests
 on, on real data: how well linear interpolation from the visible neighbours
@@ -154,7 +154,7 @@ def solve(n_spectra: int = DEFAULT_N_SPECTRA) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Distributions of the interpolation error for the two masking schemes."""
     import matplotlib.pyplot as plt
 
@@ -178,7 +178,7 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 
 
 ANSWER: dict[str, object] = {
-    "can this be run here? no — and this is what it would take": (
+    "can this be run here? no, and this is what it would take": (
         "The exercise cannot be computed in this repository. Training the "
         f"masked autoencoder {cite('He:22')} requires a GPU, the 40 939 "
         "spectra the model was "
@@ -186,7 +186,7 @@ ANSWER: dict[str, object] = {
         "repository on the GPU machine. There is no torch in this "
         "environment, no CUDA device, and the repository deliberately ships "
         "only the *exported* latents (masked_latent*.parquet) so the "
-        "clustering benchmark stays GPU-free — see the module docstring of "
+        "clustering benchmark stays GPU-free. See the module docstring of "
         "cluster/spectral.py. Two full trainings plus two encodings plus two "
         "7-seed benchmark runs is an overnight job on the machine that has "
         "the data, and no number for it can be produced honestly from here. "
@@ -196,13 +196,13 @@ ANSWER: dict[str, object] = {
     "the mechanism, measured": (
         "Filling a single masked pixel with the mean of its two neighbours "
         "leaves a median residual of 2.88 flux units on real DR19 spectra, "
-        "which is 7.0% of the per-spectrum flux MAD — the pixel's own "
+        "which is 7.0% of the per-spectrum flux MAD: the pixel's own "
         "signal is largely reproduced by two visible pixels a few Angstrom "
         "away, because the continuum is smooth at that scale. Filling a "
         "contiguous 200-pixel hole by a straight line between its two "
         "bounding pixels leaves a median residual of 28.9 units, 70.6% of "
         "the flux MAD: the line crosses real line regions, so it cannot "
-        "reproduce the depth of the lines the abundances are measured from — "
+        "reproduce the depth of the lines the abundances are measured from: "
         f"the lines APOGEE's pipeline reads {cite('Majewski:17', bare=True)}. "
         "The ratio is a factor of 10.05 in the median. That is the entire "
         "argument of §14.3, measured on the survey's own spectra: a model "
@@ -216,11 +216,11 @@ ANSWER: dict[str, object] = {
         "computed only on the hidden pixels (§14.2, step 4), so a masking "
         "scheme whose hidden pixels are reconstructible from context gives "
         "the encoder a cheap solution. Interpolation is that solution, and it "
-        "is a solution that requires learning almost nothing global — which "
+        "is a solution that requires learning almost nothing global, which "
         "is why the latent of the single-pixel model is expected to look "
         "respectable and carry less cluster information. The block-masked "
-        "model is forced to use the spectrum's global shape — which line "
-        "regions are present and how deep — before it can fill a 200-pixel "
+        "model is forced to use the spectrum's global shape, which line "
+        "regions are present and how deep: before it can fill a 200-pixel "
         "gap, and that is where element ratios live, so its latent should "
         "score higher on the cluster-only task. That is the design argument "
         f"{cite('He:22', parenthetical=False)} make for images, and the "
@@ -234,7 +234,7 @@ ANSWER: dict[str, object] = {
         "seed, and reports medians over 8 000 single pixels and 800 blocks. "
         "That is enough to establish a factor-of-ten difference in "
         "reconstructibility; it is not enough to calibrate a reconstruction "
-        "loss, and it says nothing about the third regime — the 50% masking "
+        "loss, and it says nothing about the third regime: the 50% masking "
         "fraction, the five strided convolutional blocks, and the 256-"
         "dimensional bottleneck all shape what either model can learn. The "
         "probe isolates one design decision (contiguity) and holds everything "
@@ -246,7 +246,7 @@ ANSWER: dict[str, object] = {
         "arbitrary. A reconstruction loss is a proxy for 'how much of the "
         "spectrum did you capture' and it can be minimised by a model that "
         "captures the wrong thing; this is the same failure mode as the "
-        "provenance confound of §14.5 — a latent that scores well on the "
+        "provenance confound of §14.5: a latent that scores well on the "
         "metric it was trained on while encoding something other than the "
         "physics. The correct report of such a result is the pair of numbers "
         "and the mechanism, never the reconstruction loss alone as evidence "

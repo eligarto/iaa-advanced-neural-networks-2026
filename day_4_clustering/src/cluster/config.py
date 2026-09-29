@@ -45,7 +45,7 @@ def env(name: str, default: Any) -> Any:
 # Data acquisition / location
 # --------------------------------------------------------------------------- #
 # SDSS-V DR19: the single DR17 allStar (ASPCAP synspec) is replaced by the
-# Astra ASPCAP catalog — stellar params + [X/H] abundances + Gaia DR3
+# Astra ASPCAP catalog: stellar params + [X/H] abundances + Gaia DR3
 # astrometry/photometry + quality flags, all in one file.
 ASTRA_ASPCAP_URL = (
     "https://dr19.sdss.org/sas/dr19/spectro/astra/0.6.0/summary/"
@@ -62,7 +62,7 @@ ALLSTAR_BYTES = ASTRA_ASPCAP_BYTES
 # --------------------------------------------------------------------------- #
 # Asset bundle (embeddings + model checkpoints)
 # --------------------------------------------------------------------------- #
-# The parquets and checkpoints have no public upstream — they are published as
+# The parquets and checkpoints have no public upstream: they are published as
 # a Hugging Face dataset and fetched with ``cluster download --assets``.
 # ``hf/MANIFEST.json`` in this repo is the source of truth (path, bytes,
 # sha256, consumer); the published copy must be regenerated with
@@ -100,7 +100,7 @@ def astra_h_col(element: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# FAST tag — cut the dataset short to accelerate the run.
+# FAST tag: cut the dataset short to accelerate the run.
 # Remove it (set FAST=False) to run the full all-sky experiment.
 # --------------------------------------------------------------------------- #
 FAST: bool = env("FAST", True)
@@ -117,7 +117,7 @@ MAX_STARS: int | None = env("MAX_STARS", 25_000 if FAST else None)
 REGION_RADIUS_DEG: float | None = env("REGION_RADIUS_DEG", None)
 
 # When True, the region radius is per-cluster, scaled to the cluster angular
-# diameter: max(3 deg, 10 x diam_deg) — see Cluster.region_deg. Overrides
+# diameter: max(3 deg, 10 x diam_deg): see Cluster.region_deg. Overrides
 # REGION_RADIUS_DEG.
 REGION_SCALED: bool = env("REGION_SCALED", False)
 
@@ -250,10 +250,10 @@ EVOC: dict[str, Any] = {
 # min_cluster_size=5 is the smallest sensible value: it still catches small
 # clusters (Pleiades ~10, M 92 ~2 members in APOGEE). Raising it (e.g. 20)
 # cuts field fragmentation and lifts recall for rich clusters (M 67, M 3,
-# M 5) but drops the small ones — a precision/recall trade-off.
+# M 5) but drops the small ones: a precision/recall trade-off.
 # min_samples=None falls back to min_cluster_size (identical to =5 here).
 #
-# NOTE: the dominant precision lever is NOT these params — it is
+# NOTE: the dominant precision lever is NOT these params: it is
 # config.NORMALIZE_ROWS (L2-normalisation, which stops HDBSCAN from merging
 # the whole field into one blob). Measured on M 67: normalize_rows=False
 # gives recall 1.00 / precision 0.03 (blob); True gives recall 0.34 /

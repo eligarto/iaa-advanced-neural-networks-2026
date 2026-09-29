@@ -3,13 +3,13 @@
 Vendored copies (MIT, © 2024 Rafael Dias) of the upstream ``lightsurf`` models,
 so the published checkpoints load without that private package:
 
-* :mod:`cluster.models.masked_spectral_ae` — ``MaskedSpectralAE`` (the
+* :mod:`cluster.models.masked_spectral_ae`. ``MaskedSpectralAE`` (the
   abundance-free masked autoencoder; checkpoints ``masked_ae*.pt``)
-* :mod:`cluster.models.deep_models` — ``CnnLstmAttention`` / ``ConvPoolRegressor``
+* :mod:`cluster.models.deep_models`. ``CnnLstmAttention`` / ``ConvPoolRegressor``
   (the supervised regressors; checkpoints ``model*.pt``)
 
 ``torch`` is an optional extra (``uv sync --extra torch``), so nothing here is
-imported eagerly — attributes resolve on first access (PEP 562):
+imported eagerly: attributes resolve on first access (PEP 562):
 
     from cluster.models import MaskedSpectralAE
     from cluster.models.deep_models import CnnLstmAttention

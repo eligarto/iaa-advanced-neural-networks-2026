@@ -1,4 +1,4 @@
-"""Chapter 8, exercise 1 — the persistence barcode of a tiny real peak.
+"""Chapter 8, exercise 1: the persistence barcode of a tiny real peak.
 
     Sketch a one-dimensional density with three peaks of different heights
     and widths. For each peak, mark the interval of smoothing scale over
@@ -10,7 +10,7 @@
 neighbours as the scale changes" while a fluctuation "is absorbed almost
 immediately". This exercise builds the barcode numerically rather than by
 sketching, adds the tiny peak, and answers the question the chapter poses
-but does not resolve. The answer is no — and \\S 8.2's own honest statement
+but does not resolve. The answer is no, and \\S 8.2's own honest statement
 ("nor does any of this repair a bad space") is the reason why.
 """
 
@@ -22,8 +22,8 @@ import pandas as pd
 from exercises.citations import cite, reference_list
 
 #: (name, centre, width, number of points). The fourth peak carries 4 points
-#: against the smallest other peak's 200 — 2% of its mass, as the exercise
-#: specifies — but is narrow, so it is a genuine density peak, not a bump.
+#: against the smallest other peak's 200. 2% of its mass, as the exercise
+#: specifies, but is narrow, so it is a genuine density peak, not a bump.
 PEAKS: tuple[tuple[str, float, float, int], ...] = (
     ("P1 tall narrow", 0.0, 0.25, 400),
     ("P2 mid", 3.0, 0.60, 300),
@@ -52,7 +52,7 @@ def sample(seed: int = 42) -> np.ndarray:
 
 
 def density(x: np.ndarray, bandwidth: float, grid: np.ndarray = GRID) -> np.ndarray:
-    """Gaussian kernel density on ``grid`` — the scale-space of \\S 8.1."""
+    """Gaussian kernel density on ``grid``: the scale-space of \\S 8.1."""
     z = (grid[:, None] - x[None, :]) / bandwidth
     return np.exp(-0.5 * z ** 2).sum(axis=1) / (len(x) * bandwidth * np.sqrt(2 * np.pi))
 
@@ -88,7 +88,7 @@ def barcode(f: np.ndarray) -> pd.DataFrame:
             parent[i], peak_of[i] = i, i
             alive[i] = float(f[i])
             continue
-        # Order the merging components by birth height, tallest first — the
+        # Order the merging components by birth height, tallest first: the
         # elder rule. Sorting (height, root) pairs avoids a lambda whose
         # parameter type cannot be inferred.
         ranked = sorted(
@@ -151,7 +151,7 @@ def bandwidth_sweep(
 
 def seed_sweep(seeds: tuple[int, ...] = (42, 0, 1, 2, 7, 13, 99),
                bandwidth: float = BANDWIDTH) -> pd.DataFrame:
-    """The same test over seven realisations — is the answer stable?"""
+    """The same test over seven realisations: is the answer stable?"""
     rows = []
     for seed in seeds:
         tagged = _classify(barcode(density(sample(seed), bandwidth)))
@@ -212,7 +212,7 @@ def solve(bandwidth: float = BANDWIDTH, seed: int = 42) -> dict[str, object]:
     }
 
 
-def plot(bandwidth: float = BANDWIDTH, seed: int = 42):  # pragma: no cover — figure
+def plot(bandwidth: float = BANDWIDTH, seed: int = 42):  # pragma: no cover (figure)
     """The density profile above, its barcode below."""
     import matplotlib.pyplot as plt
 
@@ -236,16 +236,16 @@ def plot(bandwidth: float = BANDWIDTH, seed: int = 42):  # pragma: no cover — 
 
 ANSWER: dict[str, object] = {
     "the construction": (
-        "Three Gaussian peaks of different heights and widths — 400 points "
-        "at sigma 0.25, 300 at 0.60, 200 at 1.20 — plus a fourth at x=10 "
+        "Three Gaussian peaks of different heights and widths: 400 points "
+        "at sigma 0.25, 300 at 0.60, 200 at 1.20: plus a fourth at x=10 "
         "with 4 points at sigma 0.12, which is 2% of the smallest other "
         "peak's mass as the exercise specifies. Crucially, 200 uniform "
         "background points are added over the whole range. Without a "
         "background the question is unanswerable: 'distinguish it from a "
         "fluctuation' requires fluctuations to exist. The barcode is the "
         "0-dimensional superlevel-set persistence of the kernel density "
-        "estimate — the standard construction, and the one PLSCAN "
-        f"{cite('Bot:25')} sweeps across scales — computed exactly by "
+        "estimate: the standard construction, and the one PLSCAN "
+        f"{cite('Bot:25')} sweeps across scales. Computed exactly by "
         "barcode(), not sketched."
     ),
     "the barcode for the three main peaks": (
@@ -263,7 +263,7 @@ ANSWER: dict[str, object] = {
     ),
     "does the barcode distinguish the tiny peak": (
         "No. At bandwidth 0.15 the tiny peak's bar is 0.00269, rank 11 of "
-        "14 — while the uniform background produces 9 bars whose maximum is "
+        "14, while the uniform background produces 9 bars whose maximum is "
         "0.0331, twelve times longer. The tiny peak is 0.081 of the largest "
         "pure-noise bar, and P3, a real peak with 50x the mass, is 26.6x "
         "longer than the tiny one. Sweeping the bandwidth does not rescue "
@@ -271,7 +271,7 @@ ANSWER: dict[str, object] = {
         "0.0597; at 0.25 and above it has vanished entirely (persistence "
         "1e-6, then 0). There is no scale at which it clears the noise, and "
         "over seven random realisations it clears the largest background bar "
-        "in exactly 1 of 7 — which is what 'indistinguishable' looks like."
+        "in exactly 1 of 7, which is what 'indistinguishable' looks like."
     ),
     "why this is the honest answer": (
         "The exercise is phrased hopefully and the chapter's marketing "
@@ -290,12 +290,12 @@ ANSWER: dict[str, object] = {
     ),
     "what would make it detectable": (
         "Three things, in decreasing order of usefulness. (1) A quieter "
-        "background — remove the uniform component and the tiny peak becomes "
+        "background. Remove the uniform component and the tiny peak becomes "
         "the only structure near x=10 and its bar is the whole local "
         "density. This is the embedding step of S 10-12 in miniature: change "
         "the space so the background stops competing"
         f" ({cite('vanderMaaten:08', 'McInnes:18', bare=True)}). (2) More "
-        "members — "
+        "members: "
         "persistence scales with the height of the peak, so 12 points "
         "instead of 4 would clear the noise at bandwidth 0.15. (3) A "
         "significance calibration rather than a raw threshold: compare each "
@@ -308,8 +308,8 @@ ANSWER: dict[str, object] = {
         "A persistence value alone is not evidence. Quote it alongside the "
         "persistence distribution of a null realisation of your background, "
         "exactly as you would quote a detection significance rather than a "
-        "flux. The barcode makes the comparison easy — it is one extra run "
-        "on shuffled or background-only data — and the workbook's rule from "
+        "flux. The barcode makes the comparison easy. It is one extra run "
+        "on shuffled or background-only data, and the workbook's rule from "
         "S 9.4 applies unchanged: any statistic that can be computed on pure "
         "noise must be reported with what pure noise gives."
     ),

@@ -1,4 +1,4 @@
-"""Chapter 4, exercise 2 — k-means++ seeding versus restarts.
+"""Chapter 4, exercise 2: k-means++ seeding versus restarts.
 
     Implement k-means++ seeding in ten lines of NumPy and compare the final J
     over 50 random datasets against a uniform-random initialisation. How much
@@ -26,7 +26,7 @@ from exercises.citations import cite, reference_list
 #: Number of synthetic datasets in the sweep.
 N_DATASETS = 50
 
-#: Restarts per configuration — sklearn's ``n_init`` default of 10.
+#: Restarts per configuration. Sklearn's ``n_init`` default of 10.
 N_RESTARTS = 10
 
 #: Ground-truth blob count of the synthetic data, handed to every method.
@@ -96,7 +96,7 @@ def make_dataset(
     rng: np.random.Generator, n: int = 300, k: int = K,
     dim: int = 2, spread: float = 0.6,
 ) -> np.ndarray:
-    """``k`` isotropic Gaussian blobs — the case K-means is designed for.
+    """``k`` isotropic Gaussian blobs: the case K-means is designed for.
 
     Deliberately easy: if the seeding rule does not help here, it will not
     help on the abundance matrix, where §4.4's assumption list is violated.
@@ -180,7 +180,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Mean final J for each (init rule, restart budget)."""
     import matplotlib.pyplot as plt
 
@@ -213,7 +213,7 @@ ANSWER: dict[str, object] = {
         "For each remaining centre, sample a data point with probability "
         "D2/sum(D2) and update D2 with an elementwise minimum against the "
         "new centre's distances. That is the whole of k-means++ "
-        f"{cite('Arthur:07')} — see kmeanspp() in this module. The "
+        f"{cite('Arthur:07')}. See kmeanspp() in this module. The "
         "D^2 weighting is the point: a point far from every existing centre "
         "is likely to be picked next, so the seeds spread out instead of "
         "clumping in the densest blob. What follows the seeding is the "
@@ -227,7 +227,7 @@ ANSWER: dict[str, object] = {
         "from seeding alone; uniform init with 10 restarts 261.4, a 76.2% "
         "reduction from restarts alone; k-means++ with 10 restarts 204.7, "
         "81.4% from both. So the honest answer to 'how much comes from "
-        "which' is: roughly the same from each, and they do not add — 72 + "
+        "which' is: roughly the same from each, and they do not add. 72 + "
         "76 would be 148, and the combination delivers 81. The two "
         "mechanisms fix the same failure (a badly placed initial centre), so "
         "most of what one repairs the other would have repaired too."
@@ -235,8 +235,8 @@ ANSWER: dict[str, object] = {
     "the fairer comparison": (
         "Uniform-random centres in the bounding box is a weak baseline "
         "because it can place a centre in empty space, where it captures no "
-        "points and effectively reduces K. Forgy initialisation — k distinct "
-        "*data points*, chosen uniformly — is the honest middle term, and it "
+        "points and effectively reduces K. Forgy initialisation: k distinct "
+        "*data points*, chosen uniformly: is the honest middle term, and it "
         "gets most of the way there: mean J 693.9 at 1 restart and 230.8 at "
         "10, against k-means++'s 306.2 and 204.7. Measured this way, "
         "k-means++'s advantage over plain data-point sampling is real but "
@@ -253,21 +253,21 @@ ANSWER: dict[str, object] = {
         "uniform-random start finds the best answer 6% of the time. The "
         "spread across the 10 restarts tells the same story: mean standard "
         "deviation of J is 136.9 for k-means++ against 667.5 for uniform and "
-        "651.1 for Forgy — k-means++'s real contribution is that its runs "
+        "651.1 for Forgy: k-means++'s real contribution is that its runs "
         "agree with each other."
     ),
     "the practical reading": (
         "If you can afford only one run, the seeding rule is what saves you "
         "(0.52 versus 0.06 hit rate). If you can afford ten, restarts alone "
         "get you most of the way and the seeding rule mainly buys "
-        "consistency. scikit-learn's default — init='k-means++', n_init=10 "
-        f"{cite('Pedregosa:11')} — "
+        "consistency. scikit-learn's default: init='k-means++', n_init=10 "
+        f"{cite('Pedregosa:11')}. "
         "takes both, and the 81.4% figure above is what that default is "
         "worth against the naive alternative on data K-means is designed "
         "for. Note the scope: these are isotropic blobs with K set to the "
         "truth. On data that violates §4.4's assumption list, a better local "
         "optimum of a misspecified objective is not obviously a better "
-        "answer — §4.6's 'the objective can be lowered without the answer "
+        "answer: §4.6's 'the objective can be lowered without the answer "
         "getting better'."
     ),
     "caveats on the experiment": (
@@ -275,14 +275,14 @@ ANSWER: dict[str, object] = {
         "well-separated isotropic blobs are exactly where the D^2 rule "
         "works, and the gap narrows on overlapping or elongated structure. "
         "(2) 'Improvement' here is measured in J, which is the quantity "
-        "K-means optimises and not the quantity anyone cares about — §4.6 "
+        "K-means optimises and not the quantity anyone cares about: §4.6 "
         "shows homogeneity and J disagree on the member matrix. (3) The "
         "restart budget and K are fixed at 10 and 6; the balance between the "
         "two mechanisms shifts with both, so quote them with the result. For "
         "what initialisation sensitivity looks like on real spectra rather "
         f"than on blobs, {cite('GarciaDias:18', parenthetical=False)} report "
         "that their K-means solution on 153 847 APOGEE spectra moves with the "
-        "initialisation — the seeding rule mitigates that, it does not remove "
+        "initialisation: the seeding rule mitigates that, it does not remove "
         "it."
     ),
     "references": reference_list(

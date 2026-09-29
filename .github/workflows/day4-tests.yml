@@ -1,7 +1,7 @@
 name: day4 tests
 
 # The Day 4 package has 887 tests; this workflow runs the ones that need no real
-# data — synthetic fixtures only — so it is a cheap gate on every change under
+# data (synthetic fixtures only), so it is a cheap gate on every change under
 # day_4_clustering/. The workbook-exercise tests are part of that: the two
 # that read the DR19 catalogue carry a `needs_data` skip, and everything else
 # (module contracts, the citation keys resolving against article/references.bib,
@@ -24,7 +24,7 @@ on:
       - ".github/workflows/day4-tests.yml"
 
 # A second push to the same PR makes the first run pointless; stop it rather
-# than pay for both. Never cancel a run on main — those gate the image build.
+# than pay for both. Never cancel a run on main: those gate the image build.
 concurrency:
   group: day4-tests-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -56,8 +56,8 @@ jobs:
 
       # The decks are generated from src/exercises, so the text a student is
       # asked to run can fall out of step with the modules. This catches drift
-      # in anything rendered into a deck — the workbook prose and the scratch
-      # cell's imports — which is where an exercise once shipped telling
+      # in anything rendered into a deck: the workbook prose and the scratch
+      # cell's imports, which is where an exercise once shipped telling
       # students to `import as`. (Module internals are covered by pytest, not
       # here: changing a module body alone does not change the decks.)
       - name: notebook decks match the exercise modules
@@ -69,9 +69,9 @@ jobs:
       # Pyrefly's strict preset is not clean on this codebase yet, so a plain
       # `pyrefly check` would be red on every PR and quickly ignored. Instead it
       # is a ratchet: the count may fall freely, but a PR that raises it fails.
-      # Lower PYREFLY_CEILING whenever you drive the number down — that is the
+      # Lower PYREFLY_CEILING whenever you drive the number down; that is the
       # whole mechanism, and it only works if the ceiling follows the floor.
-      - name: type check (ratchet — the error count may not rise)
+      - name: type check (ratchet, the error count may not rise)
         env:
           PYREFLY_CEILING: "59"
         run: |
@@ -80,7 +80,7 @@ jobs:
           echo "$out"
           errors=$(printf '%s\n' "$out" | sed -n 's/.*INFO \([0-9]\+\) error.*/\1/p' | tail -1)
           if [ -z "$errors" ]; then
-            echo "::error::could not parse an error count from pyrefly — treating as a failure"
+            echo "::error::could not parse an error count from pyrefly, treating as a failure"
             exit 1
           fi
           echo "pyrefly errors: $errors (ceiling $PYREFLY_CEILING)"
@@ -89,5 +89,5 @@ jobs:
             exit 1
           fi
           if [ "$errors" -lt "$PYREFLY_CEILING" ]; then
-            echo "::notice::pyrefly errors down to $errors — lower PYREFLY_CEILING in this workflow"
+            echo "::notice::pyrefly errors down to $errors, lower PYREFLY_CEILING in this workflow"
           fi

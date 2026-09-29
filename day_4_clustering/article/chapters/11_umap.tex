@@ -1,17 +1,17 @@
-% 11 · UMAP — fuzzy graphs and a cross-entropy layout
+% 11 · UMAP: fuzzy graphs and a cross-entropy layout
 \section{UMAP: A GRAPH, THEN A LAYOUT}
 \label{sec:umap}
 
-\deckslides{slides 39--42 --- graph, fuzzy edges, layout.}
+\deckslides{slides 39--42: graph, fuzzy edges, layout.}
 
 t-SNE converts a fully connected distance matrix into probabilities and then
 optimises a two-dimensional layout against them. UMAP \citep{McInnes:18} takes
 a different route to a similar-looking picture: build a weighted
 nearest-neighbour graph, decide what that graph's low-dimensional analogue
 should look like, and find positions that make the two agree. The construction
-is more explicit about its assumptions, it is faster, and --- as
-\S\ref{sec:benchmark} shows --- it behaves differently on our data in a way
-that teaches something about both methods.
+is more explicit about its assumptions, it is faster, and (as
+\S\ref{sec:benchmark} shows) it behaves differently on our data in a way that
+teaches something about both methods.
 
 \begin{figure}[htbp]\centering
   \begin{tabular}{@{}c@{\hskip5pt}c@{\hskip5pt}c@{}}
@@ -21,19 +21,19 @@ that teaches something about both methods.
   \end{tabular}
   \caption{UMAP in three moves, from the deck: \panel{a} build the
   $k$-nearest-neighbour graph of the high-dimensional data; \panel{b} weight
-  its edges by local distance and treat the result as a fuzzy set --- every
-  edge has a probability of existing; \panel{c} lay the graph out in low
-  dimensions so that strong edges are short and the layout stays spread out,
-  by minimising the cross-entropy between the two edge distributions.}
+  its edges by local distance and treat the result as a fuzzy set. Every edge
+  has a probability of existing; \panel{c} lay the graph out in low dimensions
+  so that strong edges are short and the layout stays spread out, by minimising
+  the cross-entropy between the two edge distributions.}
   \label{fig:umapsteps}
 \end{figure}
 
 \subsection{The high-dimensional graph}
 
-For each point $i$, let $\rho_i$ be the distance to its nearest neighbour ---
-a local connectivity term that makes the metric robust in dense regions ---
-and let $\sigma_i$ be a bandwidth chosen so that the total edge weight out of
-$i$ is a fixed constant:
+For each point $i$, let $\rho_i$ be the distance to its nearest neighbour (a
+local connectivity term that makes the metric robust in dense regions) and let
+$\sigma_i$ be a bandwidth chosen so that the total edge weight out of $i$ is a
+fixed constant:
 
 \begin{equation}
 w_{ij} = \exp\!\left(-\frac{d(i,j) - \rho_i}{\sigma_i}\right).
@@ -52,7 +52,7 @@ approximate $k$NN search (NN-descent, \S\ref{sec:knn}), which is why UMAP
 scales to $10^6$ points where t-SNE does not. Second, the graph is
 \emph{local}: edges exist only to the $k$ nearest neighbours, so UMAP never
 sees a long-range distance. Every claim about UMAP preserving ``more global
-structure'' than t-SNE has to be read against that fact --- the long ranges it
+structure'' than t-SNE has to be read against that fact. The long ranges it
 appears to preserve are produced by the layout's initialisation and by the
 repulsion term, not by information in the graph.
 
@@ -68,7 +68,7 @@ q_{ij} = \left(1 + a\,\|\mathbf{y}_i - \mathbf{y}_j\|^{2b}\right)^{-1},
 with $a$ and $b$ fitted so that the curve approximates the shape of the
 high-dimensional weights for the requested \texttt{min\_dist}. The objective is
 the cross-entropy between the two edge distributions, minimised by stochastic
-gradient descent with negative sampling --- a handful of random non-edges
+gradient descent with negative sampling: a handful of random non-edges
 attracted or repelled per real edge, which is the second reason UMAP is fast.
 
 \begin{marginnote}[]
@@ -98,11 +98,11 @@ UMAP exposes more knobs than t-SNE, and three of them matter here.
   \texttt{metric=cosine} cut recall from $0.415$ to $0.044$. The nominal
   geometry did not change; the implementation's internal handling of the graph
   did. Report the setting you used.
-\item \texttt{random\_state}. UMAP's optimisation is genuinely stochastic ---
-  unlike the t-SNE rows in our tables, which came out identical across the
-  seven seeds we tried, UMAP's homogeneity spread is $\pm0.011$ on the
-  masked-AE latent. That is small, but it is the same order as some of the
-  gaps quoted between arms.
+\item \texttt{random\_state}. UMAP's optimisation is genuinely stochastic:
+unlike the t-SNE rows in our tables, which came out identical across the seven
+seeds we tried, UMAP's homogeneity spread is $\pm0.011$ on the masked-AE
+latent. That is small, but it is the same order as some of the gaps quoted
+between arms.
 \end{itemize}
 
 \begin{figure}[htbp]\centering
@@ -117,8 +117,8 @@ UMAP exposes more knobs than t-SNE, and three of them matter here.
 
 \subsection{How it differs from t-SNE in practice}
 
-The two methods answer the same question --- produce a low-dimensional map that
-keeps neighbours together --- and disagree in ways that matter for the rest of
+The two methods answer the same question (produce a low-dimensional map that
+keeps neighbours together) and disagree in ways that matter for the rest of
 this workbook:
 
 \begin{itemize}
@@ -127,17 +127,17 @@ this workbook:
   pipeline therefore defaults to it for field work, and the t-SNE arm is run in
   region mode or on subsamples.
 \item \textbf{What ``noise'' looks like.} UMAP has no noise model. Everything
-  gets a position, so a cluster in a UMAP map is a density peak and nothing
-  more --- which is why the pipeline clusters the embedding afterwards rather
-  than reading groups off the picture.
+gets a position, so a cluster in a UMAP map is a density peak and nothing more,
+which is why the pipeline clusters the embedding afterwards rather than reading
+groups off the picture.
 \item \textbf{Blob formation.} On our abundance matrix, UMAP reaches a higher
-  cluster-only homogeneity than t-SNE ($0.578$ vs $0.560$) while producing
-  larger, fewer groups --- and in the field-retrieval task it recovers all
-  978 members at a precision of $0.0013$, that is, by declaring a large part of
-  the field to be cluster members. \textbf{Table~\ref{tab:field}} is the
-  clearest illustration in the workbook of why recall and precision must be
-  read as a pair, and of why the ``which method is better'' question has no
-  answer until the task is specified.
+cluster-only homogeneity than t-SNE ($0.578$ vs $0.560$) while producing
+larger, fewer groups, and in the field-retrieval task it recovers all 978
+members at a precision of $0.0013$, that is, by declaring a large part of the
+field to be cluster members. \textbf{Table~\ref{tab:field}} is the clearest
+illustration in the workbook of why recall and precision must be read as a
+pair, and of why the ``which method is better'' question has no answer until
+the task is specified.
 \end{itemize}
 
 \begin{issues}[EXERCISES]

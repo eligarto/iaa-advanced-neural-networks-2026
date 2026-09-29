@@ -1,6 +1,6 @@
 # Chemical Tagging Workshop
 
-Benchmark of clustering methods and stellar signals for **chemical tagging** — deciding which stars in a field belong to a cluster — for an IAA-SO School session.
+Benchmark of clustering methods and stellar signals for **chemical tagging** (deciding which stars in a field belong to a cluster) for an IAA-SO School session.
 
 ## Language
 
@@ -9,15 +9,15 @@ Recovering which stars in a field share a common origin (a cluster), via their m
 _Avoid_: classification, cluster search
 
 **Membership determination**:
-The core task — labelling each star as `member` or `field` for a given cluster.
+The core task: labelling each star as `member` or `field` for a given cluster.
 _Avoid_: tagging, clustering
 
 **Discovery**:
-Blind search — finding members of a (possibly dispersed) cluster without knowing its location/kinematics in advance.
+Blind search: finding members of a (possibly dispersed) cluster without knowing its location/kinematics in advance.
 _Avoid_: unsupervised search
 
 **Refinement**:
-Cleaning an existing candidate list — pruning field contamination from a known cluster's member sample.
+Cleaning an existing candidate list: pruning field contamination from a known cluster's member sample.
 _Avoid_: cleaning, decontamination
 
 **Signal**:
@@ -29,7 +29,7 @@ Parallax, proper motion (PMRA, PMDEC), radial velocity. Defines the ground-truth
 _Avoid_: astrometry, phase space
 
 **Field retrieval**:
-The benchmark task — separating `member` from `field` stars at a given angular scale, scored by precision/recall/purity.
+The benchmark task: separating `member` from `field` stars at a given angular scale, scored by precision/recall/purity.
 _Avoid_: contamination test
 
 **Curse of dimensionality**:
@@ -37,7 +37,7 @@ Naive concatenation of a high-dimensional signal (256-d latent) with a low-dimen
 _Avoid_: dilution (alias)
 
 **Isochrone fitting**:
-Downstream use of membership — fitting a stellar-population model (ASteCA) to the member sample to recover cluster age, metallicity, distance.
+Downstream use of membership: fitting a stellar-population model (ASteCA) to the member sample to recover cluster age, metallicity, distance.
 _Avoid_: CMD fitting (narrower)
 
 **Two-stage pipeline**:
@@ -46,10 +46,10 @@ _Avoid_: stacking, concatenation
 
 **Spectral rejection**:
 Rejecting kinematic doppelgängers via their RNN-latent distance to the cluster centroid.
-_Avoid_: chemical cut (narrower — abundances only)
+_Avoid_: chemical cut (narrower. Abundances only)
 
 **Age-dependence**:
-The empirical result that chemical tagging's difficulty scales with cluster age — young clusters blend into the field, old/metal-poor clusters stand out spectrally.
+The empirical result that chemical tagging's difficulty scales with cluster age: young clusters blend into the field, old/metal-poor clusters stand out spectrally.
 _Avoid_: age bias
 
 ## Relationships
@@ -65,8 +65,8 @@ _Avoid_: age bias
 ## Example dialogue
 
 > **Dev:** "When we score a **Signal** on **Field retrieval**, do we use **Kinematics** as one of the signals?"
-> **Domain expert:** "Only as the *ceiling*. **Kinematics** define the labels, so scoring them is circular — the honest benchmark is how close **Discovery** signals (abundances, spectroscopy, colours) get to that ceiling."
+> **Domain expert:** "Only as the *ceiling*. **Kinematics** define the labels, so scoring them is circular. The honest benchmark is how close **Discovery** signals (abundances, spectroscopy, colours) get to that ceiling."
 
 ## Flagged ambiguities
 
-- "tagging" used for both the task (**chemical tagging**) and the labelling step — resolved: **Membership determination** is the task, **Chemical tagging** is the goal.
+- "tagging" used for both the task (**chemical tagging**) and the labelling step: resolved: **Membership determination** is the task, **Chemical tagging** is the goal.

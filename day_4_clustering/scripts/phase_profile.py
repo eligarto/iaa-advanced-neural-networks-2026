@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Where does the wall clock go, and how many cores does it actually use?
 
-Answers the question the notebook provokes every year — *"it is slow, but my CPU
-is idle"* — with wall time, process CPU time and the ratio between them, per
+Answers the question the notebook provokes every year: *"it is slow, but my CPU
+is idle"*: with wall time, process CPU time and the ratio between them, per
 stage. A ratio near 1.0 means the machine is idle while one core works: that
 stage is serial by construction and no amount of extra hardware helps it.
 
@@ -33,9 +33,9 @@ os.environ.setdefault("PYTHONHASHSEED", "42")
 def cpu_seconds_all_threads() -> float:
     """CPU time summed over every thread of this process (across all cores on Linux)."""
     total = 0.0
-    for task in os.listdir("/proc/self/task"):  # noqa: PTH208 — procfs, not a real FS
+    for task in os.listdir("/proc/self/task"):  # noqa: PTH208 (procfs, not a real FS)
         try:
-            with open(f"/proc/self/task/{task}/stat") as fh:  # noqa: PTH123 — procfs
+            with open(f"/proc/self/task/{task}/stat") as fh:  # noqa: PTH123 (procfs)
                 fields = fh.read().rsplit(") ", 1)[1].split()
             utime, stime = int(fields[11]), int(fields[12])
             total += (utime + stime) / os.sysconf("SC_CLK_TCK")
@@ -123,8 +123,8 @@ def main() -> None:
             lambda: umap_lib.UMAP(n_neighbors=15, random_state=None, n_jobs=-1).fit_transform(X),
         )
 
-    print("(run_benchmark as a whole, for reference — the notebook memoises this call:)")
-    phase("run_benchmark(prepared) — the full §3 cell", lambda: run_benchmark(prepared, settings))
+    print("(run_benchmark as a whole, for reference: the notebook memoises this call:)")
+    phase("run_benchmark(prepared): the full §3 cell", lambda: run_benchmark(prepared, settings))
 
     print(
         "\nStages at ~1 core are serial by construction: the on-disk cache and the\n"

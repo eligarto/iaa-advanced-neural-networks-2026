@@ -1,4 +1,4 @@
-# DR19 spectral re-analysis — plan & status
+# DR19 spectral re-analysis: plan & status
 
 Re-run the DR17 spectral experiment matrix (docs/spectral_benchmark_results.md)
 on the DR19 long re-train embeddings.
@@ -10,7 +10,7 @@ on the DR19 long re-train embeddings.
 - Catalogue: `data/astraAllStarASPCAP-0.6.0.fits.gz` (SDSS-V DR19).
 - Cluster labels: kinematic σ-clip (the benchmark's own `label_clusters`).
 - APO-only coverage: DR19 `allStar-1.3` is apo25m → ~11 of 25 clusters have
-  spectral members (southern/LCO clusters missing — Collinder 261, NGC 2243,
+  spectral members (southern/LCO clusters missing: Collinder 261, NGC 2243,
   M 15, etc.).
 
 ## Experiment matrix (run via scripts/spectral_dr19_analysis.py)
@@ -28,21 +28,21 @@ on the DR19 long re-train embeddings.
 
 ## Follow-ups (from the DR17 matrix, not yet re-run)
 
-- [ ] **Raw-spectra control** (8575-d + raw+abundance 8591-d) — cluster the
+- [ ] **Raw-spectra control** (8575-d + raw+abundance 8591-d): cluster the
       raw flux directly; needs the flux CSV aligned to labels.
-- [ ] **Phase B disentangled AE** — re-train `DisentangledSpectralAE` on DR19
+- [ ] **Phase B disentangled AE**: re-train `DisentangledSpectralAE` on DR19
       (64-d latent; DR17 result: below Phase A but the honest abundance-free arm).
-- [ ] **Two-stage pipeline** (kin → spectral rejection) — re-run
+- [ ] **Two-stage pipeline** (kin → spectral rejection): re-run
       `scripts/two_stage_pipeline.py` with the DR19 spectral embeddings.
-- [ ] **Per-cluster diagnostics** — subagents, one per cluster, for the
+- [ ] **Per-cluster diagnostics**: subagents, one per cluster, for the
       confusion matrix + completeness + the globular/open split.
 
 ## Docs to update after the run
 
-- `docs/spectral_benchmark_results.md` — append DR19 section.
-- `docs/dr19_rerun_results.md` — add spectral table.
-- `docs/narrative.md` — refresh Beats 2-6 numbers with DR19 spectral.
-- Slides `IaaSoChemicalTaggingDeck.vue` §47c — swap the DR17 spectral numbers.
+- `docs/spectral_benchmark_results.md`: append DR19 section.
+- `docs/dr19_rerun_results.md`. Add spectral table.
+- `docs/narrative.md`: refresh Beats 2-6 numbers with DR19 spectral.
+- Slides `IaaSoChemicalTaggingDeck.vue` §47c: swap the DR17 spectral numbers.
 
 ## Training status
 

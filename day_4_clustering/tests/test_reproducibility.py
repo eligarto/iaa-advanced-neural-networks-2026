@@ -5,7 +5,7 @@ cover the tier that must be exact and *can* be checked on a tiny fixture:
 
 * the same seed gives the same partition and the same scores, every method;
 * :func:`cluster.seeding.seed_everything` really does seed the global RNGs;
-* the environment the tolerance tier refers to is recorded — ``thread_report``
+* the environment the tolerance tier refers to is recorded: ``thread_report``
   and ``cluster doctor`` end to end;
 * the CLI exposes the seed and prints it, so a number quoted in a bug report can
   be traced back to the run that produced it.

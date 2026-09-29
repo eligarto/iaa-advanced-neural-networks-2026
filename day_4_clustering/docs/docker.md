@@ -1,6 +1,6 @@
 # Docker: running the workshop in a container
 
-Requirement: **Docker** — section B of the School Software Installation Guide.
+Requirement: **Docker**. Section B of the School Software Installation Guide.
 Nothing else is installed on your machine: `uv`, Python and every dependency live
 inside the image, and the commands below run them there.
 
@@ -27,7 +27,7 @@ docker run --rm -it -p 8889:8889 $DAY4 $IMG \
   uv run jupyter lab --ip=0.0.0.0 --port=8889 --no-browser --IdentityProvider.token=""
 ```
 
-Windows (PowerShell) — same commands, array splatting instead of `$DAY4`:
+Windows (PowerShell): same commands, array splatting instead of `$DAY4`:
 
 ```powershell
 $Day4 = @("-v","$($PWD.Path)/data:/app/data","-v","$($PWD.Path)/results:/app/results","-v","$($PWD.Path)/notebooks:/app/notebooks")
@@ -35,13 +35,13 @@ docker run --rm -it @Day4 ghcr.io/iaa-so-training/day4-clustering uv run cluster
 ```
 
 `./run.sh` / `.\run.ps1` are optional shortcuts that only save typing the mount
-flags — `./run.sh run --fast` is exactly the `docker run … uv run cluster run
+flags. `./run.sh run --fast` is exactly the `docker run … uv run cluster run
 --fast` above, and if the published image is not reachable they build it from the
 folder you cloned.
 
-The embedding/checkpoint bundle is public on the Hub —
+The embedding/checkpoint bundle is public on the Hub,
 [`RafaelDias/iaa-chemical-tagging-2026`](https://huggingface.co/datasets/RafaelDias/iaa-chemical-tagging-2026)
-— so you can browse the files, sizes and provenance without an account; the
+, so you can browse the files, sizes and provenance without an account; the
 `download --assets` commands above fetch the same files into `./data` and verify
 them against the sha256 recorded in the dataset's `MANIFEST.json`.
 
@@ -49,7 +49,7 @@ them against the sha256 recorded in the dataset's `MANIFEST.json`.
 
 `notebooks/chemical_tagging.ipynb` (the end-to-end demo) and
 `notebooks/tuning_template.ipynb` (the knob-turning lab) are JupyterLab notebooks
-over the same library the CLI uses — same calls, same seeds, same numbers.
+over the same library the CLI uses: same calls, same seeds, same numbers.
 
 ```bash
 docker run --rm -it -p 8889:8889 $DAY4 $IMG \
@@ -57,7 +57,7 @@ docker run --rm -it -p 8889:8889 $DAY4 $IMG \
 ```
 
 `8889`, not Jupyter's default `8888`: on the workshop laptop `8888` is glance, and
-the collision is silent — Jupyter starts, and the browser shows the other service.
+the collision is silent: Jupyter starts, and the browser shows the other service.
 To move it, change the left-hand number (`-p 18889:8889`) and browse to that port.
 Open the notebook from the file browser; you start in `/app`, the notebooks are
 under `notebooks/`.
@@ -69,16 +69,16 @@ before is instant while a genuinely new one is a real computation.
 
 Measured on the workshop laptop (16 cores, warm data cache, `day4-v10`): the main
 notebook executes end to end in **3 min 15 s** and the tuning lab in **3 min 13 s**,
-over **1.48 MB of cell outputs** (1.07 MB of that is plotly JSON) — the heaviest
+over **1.48 MB of cell outputs** (1.07 MB of that is plotly JSON): the heaviest
 figure is 335 kB (the file with its widget state is 2.13 MB). The figures are
 capped exactly as the CLI's are
-(`CLUSTER_PLOT_MAX_POINTS`; every member is always drawn — see *A sluggish
+(`CLUSTER_PLOT_MAX_POINTS`; every member is always drawn. See *A sluggish
 notebook is usually the page, not the CPU* below).
 
 Two notes. A *saved* notebook (one someone else executed, like the copy in
 `results/`) shows the widgets as their plain-text repr until you trust it
 (`File → Trust Notebook`; live output has no such gate). And `nbconvert` only
-persists widget state when it drives the whole notebook — a hand-rolled
+persists widget state when it drives the whole notebook: a hand-rolled
 cell-by-cell driver has to call `client.set_widgets_metadata()`.
 
 ## Why `uv run` inside the container
@@ -86,7 +86,7 @@ cell-by-cell driver has to call `client.set_widgets_metadata()`.
 The image is built with `uv` from the same `pyproject.toml` + `uv.lock` that the
 native instructions use, and the environment is already synced at `/app/.venv`.
 `uv run cluster …` therefore starts in **under a second** and executes the pinned
-environment — no resolution, no downloads, no sync (`UV_NO_SYNC=1` is baked in).
+environment, no resolution, no downloads, no sync (`UV_NO_SYNC=1` is baked in).
 Inside the container, `uv run cluster …`, a bare `cluster …`, and `/app/.venv/bin/python`
 are all the same interpreter.
 
@@ -95,7 +95,7 @@ are all the same interpreter.
 | host folder | in the container | holds |
 |---|---|---|
 | `./data` | `/app/data` | the 1.17 GB SDSS catalogue, the ~1 GB embeddings/checkpoints bundle |
-| `./results` | `/app/results` | the score tables, `benchmark_grid.png`, the prepared-sample cache (`cache/prepared/`), and `mlruns/` — the image sets `MLFLOW_TRACKING_URI=file:///app/results/mlruns`, so container runs keep their MLflow record here (a *native* run writes to `./mlruns` instead) |
+| `./results` | `/app/results` | the score tables, `benchmark_grid.png`, the prepared-sample cache (`cache/prepared/`), and `mlruns/`: the image sets `MLFLOW_TRACKING_URI=file:///app/results/mlruns`, so container runs keep their MLflow record here (a *native* run writes to `./mlruns` instead) |
 | `./notebooks` | `/app/notebooks` | the notebooks, so your edits are saved in your checkout |
 
 The image starts as root, then the entrypoint **drops to the uid that owns
@@ -104,7 +104,7 @@ It also sets `HOME`, `MPLCONFIGDIR` and `UV_CACHE_DIR` to scratch
 directories inside the container, which is what makes the plain `docker run`
 above work without `-u`/`-e` flags. `DAY4_KEEP_ROOT=1 docker run …` opts out.
 
-Build it yourself instead (a few minutes), if you prefer — or to add the optional
+Build it yourself instead (a few minutes), if you prefer, or to add the optional
 torch extra for the re-embedding extension, which is left out of the published
 image to keep the pull small:
 
@@ -115,17 +115,17 @@ docker build -t day4-clustering --build-arg WITH_TORCH=1 .   # + ~200 MB, CPU wh
 
 ## Performance
 
-A container run is slower than a native install on the same laptop — measured
+A container run is slower than a native install on the same laptop: measured
 2026-09-24 on the reference machine: the all-sky fast run takes **≈2 minutes
 natively vs ≈3 minutes in the container** (16 CPUs, Docker CPU shares).
 
 The scores are **identical to the last printed digit** between native and
-container on that machine — same code, same data, same thread setting. That is a
+container on that machine: same code, same data, same thread setting. That is a
 property of the *pinned* image: the earlier unpinned build gave 0.1974 where
 native gives 0.2093, because `python:3.13-slim` had moved underneath it. Since
 `day4-v5` the base images are pinned (`python:3.13.15-slim`, uv 0.12.18) and the
 parity holds. Across *machines* the same command still lands a decimal or two
-away — that tolerance, and the readings behind it, are in
+away: that tolerance, and the readings behind it, are in
 `docs/reproducibility.md`.
 
 Use Docker for convenience and `uv` when you are timing something.
@@ -139,7 +139,7 @@ sampling, 25 000 stars × 16 elements):
 
 | stage | wall | CPU time | cores used |
 | --- | --- | --- | --- |
-| `prepare` — read the 1.17 GB `.fits.gz`, cuts, membership | 20.6 s | 20.6 s | **1.00 / 16** |
+| `prepare`: read the 1.17 GB `.fits.gz`, cuts, membership | 20.6 s | 20.6 s | **1.00 / 16** |
 | t-SNE (sklearn Barnes-Hut, 1000 iters) | 42.7 s | 259.1 s | 6.06 |
 | UMAP (`random_state` ⇒ `n_jobs=1`) | 50.1 s | 80.9 s | **1.62** |
 | HDBSCAN | 1.9 s | 0.3 s | 0.14 |
@@ -150,7 +150,7 @@ Three of the six stages cannot use more than one core:
 
 - **gzip** decompression is serial and astropy cannot `memmap` a `.gz`, so the
   catalogue read is ~20 s on one core no matter how many cores you have.
-- **UMAP forces `n_jobs=1` whenever `random_state` is set** — it prints
+- **UMAP forces `n_jobs=1` whenever `random_state` is set**: it prints
   `n_jobs value 1 overridden to 1 by setting random_state` on every run. This
   project seeds every stochastic step on purpose (see
   `docs/reproducibility.md`), so the parallel path is the *unseeded* one.
@@ -169,26 +169,26 @@ The two levers that keep iteration cheap, both on by default:
   of recomputing minutes.
 
 Deliberately *not* cached: the benchmark itself. A new configuration means a
-real computation — say so in your report, and remember that scores move ~±0.02
+real computation: say so in your report, and remember that scores move ~±0.02
 across machines anyway. `CLUSTER_TSNE_N_ITER=250` shortens t-SNE (43 s → 14 s on
 the same sample) when you are exploring rather than quoting.
 
 ### A sluggish notebook is usually the page, not the CPU
 
-Slow *interaction* is a different layer: a figure ships every trace — and every
-hover string — to the browser, so 25 000 stars that each carry hover text are
+Slow *interaction* is a different layer: a figure ships every trace, and every
+hover string: to the browser, so 25 000 stars that each carry hover text are
 megabytes of JSON. Before the cap, three figures in this notebook carried
 **6.2 MB** between them (30° cone around M 67) and the mouse stopped responding
 long before the machine was busy. Now the whole executed notebook is **1.48 MB**
-of cell outputs and no figure exceeds **335 kB** — with every member still
+of cell outputs and no figure exceeds **335 kB**: with every member still
 plotted. The plots cap the grey field at `CLUSTER_PLOT_MAX_POINTS` (default
 **3000**) points per panel:
 
-- **every member is always drawn** — only *unlabelled* field stars are thinned,
+- **every member is always drawn**: only *unlabelled* field stars are thinned,
   the same budget `abundance_violins` already applies on the data side;
 - hover text is built only for the stars that display it (field traces set
   `hoverinfo="skip"`);
-- the sample is seeded, so the same figure is drawn twice for the same seed —
+- the sample is seeded, so the same figure is drawn twice for the same seed,
   nothing about the science changes, only what is *painted*.
 
 `CLUSTER_PLOT_MAX_POINTS=0` draws members only; raise it and restart the kernel
@@ -199,20 +199,20 @@ for the full crowd.
 - **In**: the code (`src/`, `scripts/`, `notebooks/`, `hf/`), all runtime deps
   (astropy, scikit-learn, umap-learn, hdbscan, EVoC, asteca, emcee, astroquery,
   huggingface_hub, and the notebook stack: jupyterlab, ipykernel, ipywidgets,
-  ipympl), pinned by `uv.lock` — one pull serves the CLI and the notebooks.
+  ipympl), pinned by `uv.lock`: one pull serves the CLI and the notebooks.
 - **Not in** (keeps it small): the 1.17 GB catalogue, the ~1 GB embedding
   bundle, docs, tests, dev tooling, and the optional `torch` extra for the
-  re-embedding extension — add that with
+  re-embedding extension. Add that with
   `docker build -t day4-clustering --build-arg WITH_TORCH=1 .` (~200 MB, CPU
   wheels; the default image stays lean for the pull 30 people do at once).
 
 Track A needs `data/embeddings/attention_broad_merged.parquet`, which arrives with
-`cluster download --assets` (or `--all` above) — see
+`cluster download --assets` (or `--all` above). See
 `docs/spectral_embeddings_plan.md`.
 
 ## Troubleshooting
 
-**A cell hangs with no error, and the CPU stays near zero** — an archive that
+**A cell hangs with no error, and the CPU stays near zero**: an archive that
 accepted the connection and then went quiet (hotel wifi, or VizieR/Gaia having a
 bad day). Every archive call the pipeline makes is bounded: after
 `CLUSTER_NET_TIMEOUT` seconds (default 30) it gives up with a message instead of
@@ -222,13 +222,13 @@ unreachable …" and carries on. Raise the budget on a slow-but-working link wit
 `CLUSTER_NET_TIMEOUT=120`, or work from the caches under `data/gaia/` and
 `data/literature/`.
 
-**Downloads** resume where they stopped (HTTP range requests inside the image —
+**Downloads** resume where they stopped (HTTP range requests inside the image,
 no `wget`/`curl` needed, and none installed); re-run the same command after a
 dropped connection. The catalogue is verified against its exact byte size, the
 bundle against per-file sha256
 (`docker run --rm -it $DAY4 $IMG uv run cluster download --assets --check`).
 
-**The run dies with `exit 139` after "Running benchmark (t-SNE / UMAP / EVoC)"** — numba picked
+**The run dies with `exit 139` after "Running benchmark (t-SNE / UMAP / EVoC)"**: numba picked
 its *workqueue* threading layer, which is not threadsafe; EVoC's nested parallel regions then
 abort the process. The published image avoids this by shipping `libgomp1`. If you built your own:
 
@@ -258,26 +258,26 @@ def f(n):
 f(100); print('layer:', numba.threading_layer())"   # want: omp (or tbb), never workqueue
 ```
 
-- **`docker pull` says "unauthorized" or asks for a login** — either you have a
+- **`docker pull` says "unauthorized" or asks for a login**: either you have a
   stale (private) login cached for another Day 4 image, `docker logout ghcr.io`
   fixes it, or the published package is not public yet; you do not need it:
   build the image yourself, it is the same thing and takes a few minutes:
   `docker build -t day4-clustering .` then use `day4-clustering` as `$IMG`
   (add `--build-arg WITH_TORCH=1` for the torch extra; see below).
-- **"device or resource busy" / permission errors** — mount the folder with
+- **"device or resource busy" / permission errors**: mount the folder with
   `:Z` (SELinux) or run from a fresh dir.
-- **Files in `data/`/`results/` belong to root** — only if you created the mount
+- **Files in `data/`/`results/` belong to root**: only if you created the mount
   folder as root before the first run (e.g. `sudo mkdir data`), because the
   entrypoint derives your uid from that folder's owner. Fix once with
   `sudo chown -R "$USER" data results`, or run as root deliberately with
   `docker run -e DAY4_KEEP_ROOT=1 …`.
-- **JupyterLab doesn't open, or shows something else** — inside the container it
+- **JupyterLab doesn't open, or shows something else**: inside the container it
   needs `--ip=0.0.0.0` and an empty token (`--IdentityProvider.token=""`), and the
   port must be published: `-p 8889:8889`. If 8889 is taken on your machine, change
   the left number only (`-p 18889:8889`) and browse to `http://localhost:18889`.
-- **`./run.sh` says "permission denied"** — `chmod +x run.sh` (git preserves the
+- **`./run.sh` says "permission denied"**: `chmod +x run.sh` (git preserves the
   bit, but zip downloads may not), or run `bash run.sh …`. You can always fall
   back to the plain `docker run` commands above.
-- **Out of disk** — the image (~1.6 GB, measured on `day4-v10`) + the catalogue (1.17 GB) + the asset
+- **Out of disk**: the image (~1.6 GB, measured on `day4-v10`) + the catalogue (1.17 GB) + the asset
   bundle (1.0 GB) ≈ 3.9 GB, plus what Docker itself keeps. Delete `data/` to
   reclaim the downloads; `results/` holds only figures and MLflow runs.

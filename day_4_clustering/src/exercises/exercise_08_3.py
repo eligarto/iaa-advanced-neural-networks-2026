@@ -1,4 +1,4 @@
-"""Chapter 8, exercise 3 — persistence measured in stars, for M 67 and NGC 2158.
+"""Chapter 8, exercise 3: persistence measured in stars, for M 67 and NGC 2158.
 
     The persistence of a cluster is a range of minimum cluster sizes, i.e. a
     number of stars (their Eq. 7). Using the member counts of Table 1, work
@@ -7,7 +7,7 @@
 
 \\S 8.2 states the workbook's requirement directly: "M 67 (230 members) and
 NGC 2158 (6 members) must be judged by the same rule". This exercise does the
-arithmetic on the real member counts and then tests it — sweeping
+arithmetic on the real member counts and then tests it: sweeping
 min_cluster_size over the actual 1 002-row member matrix and watching what
 each value does to the largest and smallest cluster at the same time. No
 single value serves both, and the sweep shows exactly how the failure is
@@ -26,13 +26,13 @@ from exercises.utils import members
 LARGEST = "M 67"
 SMALLEST = "NGC 2158"
 
-#: Size floors swept by :func:`sweep`. 230 is M 67's own population — the
+#: Size floors swept by :func:`sweep`. 230 is M 67's own population. The
 #: largest floor that could in principle still return one cluster.
 FLOORS: tuple[int, ...] = (2, 3, 5, 6, 7, 10, 15, 20, 23, 50, 100, 230)
 
 
 def population() -> pd.DataFrame:
-    """Member counts per cluster, largest first — Table 1's own numbers."""
+    """Member counts per cluster, largest first: Table 1's own numbers."""
     counts = members().df["cluster"].value_counts()
     frame = pd.DataFrame({
         "cluster": [str(c) for c in counts.index],
@@ -115,7 +115,7 @@ def solve() -> dict[str, object]:
     best_small_floor, best_small_recall = _argmax_scalar(table, f"recall_{SMALLEST}")
     best_macro_floor, best_macro_recall = _argmax_scalar(table, "macro_recall")
     # Precision at the recall-optimal floor, and the floor that maximises
-    # precision — two different rows, and quoting the wrong one would compare
+    # precision: two different rows, and quoting the wrong one would compare
     # a precision from mcs=3 with a recall from mcs=15.
     macro_recall_row = int(np.flatnonzero(
         table["min_cluster_size"].to_numpy(dtype=int) == best_macro_floor,
@@ -158,7 +158,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Recall for the largest and smallest cluster against the size floor."""
     import matplotlib.pyplot as plt
 
@@ -183,14 +183,14 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 ANSWER: dict[str, object] = {
     "the arithmetic": (
         "The workbook's 25 clusters span 230 members (M 67) to 6 "
-        "(NGC 2158) — a ratio of 38.3 to 1, in a single sample of 1 002 "
+        "(NGC 2158): a ratio of 38.3 to 1, in a single sample of 1 002 "
         "rows. Because PLSCAN's persistence is measured in the same units "
         "as the floor it replaces (a range of minimum cluster sizes, "
         f"{cite('Bot:25', bare=True)} Eq. 7), any value has to be read as a "
         "fraction of "
         "the cluster it is applied to. A floor of 10 stars is 4.35% of "
-        "M 67 — a rounding error, it could lose 95% of its members and "
-        "still qualify — and 167% of NGC 2158, which is to say NGC 2158 "
+        "M 67: a rounding error, it could lose 95% of its members and "
+        "still qualify, and 167% of NGC 2158, which is to say NGC 2158 "
         "cannot pass it at all, at any density, however chemically perfect "
         "it is. The same number means 'no constraint' and 'automatic "
         "disqualification' depending on which row of Table 1 you are on."
@@ -198,9 +198,9 @@ ANSWER: dict[str, object] = {
     "how many clusters each floor deletes": (
         "Counted on the real member list: a floor of 5 excludes none of the "
         "25 (the sample's own min_members=5 selection already guarantees "
-        "that). A floor of 10 excludes 3 — King 7 (8), Berkeley 17 (7), "
+        "that). A floor of 10 excludes 3: King 7 (8), Berkeley 17 (7), "
         "NGC 2158 (6). A floor of 15 excludes 7, a floor of 20 excludes 9, "
-        "a floor of 23 — the Pleiades' own population — excludes 11, i.e. "
+        "a floor of 23 (the Pleiades' own population) excludes 11, i.e. "
         "44% of the sample. A floor of 50 excludes 21 of 25. These are "
         "hard exclusions before any data is examined: the clusters cannot "
         "be found, not merely found badly."
@@ -215,7 +215,7 @@ ANSWER: dict[str, object] = {
         "to 0.167 everywhere between (mcs=3 to 7); M 67's recall is flat "
         "and poor throughout, 0.121 to 0.174, best at mcs=2 and at "
         "mcs=20-23 (0.170). Macro recall over all 25 is maximised at mcs=15 "
-        "(0.602) — but that floor already excludes 7 clusters by "
+        "(0.602), but that floor already excludes 7 clusters by "
         "construction, so it is maximising an average over the clusters it "
         "did not delete, and its macro precision is only 0.079. Macro "
         "precision peaks at the other end, at mcs=3 (0.276, i.e. just above "
@@ -223,7 +223,7 @@ ANSWER: dict[str, object] = {
         "own population, every point is noise and every score is zero."
     ),
     "can one cut serve both": (
-        "Not as a size floor, no — the arithmetic above is a proof, not an "
+        "Not as a size floor, no: the arithmetic above is a proof, not an "
         "empirical finding: a constant cannot be both 4% and 167% of "
         "something. What PLSCAN "
         f"{cite('Bot:25')} changes is *who chooses*, not the units. "
@@ -242,8 +242,8 @@ ANSWER: dict[str, object] = {
         "dependency of this workbook; PLSCAN enters the pipeline only "
         "indirectly, as the model-selection rule inside EVoC "
         f"({cite('EVoC', bare=True)}, S 8.3). So "
-        "what is demonstrated is the *problem* — that a single size floor "
-        "cannot serve a 38:1 population range — measured on the real data, "
+        "what is demonstrated is the *problem*: that a single size floor "
+        "cannot serve a 38:1 population range. Measured on the real data, "
         "rather than PLSCAN's solution to it. The claim that persistence "
         "solves the problem on this sample is untested here; exercise 12's "
         "EVoC results are the closest the workbook comes to evidence, and "

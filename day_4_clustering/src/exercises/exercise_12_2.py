@@ -1,4 +1,4 @@
-"""Chapter 12, exercise 2 — EVoC's seed spread versus t-SNE's row-order spread.
+"""Chapter 12, exercise 2: EVoC's seed spread versus t-SNE's row-order spread.
 
     On the member matrix, run EVoC with the seed varied over the same seven
     values used in this workbook, and report homogeneity as mean ± standard
@@ -8,8 +8,8 @@
 
 \\S 12.4 opens its objections with "the seed spread is larger than several of
 the gaps", quoting EVoC's +-0.043 on abundances. \\S 9.3 quotes t-SNE's
-0.218-0.560 under row permutation. This exercise puts the two on one axis —
-same data, same population, same scoring — and the answer is not a matter of
+0.218-0.560 under row permutation. This exercise puts the two on one axis,
+same data, same population, same scoring, and the answer is not a matter of
 opinion once measured. The comparison only became possible because both halves
 were run under the workbook's own protocol; that is the methodological point.
 """
@@ -138,7 +138,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Both spreads on one axis."""
     import matplotlib.pyplot as plt
 
@@ -174,8 +174,8 @@ ANSWER: dict[str, object] = {
         "*row order* at fixed seed. That is deliberate "
         "and it is the fair comparison, because those are the variations each "
         "method actually has. §9.3 established that t-SNE with init='pca' is "
-        "seed-deterministic — a seed loop reports std = 0.000 for it and "
-        "measures nothing — while its row-order spread is the real thing. EVoC "
+        "seed-deterministic: a seed loop reports std = 0.000 for it and "
+        "measures nothing, while its row-order spread is the real thing. EVoC "
         "has no row-order sensitivity of comparable size and does have a "
         "genuine seed spread. Comparing them means comparing each method's "
         "dominant source of arbitrariness, not forcing both through one knob."
@@ -195,13 +195,13 @@ ANSWER: dict[str, object] = {
         "coefficient-of-variation terms, 1.68x."
     ),
     "which is larger, and why": (
-        "The t-SNE row-order spread, by a factor of about 1.8 on this data — "
+        "The t-SNE row-order spread, by a factor of about 1.8 on this data: "
         "not the order-of-magnitude gap the published 0.218-0.560 range might "
         "suggest, but a consistent gap in every summary statistic. The "
         "difference is structural rather than numerical. EVoC's seed perturbs "
         "one optimisation from a fixed starting point on a fixed graph, and "
         "the persistence criterion then chooses among a small family of "
-        "candidate layers — here 3 or 4 of them — so the output can only take "
+        "candidate layers (here 3 or 4 of them) so the output can only take "
         "a handful of values. Row permutation perturbs the *path of the "
         "Barnes-Hut accumulation itself* "
         f"({cite('vanderMaaten:14', bare=True)}), so the t-SNE embedding is "
@@ -218,7 +218,7 @@ ANSWER: dict[str, object] = {
     "the uncomfortable parity": (
         "Neither spread is small compared with the effects the workbook "
         "reports. §12.4's own complaint is that EVoC's +-0.043 overlaps the "
-        f"t-SNE and UMAP {cite('McInnes:18')} arms — and the row-order spread "
+        f"t-SNE and UMAP {cite('McInnes:18')} arms, and the row-order spread "
         "is larger still, so "
         "the t-SNE arm does not escape the same objection. Any statement of "
         "the form 'method X beats method Y on abundances' is unsupported at "
@@ -228,7 +228,7 @@ ANSWER: dict[str, object] = {
         "kinematic ceiling of 0.942."
     ),
     "which number belongs in a paper": (
-        "The pair, always — mean and spread, over the perturbation that is "
+        "The pair, always: mean and spread, over the perturbation that is "
         "actually live for that method, with the perturbation named. Not the "
         "seed spread for t-SNE (it is zero and misleading), not the row-order "
         "spread for EVoC (it is not the dominant term), and never a best-of "
@@ -240,14 +240,14 @@ ANSWER: dict[str, object] = {
         "is §9.4 rules 2 and 5, applied per method rather than uniformly."
     ),
     "what the exercise is really teaching": (
-        "That 'run it with several seeds' is not a validation protocol — it is "
+        "That 'run it with several seeds' is not a validation protocol. It is "
         "a check that only finds the variation you already suspected. The "
         "workbook's own t-SNE table carried std = 0.000 across seven seeds, "
         "which reads as perfect stability and meant only that init='pca' had "
         "removed the seed's influence. The row-order audit was needed to find "
         "the instability that was there all along. Before quoting an "
         "uncertainty on any embedding, ask which input the optimiser treats as "
-        "a path variable — and vary that."
+        "a path variable, and vary that."
     ),
     "references": reference_list(
         "EVoC", "vanderMaaten:08", "vanderMaaten:14", "Campello:13",

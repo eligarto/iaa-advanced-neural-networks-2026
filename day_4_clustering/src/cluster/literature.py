@@ -1,7 +1,7 @@
 """Literature parameters for the target clusters, for fit comparison.
 
 Open clusters come from VizieR ``B/ocl/clusters`` (Dias et al. 2002-2015);
-globulars from ``VII/202`` (Harris 1996, 2010 edition — arXiv:0904.2907).
+globulars from ``VII/202`` (Harris 1996, 2010 edition: arXiv:0904.2907).
 Globular absolute ages are not in Harris, so they come from Dotter et al.
 (2010) / Marin-Franch et al. (2009).
 """

@@ -1,7 +1,7 @@
 """Run every exercise module's solve() end to end and report what breaks.
 
 The honest check: each module must import, and its solve() must return a
-non-empty dict. Nothing here is mocked — the modules hit the real catalogue.
+non-empty dict. Nothing here is mocked: the modules hit the real catalogue.
 """
 
 from __future__ import annotations

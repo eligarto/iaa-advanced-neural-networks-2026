@@ -1,7 +1,7 @@
 """Figures for the workbook exercises.
 
 The rule the rest of this package follows applies here too: **the notebook
-presents, the module computes**. A deck never builds a plot inline — it calls
+presents, the module computes**. A deck never builds a plot inline: it calls
 ``figure()`` on the exercise's module, exactly as it calls ``solve()``. This
 module holds the three plot families the exercises need, so an individual
 exercise states *what* to draw and never *how*.
@@ -13,7 +13,7 @@ Three families, matching the three things the workbook actually measures:
     picture behind every "did the clusters separate?" question.
 
 ``cmd_diagram``
-    A colour-magnitude diagram — Gaia ``BP-RP`` against ``G`` — optionally with
+    A colour-magnitude diagram (Gaia ``BP-RP`` against ``G``) optionally with
     a fitted isochrone over it. This is the picture behind chapter 15's ages.
 
 ``sky_cutout``
@@ -52,7 +52,7 @@ __all__ = [
 SKYVIEW_CACHE = Path("results/exercise_cache/skyview")
 
 #: Set ``EXERCISES_NO_NETWORK=1`` to force the offline path even where a
-#: connection exists — what CI does, and what a student on a train wants.
+#: connection exists. What CI does, and what a student on a train wants.
 NO_NETWORK = os.environ.get("EXERCISES_NO_NETWORK", "") not in ("", "0")
 
 #: Seconds to wait on SkyView before giving up and drawing the offline panel.
@@ -65,7 +65,7 @@ class SkyImageUnavailable(RuntimeError):
 
 
 # --------------------------------------------------------------------------- #
-# Embeddings — the clustering runs
+# Embeddings: the clustering runs
 # --------------------------------------------------------------------------- #
 
 def embedding_scatter(
@@ -116,7 +116,7 @@ def embedding_scatter(
 
 
 # --------------------------------------------------------------------------- #
-# Colour-magnitude diagrams — the isochrone fits
+# Colour-magnitude diagrams: the isochrone fits
 # --------------------------------------------------------------------------- #
 
 def cmd_diagram(
@@ -137,8 +137,8 @@ def cmd_diagram(
     ``absolute`` is set). ``member_mask`` picks the stars drawn as members;
     everything else is drawn as grey field behind them.
 
-    Pass ``curve_color``/``curve_mag`` — the two arrays an
-    :class:`cluster.isochrone.IsochroneFit` carries — to draw the fitted
+    Pass ``curve_color``/``curve_mag``: the two arrays an
+    :class:`cluster.isochrone.IsochroneFit` carries, to draw the fitted
     isochrone over the points. The fit works in *apparent* magnitude because
     the distance modulus is one of its free parameters, so ``absolute=False``
     is the axis that can be compared against a fit.
@@ -201,7 +201,7 @@ def cmd_diagram(
 
 
 # --------------------------------------------------------------------------- #
-# Sky cutouts — the members marked on a real survey image
+# Sky cutouts: the members marked on a real survey image
 # --------------------------------------------------------------------------- #
 
 def _cache_path(cluster_name: str, survey: str, size_deg: float) -> Path:
@@ -283,7 +283,7 @@ def _offline_panel(
 ) -> None:
     """Plain RA/Dec scatter, used when no survey image can be had.
 
-    The exercise still works offline — the astrometry is in the catalogue. Only
+    The exercise still works offline. The astrometry is in the catalogue. Only
     the background image is missing, and the panel says so rather than
     pretending it drew one.
     """
@@ -327,8 +327,8 @@ def sky_cutout(
 
     This is the reality check on a chemical-tagging result: a cluster the
     abundances group together should also be a visible concentration of stars
-    on the sky. Where it is not — and for the dispersed open clusters it often
-    is not — that is the finding, not a bug.
+    on the sky. Where it is not, and for the dispersed open clusters it often
+    is not. That is the finding, not a bug.
 
     Falls back to a plain RA/Dec scatter (clearly labelled) when the image
     cannot be fetched, so the figure still renders offline and in CI.
@@ -354,7 +354,7 @@ def sky_cutout(
         else:
             fig = ax.figure
         _offline_panel(ax, ra, dec, members, str(exc).split(":")[0])
-        ax.set_title(title or f"{cluster_name} — member positions")
+        ax.set_title(title or f"{cluster_name}: member positions")
         return fig
 
     from astropy.visualization import ImageNormalize, ZScaleInterval
@@ -408,7 +408,7 @@ def sky_cutout(
     # title; move them under the frame and give the title its own room.
     ax.coords[0].set_ticklabel_position("b")
     ax.coords[0].set_axislabel_position("b")
-    ax.set_title(title or f"{cluster_name} — {survey} ({size_deg:g}°)", pad=12)
+    ax.set_title(title or f"{cluster_name}: {survey} ({size_deg:g}°)", pad=12)
     ax.legend(fontsize=8, frameon=True, loc="upper right", framealpha=0.85)
     ax.coords.grid(color="#8a8a8a", alpha=0.25, linewidth=0.4)
     return fig

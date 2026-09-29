@@ -5,7 +5,7 @@ labelling of the DR19 Astra catalogue (~986 unique APOGEE_IDs). The DR17
 backfill (``dr19_rerun_members.csv``) only covered 724 of them; the other
 ~262 were already in the DR19 apStar arm and were never re-downloaded.
 
-Writes ``data/dr19_rerun_all_members.csv`` — every member's APOGEE_ID, sdss_id
+Writes ``data/dr19_rerun_all_members.csv``: every member's APOGEE_ID, sdss_id
 and mwmStar URL, so the field arm + member arm together span the full sample.
 """
 from __future__ import annotations

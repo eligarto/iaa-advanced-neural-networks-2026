@@ -2,11 +2,11 @@
 
 One file replaces the old ``allStar-dr17-synspec_rev1.fits``:
 
-* ``astraAllStarASPCAP-0.6.0.fits.gz`` (1.17 GB) — stellar params + [X/H]
+* ``astraAllStarASPCAP-0.6.0.fits.gz`` (1.17 GB): stellar params + [X/H]
   abundances, Gaia DR3 astrometry/photometry, quality flags.
 
 Uses ``requests`` with HTTP range requests, so interrupted transfers resume and
-the download also works where no ``wget``/``curl`` binary exists — notably
+the download also works where no ``wget``/``curl`` binary exists: notably
 inside the workshop container (``python:*-slim`` ships neither).
 """
 
@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess  # noqa: F401 — tests monkeypatch download.subprocess to assert wget never runs
+import subprocess  # noqa: F401 (tests monkeypatch download.subprocess to assert wget never runs)
 from pathlib import Path
 
 import click
@@ -57,7 +57,7 @@ def stream_to_file(url: str, destination: Path, expected_bytes: int | None = Non
         if response.status_code == 416:          # nothing left to fetch
             return destination
         if offset and response.status_code != 206:
-            click.echo("   (server ignored the resume request — starting over)")
+            click.echo("   (server ignored the resume request: starting over)")
             offset, mode = 0, "wb"
         response.raise_for_status()
 
@@ -113,7 +113,7 @@ def _write_catalogue_sidecar(catalogue: Path) -> Path:
     A size check catches a truncated transfer but not a corrupted one. The
     sidecar makes the bytes checkable later (``cluster doctor --deep``); when one
     is already present its hash is compared now, and a mismatch is reported
-    loudly rather than overwritten — it means the file is not the one this
+    loudly rather than overwritten. It means the file is not the one this
     machine recorded.
     """
     sidecar = catalogue.with_name(catalogue.name + ".sha256")
@@ -123,7 +123,7 @@ def _write_catalogue_sidecar(catalogue: Path) -> Path:
         if recorded != digest:
             click.echo(
                 f"⚠ {sidecar.name} records {recorded[:16]}… but the file hashes to "
-                f"{digest[:16]}… — these are not the bytes this machine verified. "
+                f"{digest[:16]}…. These are not the bytes this machine verified. "
                 "Delete the file and rerun to download it again."
             )
         else:
@@ -162,7 +162,7 @@ def _sha256(path: Path) -> str:
 
 
 def _hf_download(repo_id: str, filename: str, repo_type: str) -> Path:
-    """Fetch one file from the Hub (imported lazily — network is optional)."""
+    """Fetch one file from the Hub (imported lazily: network is optional)."""
     from huggingface_hub import hf_hub_download
 
     return Path(hf_hub_download(repo_id=repo_id, filename=filename, repo_type=repo_type))
@@ -174,7 +174,7 @@ def _hub_hint(repo_id: str, repo_type: str, exc: Exception) -> click.ClickExcept
         f"could not reach the asset bundle at "
         f"https://huggingface.co/{'datasets/' if repo_type == 'dataset' else ''}{repo_id}\n"
         f"  reason: {exc}\n"
-        "  • check your connection — the download resumes, just re-run it\n"
+        "  • check your connection: the download resumes, just re-run it\n"
         "  • the bundle must be published there by the workshop organisers\n"
         "  • point elsewhere with CLUSTER_HF_REPO=<owner/name> (no retraining needed)"
     )
@@ -188,7 +188,7 @@ def load_manifest(
     """Read ``MANIFEST.json``.
 
     The manifest ships with the code (``hf/MANIFEST.json``, and inside the
-    container image), so this is normally an offline file read — ``--list``
+    container image), so this is normally an offline file read: ``--list``
     works before any download. Only a manifest that is not on disk is fetched
     from the Hub, which is what lets someone verify a bundle they found
     elsewhere.
@@ -296,7 +296,7 @@ def download_assets(
         if check_only:
             state = "size/hash mismatch" if dest.exists() else "missing"
             problems.append(f"{dest} ({state})")
-            click.echo(f"✗ {dest} — {state}")
+            click.echo(f"✗ {dest}: {state}")
             continue
 
         click.echo(f"🌐 {entry['path']} → {dest} ({entry['bytes'] / 1e6:.1f} MB)")
@@ -320,7 +320,7 @@ def download_assets(
         )
         if problems:
             raise click.ClickException(
-                "bundle incomplete — rerun `cluster download --assets` "
+                "bundle incomplete: rerun `cluster download --assets` "
                 "or inspect: " + "; ".join(problems)
             )
     else:

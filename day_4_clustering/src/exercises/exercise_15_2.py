@@ -1,4 +1,4 @@
-"""Chapter 15, exercise 2 — the age-metallicity degeneracy, quantified.
+"""Chapter 15, exercise 2: the age-metallicity degeneracy, quantified.
 
     The age-metallicity degeneracy means the posterior stays broad even with
     perfect membership. Choose a cluster in the sample and quantify the
@@ -8,7 +8,7 @@
 M 67 is the cluster to use: its membership is the workbook's best, so the
 breadth that remains cannot be blamed on contamination. The degeneracy is then
 measured twice. First as the *shape* of the ASteCA distance function on the
-(age, metallicity) plane at the literature distance — the ridge along which the
+(age, metallicity) plane at the literature distance: the ridge along which the
 fit trades age for metallicity, its width, and the correlation of the best
 metallicity with log age. Second as the correlation in the *posterior* from a
 sampler with all four parameters free, which is a different and much smaller
@@ -19,7 +19,7 @@ the exercise.
 
 Finally the extra observable is not asserted but run: the repository's own
 isochrone machinery supports a second colour (2MASS J-K), and the ridge width
-is recomputed with it. That is the honest way to answer "what would break it" —
+is recomputed with it. That is the honest way to answer "what would break it",
 measure the narrowing rather than name the observable.
 """
 
@@ -255,8 +255,8 @@ def sample_posterior(
     """Sample (met, loga, dm, Av) with all four free, optionally with J-K.
 
     The same likelihood, priors and ``-distance`` log-probability as
-    ``cluster.isochrone.fit_isochrone`` — which itself passes a second colour
-    when the catalogue carries J and K — so the only difference between the two
+    ``cluster.isochrone.fit_isochrone``, which itself passes a second colour
+    when the catalogue carries J and K, so the only difference between the two
     arms is the observable.
     """
     import asteca
@@ -327,7 +327,7 @@ def posterior_correlations(
 
     This is the second, much smaller answer to the exercise's question. The
     grid ridge measures the degeneracy direction with the distance pinned; the
-    posterior measures what the *data* constrain when nothing is — and for M 67
+    posterior measures what the *data* constrain when nothing is, and for M 67
     at this magnitude range that is very little on the age axis, because the
     age-distance degeneracy takes over and the chain wanders over much of the
     age prior. Reported for both arms.
@@ -374,7 +374,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The distance function on the age-metallicity plane, with its ridge."""
     import matplotlib.pyplot as plt
 
@@ -409,8 +409,8 @@ ANSWER: dict[str, object] = {
         "4.17-degree region plus the repository's kinematic tolerances): 278 "
         f"stars with full Gaia photometry {cite('Gaia:23')}. The ASteCA "
         f"distance {cite('Perren:15')} is computed on a "
-        "31 x 5 grid of (log age, Z) — the PARSEC solar grid's five "
-        "metallicities, ages 8.60 to 10.10 dex in 0.05 dex steps — at fixed "
+        "31 x 5 grid of (log age, Z): the PARSEC solar grid's five "
+        "metallicities, ages 8.60 to 10.10 dex in 0.05 dex steps: at fixed "
         "dm = 9.537 (the literature value) and Av = 0.10, because distance and "
         "extinction are the two parameters that can be pinned and the "
         "degeneracy is about the other two. Then the same grid with the 2MASS "
@@ -421,7 +421,7 @@ ANSWER: dict[str, object] = {
     "the degeneracy, measured on the grid": (
         "The best metallicity falls as the age rises: along the ridge the "
         "correlation between log age and [Fe/H] is -0.455, with [Fe/H] running "
-        "from +0.28 at the youngest grid point to -0.21 at the oldest — the "
+        "from +0.28 at the youngest grid point to -0.21 at the oldest: the "
         "classic direction, an older and more metal-poor isochrone mimicking a "
         "younger and more metal-rich one. The best fit sits at log age 9.55 "
         "(3.55 Gyr, Z = 0.0126, [Fe/H] = -0.08) against the literature "
@@ -431,13 +431,13 @@ ANSWER: dict[str, object] = {
         "still has a one-parameter family of near-equally-good answers. Its "
         "width is the number to quote: within Δ = 0.01 of the minimum the ridge "
         "admits three grid points spanning 0.10 dex in log age (a factor of "
-        "1.26 in age); within Δ = 0.05 it admits 19 points spanning 0.45 dex — "
-        "log age 9.40 to 9.85, a factor of 2.82 in age — across Z = 0.0095 to "
+        "1.26 in age); within Δ = 0.05 it admits 19 points spanning 0.45 dex: "
+        "log age 9.40 to 9.85, a factor of 2.82 in age: across Z = 0.0095 to "
         "0.0221, nearly the full metallicity range available."
     ),
     "the posterior, which is a different and weaker number": (
         "Freeing all four parameters gives σ_loga = 0.977 dex and a posterior "
-        "whose age median is 0.16 Gyr with a 16-84 range of 0.01 to 2.61 — the "
+        "whose age median is 0.16 Gyr with a 16-84 range of 0.01 to 2.61: the "
         "chain spans most of the age prior, so the age is essentially "
         "unconstrained by this CMD at this magnitude range, and the pairwise "
         "age-metallicity correlation collapses to +0.037. That small "
@@ -450,17 +450,17 @@ ANSWER: dict[str, object] = {
         "direction and width; the posterior measures what the data constrain "
         "when nothing is pinned, which here is very little."
     ),
-    "what extra observable would break it — measured, and not this one": (
+    "what extra observable would break it: measured, and not this one": (
         "The chapter's natural candidate is a second colour, and this repository "
         "already carries the grid for it (the PARSEC isochrones with 2MASS J-K "
         "alongside Gaia BP-RP, which ``cluster.isochrone`` uses whenever the "
-        "catalogue provides J and K — as it does for all 278 stars here). Run "
+        "catalogue provides J and K: as it does for all 278 stars here). Run "
         "on the same stars, at the same fixed distance and extinction, the "
         "two-colour fit does *not* narrow the ridge: at Δ ≤ 0.02 the admitted "
         "band grows from 4 grid points to 7, at Δ ≤ 0.10 from 43 to 60, and the "
         "age factor inside Δ ≤ 0.10 doubles from 5.6 to 11.2. In the sampled "
         "posteriors σ_loga goes from 0.977 to 1.019 and the age-metallicity "
-        "correlation from +0.037 to -0.022 — unchanged in magnitude. So the "
+        "correlation from +0.037 to -0.022: unchanged in magnitude. So the "
         "measured answer to the exercise's last question is that adding J-K in "
         "this set-up does not break the degeneracy, and two honest reasons are "
         "visible. First, ASteCA's distance is normalised over the observables, "
@@ -472,7 +472,7 @@ ANSWER: dict[str, object] = {
         "constraint would still be swamped."
     ),
     "what actually breaks it": (
-        "An external distance, not an extra colour — which is what §15.3's "
+        "An external distance, not an extra colour, which is what §15.3's "
         "NGC 2243 sequence does and what exercise 1 measured on Collinder 261: "
         "the red-clump prior collapsed σ_dm from 1.170 to 0.086 (a factor of "
         "13.6) while the age-metallicity trade-off persisted underneath. The "
@@ -490,14 +490,14 @@ ANSWER: dict[str, object] = {
         "§15.1 says the posterior stays broad even with perfect membership, and "
         "the number to quote is the ridge: a factor of 2.8 in age inside a "
         "Δ = 0.05 distance penalty, at fixed distance, with all 278 stars "
-        "belonging to the cluster — log age 9.40-9.85 around a best fit of "
+        "belonging to the cluster: log age 9.40-9.85 around a best fit of "
         "9.55, which is roughly 2.5 to 7 Gyr. Any age quoted from a "
         "single-colour CMD fit of this sample therefore carries a systematic "
         "of that order, and it is an order of magnitude larger than the "
         "contamination bias: exercise 3 measures 0.073 Gyr for a 10% young "
         "admixture and 0.095 Gyr at 30%, against a ridge several Gyr wide. "
-        "Even the clean fit's own bias — 0.216 Gyr, the G < 17 truncation with "
-        "distance and reddening pinned at the truth — is three times the "
+        "Even the clean fit's own bias: 0.216 Gyr, the G < 17 truncation with "
+        "distance and reddening pinned at the truth: is three times the "
         "10% contamination shift. (Exercise 3 is explicit that these "
         "contamination magnitudes are good to the order of magnitude only; "
         "the sign is the robust part.) The practical consequence is the one "
@@ -512,7 +512,7 @@ ANSWER: dict[str, object] = {
         "grid (an earlier run of the same scan on 220 members gave -0.556, "
         "before the member selection was widened to 278). The Δ levels are "
         "ASteCA's normalised residuals, whose absolute scale is not a χ², so "
-        "the chosen levels (0.01, 0.02, 0.05, 0.10) are conventions — the "
+        "the chosen levels (0.01, 0.02, 0.05, 0.10) are conventions: the "
         "factor-2.8-in-age result is a statement at the 0.05 level and should "
         "be quoted with the level attached. And the two-colour comparison "
         "changes the number of fitted observables, so part of its result is "

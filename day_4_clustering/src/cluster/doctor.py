@@ -6,7 +6,7 @@ t-SNE (OpenMP), numba (UMAP, EVoC, HDBSCAN) and BLAS each reduce floating-point
 sums in an environment-dependent order, so identical code and identical data can
 land on slightly different floats on a different CPU, core count or thread
 setting. The workable response is to *record* the environment instead of
-promising a constant — ``cluster doctor`` prints the record, and
+promising a constant: ``cluster doctor`` prints the record, and
 ``cluster doctor --json`` is the format ``docs/reference_runs/*.json`` uses.
 """
 
@@ -96,7 +96,7 @@ def data_report(*, deep: bool = False) -> dict[str, Any]:
     else:
         report["catalogue"] = {
             "path": str(catalogue),
-            "status": "not downloaded — run `cluster download --all`",
+            "status": "not downloaded. Run `cluster download --all`",
         }
 
     try:
@@ -135,7 +135,7 @@ def mlflow_params(**extra: Any) -> dict[str, str]:
     """The fingerprint as MLflow params: a run should never need a machine guess.
 
     Package versions and the git/image stamps are flattened here rather than at
-    the call site so both stay in one place — and so a unit test can pin them
+    the call site so both stay in one place, and so a unit test can pin them
     without a data download.
     """
     params: dict[str, str] = {
@@ -147,7 +147,7 @@ def mlflow_params(**extra: Any) -> dict[str, str]:
     }
     # input identity, cheaply: the catalogue's recorded hash (its .sha256 sidecar,
     # written by `cluster download --all`) and how much of the bundle is on disk.
-    # The catalogue's bytes are not re-hashed here — `cluster doctor --deep` does
+    # The catalogue's bytes are not re-hashed here: `cluster doctor --deep` does
     # that; a run should not pay a minute to log which file it read.
     data = data_report()
     catalogue = data.get("catalogue", {})
@@ -229,7 +229,7 @@ def format_fingerprint(fp: dict[str, Any]) -> str:
         lines.append(f"  sha256={digest}")
         if cat.get("sha256_ok") is False:
             lines.append(
-                "  ⚠ catalogue bytes differ from its .sha256 sidecar — "
+                "  ⚠ catalogue bytes differ from its .sha256 sidecar: "
                 "re-run `cluster download --all`"
             )
     else:
@@ -245,7 +245,7 @@ def format_fingerprint(fp: dict[str, Any]) -> str:
         if bundle["missing"]:
             shown = ", ".join(bundle["missing"][:4])
             more = " …" if len(bundle["missing"]) > 4 else ""
-            lines.append(f"  missing: {shown}{more} — run `cluster download --assets`")
+            lines.append(f"  missing: {shown}{more}. Run `cluster download --assets`")
 
     lines += [
         "",

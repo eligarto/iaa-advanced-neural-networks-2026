@@ -110,7 +110,7 @@ search-path = ["src"]
 [tool.ruff]
 target-version = "py313"
 # The code is written to ~79 columns (95th percentile is exactly 79). This cap
-# is the runaway-line gate, not a style target — tightening it to 79 would flag
+# is the runaway-line gate, not a style target: tightening it to 79 would flag
 # 1,609 existing lines and teach everyone to add noqa.
 line-length = 120
 extend-exclude = [
