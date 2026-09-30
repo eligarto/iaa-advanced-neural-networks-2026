@@ -22,6 +22,30 @@
 \usepackage[authoryear,round]{natbib}
 \bibpunct{(}{)}{;}{a}{}{,}
 
+% -------------------------------------------------------------------- links
+% Clickable URLs. hyperref has to be loaded after every other package, which is
+% why it sits here rather than beside \usepackage{url} above. hidelinks keeps
+% the printed page exactly as it was: the URL text already reads as a URL, so a
+% coloured box would only fight the Annual Reviews layout. breaklinks lets a
+% long URL wrap inside a caption instead of running past the right margin.
+\usepackage[hidelinks,breaklinks]{hyperref}
+
+% The four addresses the workbook points at, as clickable \href targets. The
+% display forms carry \allowbreak so a long URL wraps at its slashes, and they
+% match the plain-text forms printed on the title page (\@deckurl and friends).
+%
+% KEEP THESE IN STEP with scripts/sync_figures.py, which encodes the same four
+% URLs into the QR PNGs. A caption link that disagrees with the QR printed
+% beside it is worse than no link at all.
+\newcommand{\wbDeckURL}{garciadias.github.io/\#/\allowbreak presentations/\allowbreak iaa-so-chemical-tagging-2026}
+\newcommand{\wbDeckLink}{https://garciadias.github.io/\#/presentations/iaa-so-chemical-tagging-2026}
+\newcommand{\wbRepoURL}{github.com/\allowbreak garciadias/\allowbreak iaa-advanced-neural-networks-2026-draft}
+\newcommand{\wbRepoLink}{https://github.com/garciadias/iaa-advanced-neural-networks-2026-draft}
+\newcommand{\wbSchoolURL}{granadacongresos.com/ai-ml}
+\newcommand{\wbSchoolLink}{https://www.granadacongresos.com/ai-ml}
+\newcommand{\wbLibraryURL}{github.com/\allowbreak garciadias/\allowbreak iaa-advanced-neural-networks-2026-draft/tree/main/\allowbreak docs}
+\newcommand{\wbLibraryLink}{https://github.com/garciadias/iaa-advanced-neural-networks-2026-draft/tree/main/docs}
+
 % ------------------------------------------------------------------ metadata
 \jname{IAA-SO School on AI/ML in Astronomy 2026 · companion workbook}
 \jvol{Unsupervised Learning}
