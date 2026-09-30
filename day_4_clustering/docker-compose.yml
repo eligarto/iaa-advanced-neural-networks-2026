@@ -52,9 +52,17 @@ services:
       # ./data      the SDSS DR19 catalogue + the Hugging Face bundle (~2.2 GB)
       # ./results   the parquet cache, figures, mlruns/
       # ./notebooks your decks, so the cells you edit are saved in your checkout
+      # ./article   the workbook sources. The image ships only references.bib
+      #             (the answers cite it at import time), but the notebook
+      #             generator parses every chapters/*.tex to build the exercise
+      #             cells, so without this mount
+      #               docker compose run --rm jupyter \
+      #                 uv run python scripts/make_exercise_notebooks.py
+      #             dies with FileNotFoundError on chapters/01_introduction.tex.
       - ./data:/app/data
       - ./results:/app/results
       - ./notebooks:/app/notebooks
+      - ./article:/app/article
 
     working_dir: /app
 

@@ -47,7 +47,7 @@ mkdir -p data results notebooks      # once: docker would create them as root
 docker compose up                    # then open http://localhost:9999
 ```
 
-`docker compose up` builds the image if it is not built yet and mounts three
+`docker compose up` builds the image if it is not built yet and mounts four
 folders from this directory, which is the whole reason the compose file exists:
 
 | host | in the container | holds |
@@ -55,6 +55,7 @@ folders from this directory, which is the whole reason the compose file exists:
 | `./data` | `/app/data` | the SDSS DR19 catalogue and the embeddings bundle |
 | `./results` | `/app/results` | the parquet cache, figures, `mlruns/` |
 | `./notebooks` | `/app/notebooks` | the decks, so the cells you edit are saved |
+| `./article` | `/app/article` | the workbook, so the deck generator can read `chapters/*.tex` |
 
 Open `notebooks/workbook_exercises.ipynb` (or one of the chapter decks under
 `notebooks/exercises/`) and work through it. The container writes into the

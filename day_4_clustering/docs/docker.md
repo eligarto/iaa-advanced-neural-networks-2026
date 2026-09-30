@@ -97,6 +97,7 @@ are all the same interpreter.
 | `./data` | `/app/data` | the 1.17 GB SDSS catalogue, the ~1 GB embeddings/checkpoints bundle |
 | `./results` | `/app/results` | the score tables, `benchmark_grid.png`, the prepared-sample cache (`cache/prepared/`), and `mlruns/`: the image sets `MLFLOW_TRACKING_URI=file:///app/results/mlruns`, so container runs keep their MLflow record here (a *native* run writes to `./mlruns` instead) |
 | `./notebooks` | `/app/notebooks` | the notebooks, so your edits are saved in your checkout |
+| `./article` | `/app/article` | the workbook sources: the image ships only `references.bib`, and `scripts/make_exercise_notebooks.py` parses every `chapters/*.tex` to build the exercise cells |
 
 The image starts as root, then the entrypoint **drops to the uid that owns
 `./data`**, so every file it writes belongs to you and needs no `sudo` to delete.
