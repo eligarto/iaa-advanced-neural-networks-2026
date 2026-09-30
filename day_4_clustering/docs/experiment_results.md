@@ -1,4 +1,4 @@
-# Tweak experiments — MLflow results (M 67, region 30°, seed 42)
+# Tweak experiments: MLflow results (M 67, region 30°, seed 42)
 
 Every run went through `scripts/experiment.py`, which logs the full config
 snapshot, git commit, data-file size, package versions, and per-method
@@ -6,7 +6,7 @@ recall/precision/kNN-purity to the local MLflow store
 (`mlruns/`, experiment `chemical-tagging-tweaks`). `random_state=42` is forced.
 
 > The values below are a dated record of *this* configuration (seed 42, M 67 30°
-> region, 5 000-star cap) — four decimals are shown because this is the log that
+> region, 5 000-star cap): four decimals are shown because this is the log that
 > proves they were bit-identical across six processes. For what may be quoted as
 > a workshop number and how to attach its environment, see
 > `docs/reproducibility.md`.
@@ -20,7 +20,7 @@ metrics:
 |---|---|---|---|
 | t-SNE | 0.0874 | 0.1168 | 0.1044 |
 | UMAP | 0.4153 | 0.1293 | 0.1126 |
-| EVoC | 0.3825 | 0.1243 | — |
+| EVoC | 0.3825 | 0.1243 |: |
 
 `n_referee_members = 183`, `n_stars = 5000`. Bit-identical across processes.
 
@@ -28,7 +28,7 @@ metrics:
 
 | tweak | t-SNE recall | t-SNE precision | UMAP recall | UMAP precision | EVoC recall | verdict |
 |---|---|---|---|---|---|---|
-| **baseline** | 0.087 | 0.117 | 0.415 | 0.129 | 0.383 | — |
+| **baseline** | 0.087 | 0.117 | 0.415 | 0.129 | 0.383 |: |
 | **HDBSCAN `min_cluster_size=10`** | **0.404** | **0.129** | 0.525 | 0.023 | 0.383 | ✅ best single tweak |
 | HDBSCAN `min_cluster_size=20` | 0.366 | 0.125 | 0.530 | 0.023 | 0.383 | UMAP precision collapses |
 | **t-SNE `perplexity=50`** | **0.383** | 0.124 | 0.415 | 0.129 | 0.383 | ✅ big t-SNE gain, no cost |
@@ -53,7 +53,7 @@ metrics:
 2. **t-SNE `perplexity=50` is a free win**: recall 0.087 → 0.383 at unchanged
    precision. Default 30 is too low for 5000 stars (rule of thumb:
    perplexity ≲ N/100).
-3. **`USE_ELEMENT_WEIGHTS` was a no-op — fixed, and it is the winner.**
+3. **`USE_ELEMENT_WEIGHTS` was a no-op: fixed, and it is the winner.**
    `make_matrix` applied 1/σ weights *then* standardised, so the unit-std
    rescale undid them. After reordering (standardise → weight), weighting
    becomes the single biggest lever: t-SNE recall 0.087 → **0.437**, precision
@@ -68,7 +68,7 @@ metrics:
    cosine path (different kNN graph) is worse here. EVoC unchanged (already
    cosine).
 6. **DWARF_ONLY** gives the cleanest groups (precision 0.165, purity 0.121)
-   but small sample (1617 stars) and low recall — the giant/dwarf split in
+   but small sample (1617 stars) and low recall: the giant/dwarf split in
    C-space is real.
 
 ## Adopted default

@@ -1,6 +1,6 @@
 """Bulk-download DR19 apStar spectra from the allStar-1.3 'uri' column.
 
-Simple ThreadPoolExecutor + wget (no asyncio — the lightsurf asyncio
+Simple ThreadPoolExecutor + wget (no asyncio: the lightsurf asyncio
 downloader crashes with 'Event loop is closed'). Skips already-downloaded
 files; retries transient failures.
 

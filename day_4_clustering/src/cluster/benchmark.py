@@ -27,9 +27,9 @@ def fit_tsne(X: np.ndarray, params: dict[str, Any], random_state: int) -> np.nda
 
     ``params["backend"]`` selects the implementation:
 
-    - ``"opentsne"`` — openTSNE (same BH algorithm, multi-core ``n_jobs=-1``)
-    - ``"sklearn"`` — scikit-learn (single-threaded BH)
-    - ``"auto"`` — openTSNE if importable, else scikit-learn
+    - ``"opentsne"``: openTSNE (same BH algorithm, multi-core ``n_jobs=-1``)
+    - ``"sklearn"``: scikit-learn (single-threaded BH)
+    - ``"auto"``: openTSNE if importable, else scikit-learn
 
     ``params["method"]`` (a sklearn legacy key) is ignored.
     """
@@ -83,7 +83,7 @@ def knn_purity(embedding: np.ndarray, true_labels: np.ndarray, k: int = 10, min_
 
     For each true cluster, the mean fraction of a member's ``k`` nearest
     neighbours (in the embedding) that belong to the same cluster. Mirrors
-    the target paper's visual test — "do members sit together?" — without
+    the target paper's visual test ("do members sit together?") without
     any clustering hyperparameters. ``k`` is capped at the cluster size.
     """
     from sklearn.neighbors import NearestNeighbors

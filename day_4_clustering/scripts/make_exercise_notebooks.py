@@ -153,7 +153,7 @@ def _numbered_reference(match: re.Match[str]) -> str:
 def latex_to_text(tex: str) -> str:
     """Render the workbook's LaTeX exercise prose as readable markdown.
 
-    Not a general LaTeX converter — it handles exactly the constructs the
+    Not a general LaTeX converter: it handles exactly the constructs the
     exercise blocks use, and leaves anything else alone. Math is deliberately
     left in ``$...$``: the notebooks render it, so ``$\\sigma$`` stays.
 
@@ -183,7 +183,21 @@ def latex_to_text(tex: str) -> str:
     text = re.sub(r"\\S\s*", "§", text)
     # 4. spacing, dashes and escapes
     text = text.replace("\\,", " ").replace("\\ ", " ").replace("\\%", "%")
-    text = text.replace("~", " ").replace("---", "—").replace("--", "–")
+    # `---` in the workbook is prose punctuation, and the deck text must not
+    # carry an em dash. Any `---` left in the LaTeX at this point is a bug in
+    # the source, so make it loud rather than silently rendering a dash.
+    if "---" in text:
+        raise ValueError(
+            "LaTeX source still contains '---'. Rewrite it as '.', ',', ';' or "
+            "'()' in the chapter file; the deck text must not contain em dashes."
+        )
+    # `--` is a numeric range in the workbook ("1--3", "$10^3$--$10^5$"). In the
+    # deck it reads as "1 to 3"; between words it is a compound relation
+    # ("age--metallicity") and becomes a plain hyphen. Neither may stay a dash.
+    text = text.replace("~", " ")
+    text = re.sub(r"(?<=\d)\s*--\s*(?=\d)", " to ", text)
+    text = re.sub(r"(?<=\$)\s*--\s*(?=\$)", " to ", text)
+    text = text.replace("--", "-")
     text = text.replace("``", '"').replace("''", '"')
     text = text.replace("\\_", "_").replace("\\&", "&").replace("\\#", "#")
     # 5. `$[$Fe/H$]$` is the workbook's "[Fe/H]"; markdown would render the
@@ -217,13 +231,13 @@ CHAPTERS_SLUG = {title: label for _, title, label in CHAPTERS.values()}
 def intro_cells(chapter: int | None) -> list[nbformat.NotebookNode]:
     """Title + setup cells shared by the master and per-chapter decks."""
     if chapter is None:
-        title = "# Companion workbook — exercise deck\n\n"
+        title = "# Companion workbook: exercise deck\n\n"
         scope = (
             "Every exercise from `article/workbook.tex`, all 16 chapters.\n\n"
         )
     else:
         stem, name, _label = CHAPTERS[chapter]
-        title = f"# Chapter {chapter} — {name}\n\n"
+        title = f"# Chapter {chapter}: {name}\n\n"
         scope = (
             f"The exercises of §{chapter} "
             f"(`article/chapters/{stem}.tex`).\n\n"
@@ -232,7 +246,7 @@ def intro_cells(chapter: int | None) -> list[nbformat.NotebookNode]:
     how_it_works = (
         "**How this deck works.** Each exercise gets three cells:\n\n"
         "1. the question, exactly as the workbook states it;\n"
-        "2. a **clean cell** for you to work in — the imports you need are "
+        "2. a **clean cell** for you to work in: the imports you need are "
         "already there, the solution is not;\n"
         "3. the **answer**, which is printed from "
         "`src/exercises/exercise_<chapter>_<n>.py`.\n\n"
@@ -240,7 +254,7 @@ def intro_cells(chapter: int | None) -> list[nbformat.NotebookNode]:
         "module you can open, read and re-run, so anything you see here you "
         "can also reproduce from a plain Python prompt.\n\n"
         "Work the clean cell *before* running the answer cell. The answers "
-        "are not hidden — they are just one cell further down, and the "
+        "are not hidden. They are just one cell further down, and the "
         "exercise only works if you resist for a few minutes.\n\n"
         "**Data.** The exercises that touch real data need the SDSS-V DR19 "
         "catalogue (~1.17 GB) and, for the spectral chapters, the embedding "
@@ -272,7 +286,7 @@ def intro_cells(chapter: int | None) -> list[nbformat.NotebookNode]:
         "from exercises import utils\n"
         "from exercises.utils import show\n"
         "\n"
-        "print('exercise helpers ready —', ROOT)"
+        "print('exercise helpers ready, ', ROOT)"
     )
 
     return [
@@ -301,7 +315,7 @@ def exercise_cells(
     hints = module_hints(chapter, number) if has_module else []
     hint_lines = "\n".join(hints)
     scratch = (
-        f"# --- Exercise {chapter}.{number} — your workings ---------------\n"
+        f"# --- Exercise {chapter}.{number}: your workings ---------------\n"
         f"{hint_lines}\n"
         "\n"
         "# Your code here.\n"
@@ -312,7 +326,7 @@ def exercise_cells(
             new_markdown_cell(question),
             new_code_cell(scratch),
             new_code_cell(
-                f"# --- Exercise {chapter}.{number} — the answer "
+                f"# --- Exercise {chapter}.{number}: the answer "
                 f"------------------\n"
                 f"from exercises.{name} import ANSWER\n"
                 "\n"
@@ -325,13 +339,40 @@ def exercise_cells(
                 f"# it reads the same data you have on disk.\n"
                 f"from exercises.{name} import solve\n"
                 "\n"
+                "result = None  # a failure below must not leak into the plot\n"
                 "result = solve()\n"
                 "for key, value in result.items():\n"
                 "    show({key: value})",
             ))
+        if module_has_figure(chapter, number):
+            reuse = (
+                module_has_solve(chapter, number)
+                and plot_takes_result(chapter, number)
+            )
+            if reuse:
+                body = (
+                    f"# --- Exercise {chapter}.{number}: the picture "
+                    f"-----------------\n"
+                    f"# plot() draws what solve() just computed. The result is\n"
+                    f"# handed straight over, so nothing is computed twice.\n"
+                    f"from exercises.{name} import plot\n"
+                    "\n"
+                    "plot(result)"
+                )
+            else:
+                body = (
+                    f"# --- Exercise {chapter}.{number}: the picture "
+                    f"-----------------\n"
+                    f"# plot() draws the result. Like solve(), it computes in\n"
+                    f"# the module, not here.\n"
+                    f"from exercises.{name} import plot\n"
+                    "\n"
+                    "plot()"
+                )
+            cells.append(new_code_cell(body))
         return cells
 
-    # pragma: no cover — every exercise ships a module
+    # pragma: no cover (every exercise ships a module)
     return [
         new_markdown_cell(question),
         new_code_cell(scratch),
@@ -348,6 +389,50 @@ def module_has_solve(chapter: int, number: int) -> bool:
     return "def solve(" in module_source(chapter, number)
 
 
+def plot_takes_result(chapter: int, number: int) -> bool:
+    """Whether ``plot()`` can be handed the result ``solve()`` already computed.
+
+    Requires *both* that the first parameter is named ``result`` and that it is
+    annotated as a dict. Neither test alone is enough:
+
+    - arity alone is wrong, because some plots take a tuning parameter
+      (``plot(min_pts: int)``) that is not a result at all;
+    - the annotation alone is wrong, because ``exercise_03_1.plot`` takes
+      ``curve: dict[str, np.ndarray]``. A *different* dict, built by its own
+      ``concentration_curve()``, which raises ``KeyError`` if handed
+      ``solve()``'s output.
+
+    This matters for more than tidiness: with a bare ``plot()`` every exercise
+    computes twice: once in the ``solve()`` cell and again in the plot cell,
+    which took the master deck from 14 minutes to over ten hours.
+    """
+    source = module_source(chapter, number)
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:  # pragma: no cover - a module that will not parse
+        return False
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name == "plot":
+            parameters = node.args.posonlyargs + node.args.args
+            if not parameters or parameters[0].arg != "result":
+                return False
+            annotation = parameters[0].annotation
+            if annotation is None:
+                return False
+            return "dict" in ast.unparse(annotation)
+    return False
+
+
+def module_has_figure(chapter: int, number: int) -> bool:
+    """Whether this exercise draws its result.
+
+    Figures are opt-in and use the name the modules already use: ``plot()``.
+    Detected the same way as ``solve()``: by source inspection, so generating
+    the decks never imports an exercise or touches the catalogue.
+    """
+    return re.search(r"^def plot\(", module_source(chapter, number), re.M) is not None
+
+
 #: Helpers in :mod:`exercises.utils` that actually load the catalogue or the
 #: population. Importing only, say, ``SEEDS`` is not a data dependency, and
 #: claiming otherwise would send students looking for a download they do not
@@ -359,7 +444,7 @@ DATA_HELPERS = frozenset({
 })
 
 PENCIL_AND_PAPER = [
-    "# This one is pencil-and-paper (or a few lines of numpy) —",
+    "# This one is pencil-and-paper (or a few lines of numpy), ",
     "# no data or repository machinery is needed, beyond the imports above.",
 ]
 
@@ -369,8 +454,8 @@ def _utils_import_names(source: str) -> set[str]:
 
     Parsed as Python rather than split on whitespace, because a module may
     alias what it imports (``from exercises.utils import settings as _settings``).
-    Re-importing that text verbatim would put the alias machinery — and the
-    keyword ``as`` — into a scratch cell as if it were a name, which is not
+    Re-importing that text verbatim would put the alias machinery, and the
+    keyword ``as``: into a scratch cell as if it were a name, which is not
     even valid syntax. The original name is kept here: the alias exists to
     suit that module's own namespace, while a scratch cell starts empty and is
     better served by the public name a student can call.
@@ -398,8 +483,8 @@ def module_hints(chapter: int, number: int) -> list[str]:
     contains the machinery for this exercise, and the student still has to
     work out how to put it together.
 
-    Exercises that reach the data through :mod:`exercises.utils` — itself a
-    thin wrapper over ``cluster.data.prepare`` — get that import instead, so
+    Exercises that reach the data through :mod:`exercises.utils`. Itself a
+    thin wrapper over ``cluster.data.prepare``: get that import instead, so
     the steer is never a false claim about what the codebase offers.
     """
     source = module_source(chapter, number)
@@ -428,7 +513,7 @@ def module_hints(chapter: int, number: int) -> list[str]:
     if cluster_imports:
         header = [
             "# The `cluster` package already implements the pieces this",
-            "# exercise needs — these are the ones the solution uses:",
+            "# exercise needs. These are the ones the solution uses:",
         ]
         return header + ([utils_line] if utils_line else []) + sorted(cluster_imports)
 
@@ -439,7 +524,7 @@ def module_hints(chapter: int, number: int) -> list[str]:
             utils_line,
         ]
 
-    # handy constants only — the work is still the student's
+    # handy constants only: the work is still the student's
     return ([utils_line] if utils_line else []) + PENCIL_AND_PAPER
 
 
@@ -450,14 +535,13 @@ def build_chapter(chapter: int, standalone: bool) -> nbformat.NotebookNode:
     if not standalone:
         stem, name, _label = CHAPTERS[chapter]
         cells.append(new_markdown_cell(
-            f"---\n\n## Chapter {chapter} — {name}\n\n"
+            f"---\n\n## Chapter {chapter}: {name}\n\n"
             f"<sub>§{chapter} · `article/chapters/{stem}.tex`</sub>",
         ))
     for number, statement in enumerate(statements, start=1):
         cells.extend(exercise_cells(chapter, number, statement))
 
-    nb = new_notebook(cells=cells, metadata=KERNEL_META)
-    return nb
+    return new_notebook(cells=cells, metadata=KERNEL_META)
 
 
 def build_master() -> nbformat.NotebookNode:
@@ -466,7 +550,7 @@ def build_master() -> nbformat.NotebookNode:
     toc = ["\n**Contents**\n"]
     for chapter in sorted(CHAPTERS):
         _, name, label = CHAPTERS[chapter]
-        toc.append(f"{chapter}. {name} — {EXERCISES[chapter]} exercises")
+        toc.append(f"{chapter}. {name}: {EXERCISES[chapter]} exercises")
     cells.append(new_markdown_cell("\n".join(toc)))
 
     for chapter in sorted(CHAPTERS):
@@ -531,7 +615,7 @@ def main() -> int:
 
     if args.check:
         if changed:
-            print("out of date — re-run scripts/make_exercise_notebooks.py:")
+            print("out of date: re-run scripts/make_exercise_notebooks.py:")
             for path in changed:
                 print(f"  {path.relative_to(ROOT)}")
             return 1

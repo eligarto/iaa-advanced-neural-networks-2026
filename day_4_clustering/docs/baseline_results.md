@@ -1,8 +1,8 @@
-# Paper baseline — cluster-only multiclass separation
+# Paper baseline: cluster-only multiclass separation
 
 > **Historical (APOGEE DR17).** These numbers were produced on
 > `allStar-dr17-synspec_rev1.fits`, which `cluster download` no longer
-> fetches — the project moved to SDSS-V DR19 (`docs/data_releases.md`).
+> fetches: the project moved to SDSS-V DR19 (`docs/data_releases.md`).
 > The commands below need that DR17 file supplied manually; they will
 > not reproduce against a fresh checkout. For current numbers see
 > `docs/dr19_rerun_results.md` and `docs/spectral_benchmark_results.md`.
@@ -10,7 +10,7 @@
 Re-creates Garcia-Dias et al. (2019, A&A 629, A34): take **only the known
 cluster members** (no field stars), cluster them, and ask how well each star
 is assigned back to its own cluster. Scored with the paper's own merit
-functions — **homogeneity**, **completeness**, **v-measure**, and **accuracy**
+functions: **homogeneity**, **completeness**, **v-measure**, and **accuracy**
 (best label permutation via the Hungarian algorithm).
 
 Reproduce with:
@@ -22,7 +22,7 @@ uv run cluster baseline --kinematics   # abundances + parallax/PM/RV
 
 >
 > **Running these:** the commands below are written in the native form. In the
-> Docker setup (the default — see `docs/docker.md`) prefix them with
+> Docker setup (the default. See `docs/docker.md`) prefix them with
 > `docker run --rm -it $DAY4 $IMG`, e.g.
 > `docker run --rm -it $DAY4 $IMG uv run cluster baseline --kinematics`; scripts
 > become `… $IMG uv run python scripts/…`, and pass knobs with `-e`
@@ -60,24 +60,24 @@ their kinematic membership is below 5).
 
 ## Interpretation
 
-1. **Our abundances-only homogeneity (0.26–0.50) is far below the paper's
+1. **Our abundances-only homogeneity (0.26 to 0.50) is far below the paper's
    0.85.** Two honest corrections explain the gap:
 
    - the paper's best result used **LDA**, a *supervised* projection that
      already knows the cluster labels; ours is fully unsupervised;
    - the paper's membership was **2σ-clipped in the same abundances** it
-     then clustered — circular. Our kinematic (Gaia) membership has no
+     then clustered: circular. Our kinematic (Gaia) membership has no
      such leak.
 
 2. **t-SNE's completeness 1.0 vs homogeneity 0.26 is the blob.** HDBSCAN
    merges the similar-age, solar-metallicity open clusters into one predicted
-   cluster — the paper's own "indistinguishable pairs" (NGC 2158–NGC 2420,
-   NGC 2158–Pleiades, NGC 2420–Pleiades, M 15–M 92), now visible as a
+   cluster: the paper's own "indistinguishable pairs" (NGC 2158, NGC 2420,
+   NGC 2158, Pleiades, NGC 2420, Pleiades, M 15, M 92), now visible as a
    merged group rather than a score.
 
 3. **Kinematics carry the separation chemistry can't.** Adding parallax,
-   proper motion and radial velocity lifts homogeneity to 0.72–0.80 and
-   accuracy to 0.55–0.75. Chemistry narrows; kinematics decide — the same
+   proper motion and radial velocity lifts homogeneity to 0.72 to 0.80 and
+   accuracy to 0.55 to 0.75. Chemistry narrows; kinematics decide: the same
    conclusion as the field-retrieval benchmark, arrived at from the
    cluster-only direction.
 

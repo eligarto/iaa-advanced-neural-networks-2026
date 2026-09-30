@@ -1,4 +1,4 @@
-"""Chapter 13, exercise 2 — the two referees, per cluster.
+"""Chapter 13, exercise 2: the two referees, per cluster.
 
     Table 7 reports precision for the kinematic referee. Recompute it
     against the Simbad memberships and plot the difference per cluster. Which
@@ -8,8 +8,8 @@
 The chapter's claim is that both referees agree on every conclusion and that
 the Simbad referee moves precision by -0.01 to -0.08. This module re-derives
 that shift on a subsampled field-retrieval run, then asks the second half of
-the question — whether the *size* of the per-cluster shift is explained by
-stellar-population properties — and finds that it is not, while the raw
+the question: whether the *size* of the per-cluster shift is explained by
+stellar-population properties, and finds that it is not, while the raw
 referee *agreement* is. The distinction matters: a metric that shifts with age
 would make the benchmark age-dependent, and it does not.
 """
@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 from exercises.citations import cite, reference_list
-from exercises.utils import DataNotAvailable, member_field, settings
+from exercises.utils import member_field, settings
 
 #: Simbad ``main_id`` per workbook cluster, verified against the cached
 #: ``data/simbad/simbad_*.csv`` filenames. Resolving these through
@@ -50,13 +50,13 @@ def simbad_masks(
 ) -> np.ndarray:
     """Per-row Simbad cluster label, cross-matched by sky position.
 
-    Mirrors ``cluster.catalog.attach_referee`` — the referee is positional and
-    independent of the kinematic labels — but resolves the cluster name from
+    Mirrors ``cluster.catalog.attach_referee``. The referee is positional and
+    independent of the kinematic labels, but resolves the cluster name from
     the map above instead of the network. Returns an object array of cluster
     names with ``'field'`` where Simbad lists no member within the tolerance.
     """
-    from astropy.coordinates import SkyCoord
     import astropy.units as u
+    from astropy.coordinates import SkyCoord
 
     from cluster.catalog import query_members
 
@@ -252,7 +252,7 @@ def solve(field_sample: int = DEFAULT_FIELD_SAMPLE) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Per-cluster precision under both referees, largest shift first."""
     import matplotlib.pyplot as plt
 
@@ -279,12 +279,12 @@ ANSWER: dict[str, object] = {
     "what was run": (
         f"One abundance-only retrieval (t-SNE {cite('vanderMaaten:08', bare=True)} "
         f"+ HDBSCAN {cite('Campello:13', bare=True)}, seed 42) on 9 002 "
-        "stars — all 1 002 members plus an 8 000-star stratified field sample "
-        "from utils.member_field() — scored against the kinematic labels and "
+        "stars: all 1 002 members plus an 8 000-star stratified field sample "
+        "from utils.member_field(): scored against the kinematic labels and "
         "against the cached Simbad memberships, per cluster. The run returned "
         "300 groups with 32.7% of the stars labelled noise. The macro-average "
         "precision is 0.228 under the kinematic referee and 0.170 under "
-        "Simbad, a shift of -0.058 — inside the -0.01 to -0.08 band the "
+        "Simbad, a shift of -0.058: inside the -0.01 to -0.08 band the "
         "chapter reports. Absolute values differ from Table 7 because the "
         "field is subsampled and the table is one seed of one arm; the shift "
         "is the quantity the exercise asks for."
@@ -295,13 +295,13 @@ ANSWER: dict[str, object] = {
         "systematic in one direction only: no cluster's precision *rises* by "
         "more than 0.01 under Simbad, because Simbad labels fewer stars (829 "
         "of the 1 002 kinematic members), so the same predicted group can only "
-        "lose or hold. NGC 6819 is the clearest case — 62 kinematic members, "
-        "45 of them Simbad-confirmed — and it is also one of the clusters the "
+        "lose or hold. NGC 6819 is the clearest case: 62 kinematic members, "
+        "45 of them Simbad-confirmed, and it is also one of the clusters the "
         "chapter says our arms recover in every seed, so the referee "
         "disagreement lands exactly where the benchmark is strongest."
     ),
     "does it correlate with age or [Fe/H]": (
-        "No — with the literature ages and metallicities taken from the "
+        "No: with the literature ages and metallicities taken from the "
         f"catalogues cluster.literature reads, {cite('Dias:02')} for the open "
         f"clusters and {cite('Harris:96')} for the globulars. The per-cluster "
         "precision shift against age gives Spearman "
@@ -309,16 +309,16 @@ ANSWER: dict[str, object] = {
         "Spearman -0.024 (p = 0.91) and Pearson -0.207 (p = 0.34). With 24-25 "
         "clusters, none of these is significant and the sign is unstable "
         "between the two correlation measures. The honest reading is that the "
-        "size of the referee penalty is a property of the *catalogue* — how "
+        "size of the referee penalty is a property of the *catalogue*: how "
         "many members each cluster has in Simbad, which is a history of being "
-        "studied — not of the cluster's age or chemistry."
+        "studied, not of the cluster's age or chemistry."
     ),
     "what does correlate": (
         "Referee *agreement* does. The Jaccard overlap between the kinematic "
         "and Simbad member sets rises with cluster age (Spearman +0.553, "
         "p = 0.004; Pearson +0.492, p = 0.012) and falls with [Fe/H] "
-        "(Pearson -0.482, p = 0.017). Old, metal-poor clusters — mostly the "
-        "globulars, M 92 at Jaccard 1.00, M 5 at 0.94, M 15 at 0.94 — are "
+        "(Pearson -0.482, p = 0.017). Old, metal-poor clusters: mostly the "
+        "globulars, M 92 at Jaccard 1.00, M 5 at 0.94, M 15 at 0.94: are "
         "agreed on by both referees; young and metal-rich open clusters are "
         "not (King 5 at 0.00, Berkeley 66 at 0.08, Pleiades at 0.28, which is "
         "the crowded-field case). But the *metric* is insensitive to that "
@@ -327,9 +327,9 @@ ANSWER: dict[str, object] = {
     ),
     "why this is the right answer": (
         "The exercise is a test of the protocol, not of the clusters. Two "
-        f"referees built from different data — Gaia {cite('Gaia:23')} "
+        f"referees built from different data: Gaia {cite('Gaia:23')} "
         "astrometry versus literature "
-        "membership papers — disagree about a fifth of the members and move "
+        "membership papers: disagree about a fifth of the members and move "
         "the headline precision by 0.06, yet neither the ranking of clusters "
         "nor the correlation structure with physical properties changes. That "
         "is what makes the benchmark's conclusions portable: if the precision "

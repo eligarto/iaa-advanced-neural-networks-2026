@@ -1,4 +1,4 @@
-"""Isochrone fitting via ASteCA — a quantitative membership-quality proxy.
+"""Isochrone fitting via ASteCA: a quantitative membership-quality proxy.
 
 For each membership source (catalogue / kinematic / combined) we fit a PARSEC
 isochrone to the Gaia CMD of that source's members. A cleaner member list
@@ -10,8 +10,8 @@ Uses two PARSEC v1.2S grids (Gaia EDR3 filters), each with a fine 0.05-dex
 age step and five metallicities, downloaded on first use and cached under
 ``data/isochrones/``:
 
-* ``solar`` — Z = 0.010–0.030 (open clusters);
-* ``metal_poor`` — [M/H] ≈ -2.3 … -0.3 (globulars).
+* ``solar``: Z = 0.010 to 0.030 (open clusters);
+* ``metal_poor``: [M/H] ≈ -2.3 … -0.3 (globulars).
 
 The 400-isochrone CMD limit makes a single fine grid over both metallicity
 ranges impossible, so the grid is chosen per cluster type.
@@ -121,13 +121,13 @@ def fit_isochrone(
 ) -> IsochroneFit:
     """Fit a PARSEC isochrone to a membership source's CMD.
 
-    ``members`` needs Gaia photometry — either the APOGEE column names
+    ``members`` needs Gaia photometry: either the APOGEE column names
     (``GAIAEDR3_PHOT_G_MEAN_MAG``, ``GAIAEDR3_PHOT_BP_MEAN_MAG``,
     ``GAIAEDR3_PHOT_RP_MEAN_MAG``, ``GAIAEDR3_PARALLAX``) or the Gaia DR3 names
     (``phot_g_mean_mag``, ``phot_bp_mean_mag``, ``phot_rp_mean_mag``,
     ``parallax``). ``J``/``K`` (2MASS) are optional: when present a second
     colour J-Ks is fitted; otherwise the single BP-RP colour is used. ``grid`` is
-    ``"solar"`` (open clusters, Z 0.010–0.030) or ``"metal_poor"`` (globulars,
+    ``"solar"`` (open clusters, Z 0.010 to 0.030) or ``"metal_poor"`` (globulars,
     [M/H] -2.3…-0.3); it selects the isochrone set and the metallicity prior.
     """
     if grid not in _GRID_MET:
@@ -230,7 +230,7 @@ def fit_isochrone(
         return -dist  # lkl.get returns a distance (0 = perfect)
 
     # initialise walkers across the prior (log-uniform in metallicity, which
-    # spans decades). Globulars are old, so bias their loga init high — the
+    # spans decades). Globulars are old, so bias their loga init high: the
     # age-metallicity degeneracy otherwise traps the chain in young modes.
     rng = np.random.default_rng(seed)
     pos = np.empty((n_walkers, 4))
@@ -311,7 +311,7 @@ def plot_isochrone_fit(
     fig.update_yaxes(autorange="reversed")
     fig.update_layout(
         title=(
-            f"{cluster_name} — {highlight}: age={age:.2f} Gyr (±{fit.std['loga']:.2f} dex), "
+            f"{cluster_name}: {highlight}: age={age:.2f} Gyr (±{fit.std['loga']:.2f} dex), "
             f"met={fit.best['met']:.4f}±{fit.std['met']:.4f}, "
             f"dm={fit.best['dm']:.2f}±{fit.std['dm']:.2f}, Av={fit.best['Av']:.2f}"
         ),
@@ -350,8 +350,7 @@ def isochrone_cell(
     masks = membership_masks_for(df, cluster, X, settings)
     members = df[masks[method]]
     if len(members) < 25:
-        note = f"⚠ only {len(members)} members in '{method}' — need ≥ 25 for a fit"
-        return note
+        return f"⚠ only {len(members)} members in '{method}': need ≥ 25 for a fit"
     fit = fit_isochrone(
         members,
         seed=settings.isofit_seed,
@@ -378,7 +377,7 @@ def fit_isochrone_gaia(
     Queries Gaia DR3 around ``cluster`` (full depth, G ≲ 21), selects members
     by a fixed proper-motion cut, and fits the single BP-RP colour. ``mag_min``
     drops bright stars: for globulars set it ≳ 15 to exclude the RGB and blue
-    horizontal branch, which otherwise pull the age young — the main sequence
+    horizontal branch, which otherwise pull the age young: the main sequence
     / turnoff alone cleanly fixes the age.
     """
     from .gaia import gaia_members, query_gaia_region
@@ -390,7 +389,7 @@ def fit_isochrone_gaia(
         members = members[members["phot_g_mean_mag"] > mag_min]
     if len(members) < 25:
         raise ValueError(
-            f"only {len(members)} Gaia members in {radius_deg}° — need ≥ 25"
+            f"only {len(members)} Gaia members in {radius_deg}°: need ≥ 25"
         )
     grid = "metal_poor" if cluster.kind == "globular" else "solar"
     return fit_isochrone(
@@ -453,7 +452,7 @@ def gaia_age_cell(cluster_name: str, settings: Settings) -> Any:
         # No cached region for this cluster and the archive is quiet: say so and
         # leave the rest of the notebook alone instead of hanging the cell.
         return (
-            f"⚠ Gaia archive unreachable for {cluster_name} — {exc} "
+            f"⚠ Gaia archive unreachable for {cluster_name}: {exc} "
             f"Run this again when you are online; nothing else in the notebook depends on it."
         )
     members = df[gaia_members(df, cluster)]

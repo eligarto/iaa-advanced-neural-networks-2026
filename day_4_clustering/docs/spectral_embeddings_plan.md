@@ -2,7 +2,7 @@
 
 > Paths such as `scripts/export_embeddings.py`, `scripts/fetch_spectra.py` and
 > `src/lightsurf/…` below belong to the **upstream** `lightsurf` repository (a
-> separate, private checkout — see `docs/spectral_gpu_runbook.md`), not to this
+> separate, private checkout. See `docs/spectral_gpu_runbook.md`), not to this
 > tree. This repository ships the CPU-side code and the artifacts those scripts
 > produced; the names are kept so the plan can be read against that history.
 
@@ -11,7 +11,7 @@
 Train the **lightsurf** CNN-LSTM-Attention network to regress APOGEE chemical
 abundances from the raw 8575-pixel H-band spectrum (on a GPU machine), export
 the trained model, extract its **latent embeddings**, and use those embeddings
-as clustering features for chemical tagging — benchmarked head-to-head against
+as clustering features for chemical tagging: benchmarked head-to-head against
 the current 16-D ASPCAP abundance features in the workshop pipeline.
 
 ## 1. Motivation & hypothesis
@@ -20,12 +20,12 @@ the current 16-D ASPCAP abundance features in the workshop pipeline.
 - **Proposal**: feed the full spectrum through a trained RNN; take the
   penultimate layer as the feature vector.
 - **Hypothesis**: the embedding is a learned, denoised, compressed
-  representation of the *full* spectrum — it sees continuum shape, line wings,
+  representation of the *full* spectrum: it sees continuum shape, line wings,
   and blends that 16 summary abundances discard. It should therefore be
   **≥** the abundance features for tagging, at lower dimensionality.
 - **Risk (circularity)**: a supervised embedding trained only to regress the
   16 ASPCAP abundances *cannot* contain more chemical information than those
-  abundances — it is at best a denoised compression. Real novelty requires
+  abundances. It is at best a denoised compression. Real novelty requires
   either (a) multi-element targets beyond ASPCAP's 16, or (b) a
   disentangled / self-supervised objective (see §2). This is the honest
   benchmark question the pipeline must answer.
@@ -40,34 +40,34 @@ the current 16-D ASPCAP abundance features in the workshop pipeline.
 | Disentangled repr. learning (arXiv:2103.06377; ApJ 2021) | learns a **chemical latent disentangled from Teff/logg**, no label catalogue | the SOTA direction; our supervised regression is its baseline |
 | "Model-free abundances" (A&A 2025, aa55376-25) | VAE, per-element decoders → chemically meaningful latent | self-supervised path |
 | Spina et al. 2025 (deep chemical tagging, GAT) | graph-attention autoencoder over chemistry + kinematics + age | the "informed" extension we already parallel |
-| de Mijolla, Ness, Viti & Wheeler 2021 (arXiv:2103.06377) | **conditional autoencoder** `enc(spectrum, Teff/logg)→z`, `dec(z, Teff/logg)→spectrum`, loss = MSE + λ·disentanglement(z ⊥ Teff/logg). Two losses: FaderDis (adversarial critic) and FactorDis (scramble u,z pairs + WGAN critic) | the **abundance-free** chemical latent — the real target design |
+| de Mijolla, Ness, Viti & Wheeler 2021 (arXiv:2103.06377) | **conditional autoencoder** `enc(spectrum, Teff/logg)→z`, `dec(z, Teff/logg)→spectrum`, loss = MSE + λ·disentanglement(z ⊥ Teff/logg). Two losses: FaderDis (adversarial critic) and FactorDis (scramble u,z pairs + WGAN critic) | the **abundance-free** chemical latent: the real target design |
 | Price-Jones & Bovy 2019 | fit non-chemical params per wavelength bin, take residuals → PCA → cluster | the non-deep baseline the above beats |
-| Ness et al. 2018 | "doppelganger rate": ~1% of field stars chemically identical to cluster stars using ~20 abundances | **why** the full-spectrum latent matters — abundances alone saturate |
+| Ness et al. 2018 | "doppelganger rate": ~1% of field stars chemically identical to cluster stars using ~20 abundances | **why** the full-spectrum latent matters: abundances alone saturate |
 
 **Advice distilled**: (1) train **multi-element** (shared latent), not 9
 separate single-element nets; (2) tap the **bottleneck just before the output
 head** as the embedding; (3) treat the supervised embedding as a **baseline**,
 and the **disentangled conditional autoencoder** (de Mijolla 2021) as the
-primary design — a supervised regression latent is *entangled* with Teff/logg,
+primary design: a supervised regression latent is *entangled* with Teff/logg,
 so it mixes physical and chemical variation; (4) the doppelganger argument
 (Ness 2018) is the scientific justification for going beyond 16 abundances.
 
 ## 3. Architecture decisions
 
-### Phase A — supervised regression embedding (the user's baseline)
+### Phase A: supervised regression embedding (the user's baseline)
 
 1. **Multi-task**: change the output head from `Dense(1)` to `Dense(9)`
    (all lightsurf targets: FE_H, C_FE, CA_FE, K_FE, MG_FE, NI_FE, O_FE, SI_FE,
    TI_FE) so the shared latent encodes common chemical structure.
-   (Lightsurf currently trains one element at a time — `Dense(1)`.)
+   (Lightsurf currently trains one element at a time: `Dense(1)`.)
 2. **Embedding taps** (name the layers, expose all three):
-   - attention output — 256-d (rich)
-   - `Dense(20)` — 20-d
-   - `Dense(8)` — 8-d bottleneck (most compressed)
+   - attention output: 256-d (rich)
+   - `Dense(20)`: 20-d
+   - `Dense(8)`: 8-d bottleneck (most compressed)
 3. **Spectrum normalisation**: per-spectrum standard scaling, **save the scaler**.
 4. **Single-task fallback**: keep per-element training as a comparison arm.
 
-### Phase B — disentangled conditional autoencoder (recommended, de Mijolla 2021)
+### Phase B: disentangled conditional autoencoder (recommended, de Mijolla 2021)
 
 Reuse lightsurf's CNN-LSTM(-Attention) as the **encoder** of a conditional
 autoencoder:
@@ -77,13 +77,13 @@ autoencoder:
 - loss = `MSE(x, x̂) + λ · L_dis(z, u)`
 
 `L_dis` enforces statistical independence between the latent and the known
-physical parameters — FaderDis (adversarial critic) or FactorDis
+physical parameters: FaderDis (adversarial critic) or FactorDis
 (scramble-then-WGAN-critic). The latent `z` is then the **abundance-free**
 chemical embedding, free of Teff/logg contamination. This is the design that
 actually goes *beyond* the 16 ASPCAP abundances (blended lines, weak features,
 no stellar-model labels).
 
-**Recommendation**: implement Phase A first (it is cheap — the model exists),
+**Recommendation**: implement Phase A first (it is cheap, the model exists),
 use it as the benchmark baseline, then implement Phase B as the scientific
 novelty. Both feed the same workshop benchmark.
 
@@ -128,7 +128,7 @@ novelty. Both feed the same workshop benchmark.
 2. Train multi-task `CnnLstmAttentionModel(output_dimension=9)` via the
    existing `RandomizedSearchCV` path (or a fixed sensible config).
 3. Save `model.keras` + scaler; copy the two artifacts to this machine
-   (CPU inference only — embedding extraction is ~ms/star).
+   (CPU inference only: embedding extraction is ~ms/star).
 
 ## 7. Validation
 
@@ -149,7 +149,7 @@ compression).
 - **Circularity** → the head-to-head is the test; parity ⇒ compression is real
   but not novel ⇒ Phase B (disentangled autoencoder) is the answer.
 - **Teff/logg contamination** → the supervised latent is entangled with stellar
-  parameters; the disentanglement loss in Phase B removes it — and this is the
+  parameters; the disentanglement loss in Phase B removes it, and this is the
   point of de Mijolla 2021.
 - **Spectra coverage** → cross-match `flux_abundances.csv` first; only download
   the missing subset.
@@ -166,16 +166,16 @@ compression).
 | lightsurf export script (`export_embeddings.py`) | ✅ done | lightsurf `3524e8b`, `71556e4` |
 | lightsurf train+export single command (`train_embedding_model.py`) | ✅ done, CPU round-trip tested | lightsurf `d35a270` |
 | workshop spectral feature source (`spectral.py`: load/align/post-process) | ✅ done + 6 tests | workshop `de95802` |
-| CPU smoke test (synthetic spectra → embeddings → t-SNE/UMAP/EVoC) | ✅ done (both repos) | — |
+| CPU smoke test (synthetic spectra → embeddings → t-SNE/UMAP/EVoC) | ✅ done (both repos) |: |
 | GPU runbook | ✅ done | workshop `45819cd` |
 | Phase B disentangled conditional autoencoder (skeleton) | ✅ done + 2 tests | lightsurf `403c6c2` |
-| train real model (GPU machine) + export artifact | ⏳ deferred — needs GPU | — |
-| head-to-head abundances vs embeddings benchmark | ⏳ blocked on trained model | — |
+| train real model (GPU machine) + export artifact | ⏳ deferred: needs GPU |: |
+| head-to-head abundances vs embeddings benchmark | ⏳ blocked on trained model |: |
 
 ## 10. Open questions (resolve during implementation)
 
 1. Which tap wins: attention 256-d vs bottleneck 8-d vs 20-d?
-2. Multi-task vs single-task embedding — does the shared latent help?
+2. Multi-task vs single-task embedding: does the shared latent help?
 3. Per-spectrum vs global flux normalisation.
 4. Do embeddings recover the metal-poor globulars better (the spectrum may
    carry weak-line info the ASPCAP pipeline dropped)?
@@ -187,5 +187,5 @@ compression).
   (15096.68 … 16995.17 Å, from `APOGEE_WAVELENGTH_AIR_STR`).
 - `APOGEE_SPECTRUM_LENGTH = 8576` (constants) vs 8575 stored (off-by-one:
   `APOGEE_WAVELENGTH_AIR = APOGEE_WAVELENGTH_AIR[:-1]`).
-- `models/` is empty — no trained artifact exists yet.
+- `models/` is empty, no trained artifact exists yet.
 - Cross-match key: `FILE` = `aspcapStar-dr17-<APOGEE_ID>`.

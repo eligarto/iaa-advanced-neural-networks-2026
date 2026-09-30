@@ -1,4 +1,4 @@
-"""Chapter 14, exercise 3 — a paired control when you only have one product.
+"""Chapter 14, exercise 3: a paired control when you only have one product.
 
     The paired control uses 253 stars with embeddings through both pipelines.
     Design an equivalent control for a study that only has one product, and
@@ -12,7 +12,7 @@ another row, and a *nuisance floor* built from the stellar parameters the
 latent is known to encode anyway. The conclusion is structural and worth
 stating plainly: within one product, a paired control can detect per-row noise
 and can calibrate how much a nuisance label is worth, but it cannot detect a
-constant offset — which is precisely the failure mode §14.5 documents, because
+constant offset, which is precisely the failure mode §14.5 documents, because
 a constant offset puts every star into the same bucket.
 """
 
@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 from exercises.citations import cite, reference_list
-from exercises.utils import SEEDS, embedding_path, member_field, members
+from exercises.utils import embedding_path, member_field, members
 
 #: The two artifacts carrying the *same stars* through different pipelines.
 #: 253 stars are in both (the figure §14.5 quotes); the second is the DR19
@@ -83,7 +83,7 @@ def paired_control(seed: int = 0) -> dict[str, object]:
 def replicate_control() -> dict[str, object]:
     """Single-product substitute: two catalogue rows of the same star.
 
-    298 of the 1 002 member rows share an ``APOGEE_ID`` with another row — the
+    298 of the 1 002 member rows share an ``APOGEE_ID`` with another row: the
     duplicate-star problem of §13's limitation list, turned into an asset.
     191 distinct same-star pairs. In C-space this is the closest available
     analogue of "same star, two reductions": same star against a different
@@ -113,7 +113,7 @@ def replicate_control() -> dict[str, object]:
 
     replicate = np.linalg.norm(X[index[:, 0]] - X[index[:, 1]], axis=1)
     same_cluster = []
-    for i, j in index:
+    for i, _ in index:
         candidates = np.flatnonzero((labels == labels[i]) & (ids != ids[i]))
         if candidates.size:
             same_cluster.append(float(np.linalg.norm(X[i] - X[rng.choice(candidates)])))
@@ -190,7 +190,7 @@ def solve() -> dict[str, object]:
         {
             "control": "two products (workbook)",
             "detects": "any offset between the two pipelines, including a constant one",
-            "cannot_detect": "nothing about the confound — the offset is measured directly",
+            "cannot_detect": "nothing about the confound. The offset is measured directly",
             "measured_here": f"ratio {paired.get('ratio')}x on {paired.get('n')} stars",
         },
         {
@@ -212,7 +212,7 @@ def solve() -> dict[str, object]:
             "control": "external re-reduction of a subsample",
             "detects": "the product effect itself, if a second product can be produced "
                        "for even a handful of stars",
-            "cannot_detect": "nothing, if the subsample is representative — this is the "
+            "cannot_detect": "nothing, if the subsample is representative. This is the "
                              "only control that answers the question",
             "measured_here": "not runnable here: needs the spectra and the pipeline",
         },
@@ -226,7 +226,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Distance distributions for the two-product and one-product controls."""
     import matplotlib.pyplot as plt
 
@@ -259,7 +259,7 @@ ANSWER: dict[str, object] = {
         "Recomputed from the two artifacts: 253 stars are embedded through both "
         "pipelines. A star sits 3.655 ± 0.5 from its own other-pipeline "
         "embedding against 2.150 ± 0.5 from a random different star within one "
-        "pipeline — a ratio of 1.70x, exactly the chapter's figure. The shared "
+        "pipeline: a ratio of 1.70x, exactly the chapter's figure. The shared "
         "fraction of the offset is 74.9%, again matching the quoted 75%. The "
         "mean cosine *similarity* between a star's two embeddings is 0.389, so "
         "the chapter's 'cosine distance 0.389' is the similarity, not the "
@@ -274,37 +274,37 @@ ANSWER: dict[str, object] = {
         f"{cite('He:22')}. (1) A repeat-row control: 298 member rows share an "
         "APOGEE_ID with another row, giving 191 same-star pairs in C-space. "
         "The distance between a star's two rows is 0.664, against 0.989 for a "
-        "different star in the same cluster and 1.283 for a random member — "
+        "different star in the same cluster and 1.283 for a random member: "
         "ratios of 0.67x and 0.52x, i.e. the replicate is *closer* than a "
         "stranger, as it must be, and 15.3% of the offset is shared across "
         "pairs. (2) A nuisance floor: probe the same latent for a physical "
         "label instead of a product label, on 2 500 of the same stars with the same "
-        f"five-fold logistic probe ({cite('Pedregosa:11', bare=True)}) — "
+        f"five-fold logistic probe ({cite('Pedregosa:11', bare=True)}). "
         "Teff 0.968, logg 0.959, [Fe/H] 0.946, SNR "
         "0.833. That tells you what a high AUC costs to earn: if a candidate "
         "flag is confounded with a stellar parameter, a probe cannot tell the "
         "two apart."
     ),
-    "what it cannot detect — and that is the whole point": (
+    "what it cannot detect, and that is the whole point": (
         "A constant offset. §14.5's failure was a uniform 6 000x flux-scale "
         "difference between the two products, and the reason it was invisible "
-        "for so long is that a constant offset does not make a latent noisy — "
+        "for so long is that a constant offset does not make a latent noisy: "
         "it makes it *shifted*, and a shift is not detectable from inside the "
         "shifted sample. Concretely: the repeat-row control measures "
         "non-reproducible scatter, and a uniform offset contributes zero "
         "scatter. The nuisance floor measures what stellar parameters are "
         "worth, and a product offset that correlates with which stars are "
-        "faint is exactly what makes the two indistinguishable — in this "
+        "faint is exactly what makes the two indistinguishable: in this "
         "sample the single best univariate signature of the backfill label is "
         "SNR at AUC 0.647, which is a stellar-parameter effect, not a product "
         "one. Neither control can attribute a difference to the pipeline."
     ),
     "the design that answers the question": (
-        "Re-reduce a subsample through a second product and embed it — for "
+        "Re-reduce a subsample through a second product and embed it: for "
         f"APOGEE spectra {cite('Majewski:17')} that means a second reduction "
         "of the same exposures. Even 50 "
         "to 250 stars through both pipelines restores the workbook's control, "
-        "and the workbook's own fix is precisely this — 736 mwmStar spectra "
+        "and the workbook's own fix is precisely this: 736 mwmStar spectra "
         "for the backfilled members, downloaded and waiting. The internal "
         "controls are worth running in addition, because they bound the "
         "damage if the re-reduction cannot be done: a repeat-row ratio near 1 "
@@ -321,7 +321,7 @@ ANSWER: dict[str, object] = {
         "A paired control is not a statistical test, it is a *design*: it works "
         "because two measurements of the same star differ only in the thing "
         "being tested. Remove that property and no amount of careful analysis "
-        "recovers it — which is why the chapter's fix is a re-run and not a "
+        "recovers it, which is why the chapter's fix is a re-run and not a "
         "caveat, and why the withdrawn claim was withdrawn rather than "
         "footnoted. The corollary for the assignment: if your study has one "
         "data product, say so in the methods paragraph and say which controls "

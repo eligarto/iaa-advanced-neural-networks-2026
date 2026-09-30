@@ -1,4 +1,4 @@
-"""Chapter 6, exercise 1 — the epsilon-ball classification, by hand.
+"""Chapter 6, exercise 1: the epsilon-ball classification, by hand.
 
     Draw the epsilon-ball classification by hand for the 2-D dataset in
     Figure 11 with epsilon = 0.35 and minPts = 4, and mark every point core,
@@ -7,7 +7,7 @@
 
 \\S 6.1 defines core, border and noise in three sentences; this exercise is
 the check that the definitions were read rather than skimmed. The second half
-is the real lesson: minPts moves from 4 to 6 — a change of two — and the
+is the real lesson: minPts moves from 4 to 6 (a change of two) and the
 partition goes from two clusters and four noise points to one cluster and
 thirteen. That fragility is the argument \\S 6.3 makes for the k-distance plot
 and the reason chapters 7 and 8 exist.
@@ -52,7 +52,7 @@ def classify(
 
     ``min_pts`` counts the point itself, as \\S 6.1's margin note specifies.
     Border points are attached to the first core that reaches them in index
-    order — an arbitrary choice, and the subject of exercise 3.
+    order: an arbitrary choice, and the subject of exercise 3.
     """
     distance = np.linalg.norm(X[:, None] - X[None], axis=-1)
     within = distance <= eps
@@ -136,7 +136,7 @@ def solve(eps: float = EPS) -> dict[str, object]:
     return out
 
 
-def plot(min_pts: int = 4):  # pragma: no cover — figure
+def plot(min_pts: int = 4):  # pragma: no cover (figure)
     """Redraw Figure 11b: every point coloured by its role, with the balls."""
     import matplotlib.pyplot as plt
 
@@ -175,15 +175,15 @@ ANSWER: dict[str, object] = {
         "border, as is Cabove (count 2), which sits inside C5's ball but "
         "cannot recruit anyone. The five ring points R0-R4 all have count 5 "
         "and are core, forming a second cluster. The four isolated points "
-        "I0-I3 have count 1 — themselves only — and are noise. Cluster 1 has "
+        "I0-I3 have count 1 (themselves only) and are noise. Cluster 1 has "
         "10 members (the chain plus Cabove), cluster 2 has 5."
     ),
     "minPts = 6, and exactly what changes": (
-        "13 of the 19 points change status — this is the answer the exercise "
+        "13 of the 19 points change status. This is the answer the exercise "
         "is fishing for. Only C5 (count 6) is still core. C3, C4, C6, C7 fall "
         "core -> border; C1, C2 fall core -> noise (counts 4 and 5, and "
         "neither is inside C5's ball); C0 and C8 fall border -> noise. Cabove "
-        "is the one point that does *not* change — it was border at minPts=4 "
+        "is the one point that does *not* change. It was border at minPts=4 "
         "and is border at minPts=6, because its single core neighbour C5 is "
         "the one point that survives. The entire ring R0-R4 collapses "
         "core -> noise in one step: all five have count 5, one short of the "
@@ -193,7 +193,7 @@ ANSWER: dict[str, object] = {
     ),
     "the lesson in the ring": (
         "The ring is the instructive case. It is a perfectly good, visually "
-        "obvious cluster — five points in a tight pentagon — and it "
+        "obvious cluster (five points in a tight pentagon) and it "
         "disappears completely because of a threshold change of two. Nothing "
         "about the data moved. DBSCAN has no notion of 'this group was nearly "
         "dense enough'; a point is core or it is not, and a group with no "
@@ -210,7 +210,7 @@ ANSWER: dict[str, object] = {
         f"(S 6.3; the Pleiades membership is that of "
         f"{cite('Kos:17', bare=True)}). The rule of thumb "
         "minPts ~ d+1 would give 17 here, and by the logic above that would "
-        "delete every cluster with fewer than 17 chemically tight members — "
+        "delete every cluster with fewer than 17 chemically tight members: "
         "which, from the member counts of S 2, is 7 of the 25. The knob is "
         "not a detail; it is a decision about which clusters are allowed to "
         "exist before any data is looked at."

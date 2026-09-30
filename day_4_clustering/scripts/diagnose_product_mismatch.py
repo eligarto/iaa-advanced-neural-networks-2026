@@ -38,7 +38,7 @@ def main() -> None:
     d17, d19 = _load(DR17), _load(DR19)
     both = sorted(set(d17.index) & set(d19.index))
     if not both:
-        print("no paired stars — nothing to diagnose")
+        print("no paired stars: nothing to diagnose")
         return
 
     a = d17.loc[both].to_numpy(dtype=float)  # aspcapStar, normalised

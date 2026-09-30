@@ -1,4 +1,4 @@
-"""Chapter 11, exercise 2 — does the initialisation change the neighbourhoods?
+"""Chapter 11, exercise 2: does the initialisation change the neighbourhoods?
 
     For a small dataset, compute UMAP's edge weights and then run the layout
     twice: once with PCA initialisation and once with a random one. Do the
@@ -9,7 +9,7 @@
 notes that its spread is "the same order as some of the gaps quoted between
 arms". Initialisation is the other half of the same question, and \\S 10.3
 records that for t-SNE the difference was not subtle. This exercise separates
-two things a layout does — *who is next to whom* and *where everything sits* —
+two things a layout does: *who is next to whom* and *where everything sits*,
 and measures whether initialisation changes the first or only the second.
 """
 
@@ -41,7 +41,7 @@ def neighbour_sets(Z: np.ndarray, k: int = K) -> list[set[int]]:
     index = NearestNeighbors(n_neighbors=k + 1).fit(Z).kneighbors(
         Z, return_distance=False,
     )[:, 1:]
-    return [set(int(j) for j in row) for row in index]
+    return [{int(j) for j in row} for row in index]
 
 
 def agreement(a: list[set[int]], b: list[set[int]], k: int = K) -> float:
@@ -85,7 +85,6 @@ def solve(
     embeddings = layouts(X, INITIALISATIONS, seeds, k)
 
     sets = {key: neighbour_sets(Z, k) for key, Z in embeddings.items()}
-    keys = list(sets)
 
     within: dict[str, list[float]] = {init: [] for init in INITIALISATIONS}
     for init in INITIALISATIONS:
@@ -155,8 +154,8 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
-    """The same matrix under pca and random init — and their neighbourhoods."""
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
+    """The same matrix under pca and random init, and their neighbourhoods."""
     import matplotlib.pyplot as plt
 
     from exercises.utils import members
@@ -190,7 +189,7 @@ ANSWER: dict[str, object] = {
         f"{cite('Pedregosa:11')} doing the work."
     ),
     "do the layouts agree on neighbours": (
-        "Yes — to within their own seed noise, and that is the headline. "
+        "Yes: to within their own seed noise, and that is the headline. "
         "Mean overlap of the 15 nearest neighbours:\n\n"
         "  within pca       0.7605 +- 0.0225  (6 seed pairs)\n"
         "  within random    0.7577 +- 0.0150  (6 seed pairs)\n"
@@ -203,7 +202,7 @@ ANSWER: dict[str, object] = {
         "Initialisation does not change who is next to whom."
     ),
     "what it does change": (
-        "The arrangement, the group count, and the largest-group fraction — "
+        "The arrangement, the group count, and the largest-group fraction: "
         "and those three things are not small. Mean homogeneity is 0.521 "
         "(pca) against 0.536 (random); mean completeness 0.515 against 0.465; "
         "predicted groups 33.3 against 41.3; largest-group fraction 0.277 "
@@ -214,7 +213,7 @@ ANSWER: dict[str, object] = {
         "~29-33 group family with one group holding about 35% of the stars, "
         "and a ~42-45 group family with no dominant group at all. Both pca "
         "and random produce both families depending on seed, so this is seed "
-        "noise surfacing, not an initialisation effect — but it is the same "
+        "noise surfacing, not an initialisation effect, but it is the same "
         "bimodality that exercises 9.2 and 11.3 catch, and it means the group "
         "count and largest-group fraction have to be quoted alongside every "
         "homogeneity."
@@ -230,7 +229,7 @@ ANSWER: dict[str, object] = {
         "different answer but a *faster and more reproducible* route to one: "
         "it starts in a sensible arrangement, so fewer epochs are needed and "
         "the result is less sensitive to the random stream. §11.1's "
-        "'more global structure' caveat follows directly — the long ranges a "
+        "'more global structure' caveat follows directly: the long ranges a "
         "UMAP map appears to preserve come from the initialisation and the "
         "repulsion term, not from the graph, which never saw a long distance."
     ),
@@ -239,7 +238,7 @@ ANSWER: dict[str, object] = {
         "mean agreement with the C-space kNN sets is 0.510 (pca) and 0.511 "
         "(random). Against a chance floor of 0.015 that is not nothing, but it "
         "means the map is discarding half of whatever neighbourhood structure "
-        "the chemistry provided — and exercise 5's raw-space kNN purity of "
+        "the chemistry provided, and exercise 5's raw-space kNN purity of "
         "0.365 says the structure it is discarding from was weak to begin "
         "with. This is the quantitative version of §10.5's 'the neighbourhoods "
         "are preserved, and the neighbourhoods were not separated to begin "
@@ -251,7 +250,7 @@ ANSWER: dict[str, object] = {
         "reproducing your command will get. (2) It is deterministic given the "
         "input, so the run is reproducible from the data alone. (3) It starts "
         "closer to the eventual layout, so it is less dependent on the number "
-        "of optimisation epochs and on the random stream — the same reason "
+        "of optimisation epochs and on the random stream: the same reason "
         "§10.3's t-SNE arm uses ``init='pca'``. (4) Its group count is more "
         "stable across seeds (29-44 against 33-45), which is the number that "
         "moves most.\n\n"
@@ -260,7 +259,7 @@ ANSWER: dict[str, object] = {
     ),
     "what you would have to state about it": (
         "Five sentences, and none of them optional. (i) Which initialisation, "
-        "by name — 'UMAP, init=pca' — because the layouts are not "
+        "by name ('UMAP, init=pca') because the layouts are not "
         "interchangeable pictures even though they agree on neighbours. (ii) "
         "The seed, or that the run was averaged over seeds; §11.3 notes UMAP's "
         "±0.011 spread is the same order as the gaps quoted between arms, and "
@@ -268,7 +267,7 @@ ANSWER: dict[str, object] = {
         "(iii) The number of predicted groups and the largest-group fraction, "
         "which move far more than the score (§9.4 rule 5). (iv) That UMAP has "
         "no noise model, so a blob in the picture is a density peak and "
-        "nothing more — everything gets a position. (v) That the map is not "
+        "nothing more: everything gets a position. (v) That the map is not "
         "evidence of separation on its own: here it retains about half the "
         "input neighbourhoods, so the picture should be read next to the "
         "parameter-free score, not instead of it."

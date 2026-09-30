@@ -1,15 +1,15 @@
 # Spectral-embedding benchmark results (paper baseline)
 
 > **Read the caveats first.** Two systematics shape everything below:
-> a data-PRODUCT mismatch in the 25-cluster union (§ Provenance — raw
+> a data-PRODUCT mismatch in the 25-cluster union (§ Provenance: raw
 > `apStar` vs continuum-normalised `aspcapStar`, fixable by re-downloading
 > from DR19) and a comparison that was not like-for-like (§ Same-population
-> head-to-head). Both are now measured, and the corrected numbers — not the
-> originals — are the ones to quote.
+> head-to-head). Both are now measured, and the corrected numbers, not the
+> originals: are the ones to quote.
 
 >
 > **Running these:** the commands below are written in the native form. In the
-> Docker setup (the default — see `docs/docker.md`) prefix them with
+> Docker setup (the default. See `docs/docker.md`) prefix them with
 > `docker run --rm -it $DAY4 $IMG`, e.g.
 > `docker run --rm -it $DAY4 $IMG uv run cluster baseline --kinematics`; scripts
 > become `… $IMG uv run python scripts/…`, and pass knobs with `-e`
@@ -19,12 +19,12 @@
 
 The product mismatch below was fixed at the source. On the desktop RTX 5090,
 the masked AE was **retrained from scratch on raw DR19 `mwmStar` spectra**
-(39,945 field stars, 100 epochs / early stop), and *every* star — 994 members
-plus 39,945 field — was embedded from that one product. PCA arms were rebuilt
+(39,945 field stars, 100 epochs / early stop), and *every* star: 994 members
+plus 39,945 field: was embedded from that one product. PCA arms were rebuilt
 from the same spectra. The old `masked_latent*.parquet` artifacts are backed
 up as `*_v1.parquet`. All numbers here are from the uniform data.
 
-**Same-population head-to-head — 982 stars, 25 clusters** (7 seeds):
+**Same-population head-to-head: 982 stars, 25 clusters** (7 seeds):
 
 | features | t-SNE | UMAP | EVoC |
 |---|---|---|---|
@@ -36,18 +36,18 @@ up as `*_v1.parquet`. All numbers here are from the uniform data.
 What survives the re-run, honestly:
 
 1. **The masked AE still beats abundances.** UMAP 0.76 vs 0.58, EVoC 0.69 vs
-   0.42 — a real, seed-stable gap on the same stars. Chemical tagging from
+   0.42: a real, seed-stable gap on the same stars. Chemical tagging from
    spectra alone is not a fluke.
 2. **But PCA-64d is now competitive** (0.73/0.75/0.74 vs 0.69/0.76/0.74).
    The old "3× the linear baseline" was an artefact of the product mismatch
    inflating the AE arm *and* the degenerate PCA arm. On the full sample the
    self-supervised AE's edge over a linear projection is modest, and only
-   clear on EVoC (0.69 vs 0.73 reversed — see note below) and UMAP.
+   clear on EVoC (0.69 vs 0.73 reversed. See note below) and UMAP.
 3. **M 3 is not the whole story.** Ablating it (884 stars, 24 clusters)
-   leaves the AE at t-SNE 0.71 / UMAP 0.75 / EVoC 0.67 — essentially
+   leaves the AE at t-SNE 0.71 / UMAP 0.75 / EVoC 0.67: essentially
    unchanged, so the separation is not a globular/open discriminator.
 
-**Field retrieval** (23 998 field vs 829 members scored, 24 clusters — the number
+**Field retrieval** (23 998 field vs 829 members scored, 24 clusters: the number
 that the product mismatch had forced us to withdraw). Abundance arm, quoted to
 two decimals; the exact reading and its environment are in
 `docs/reference_runs/fast_2026-09-24.json`:
@@ -58,18 +58,18 @@ two decimals; the exact reading and its environment are in
 | UMAP | ≈0.22 | ≈0.13 |
 | EVoC | ≈0.48 | ≈0.002 |
 
-Readings move by ~±0.02 across machines — the same command on a different CPU or
+Readings move by ~±0.02 across machines: the same command on a different CPU or
 thread count lands a decimal or two away, which is expected and not a bug
 (`docs/reproducibility.md`). Chance precision is ~3% (829 members in 25k stars),
 so t-SNE's 0.22 is a real signal, but retrieval from spectra alone is weak and
 EVoC over-segments the field (recall up, precision ~0). This is the honest
 baseline.
 
-**Provenance resolved.** The old confound was a *product* signature — the same
+**Provenance resolved.** The old confound was a *product* signature: the same
 star embedded twice landed 1.70× farther apart across products (AUC 0.9992,
 6.57σ). After the re-run there is no product split to probe: every star went
 through `mwmStar`. A linear probe can still separate the *was-DR17* members
-from the *was-DR19* members at AUC 0.83 — but that is the genuine population
+from the *was-DR19* members at AUC 0.83, but that is the genuine population
 difference between the original APOGEE target list and the SDSS-V
 observations, not a reduction artefact.
 
@@ -89,7 +89,7 @@ uv run cluster run
 
 A **masked spectral autoencoder** (MAE-style, `feat/masked-spectral-foundation`
 in lightsurf): mask contiguous wavelength blocks, encode the visible pixels,
-reconstruct the masked ones — **no abundance labels**. The 256-d latent beats
+reconstruct the masked ones: **no abundance labels**. The 256-d latent beats
 the supervised latent and the ASPCAP abundances on DR19.
 
 Cluster-only (55 members, 5 APO clusters; `cluster baseline --spectral
@@ -99,13 +99,13 @@ masked_latent.parquet`):
 |---|---|---|---|---|
 | PCA 64-d (linear) | 0.534 | 0.269 † | 0.462 | 0.580 |
 | PCA 256-d (linear) | 0.269 † | 0.269 † | 0.532 | 0.373 |
-| abundances (16-d) | 0.292 ‡ | 0.547 ‡ | 0.409 ‡ | — |
+| abundances (16-d) | 0.292 ‡ | 0.547 ‡ | 0.409 ‡ |: |
 | supervised ConvPool (64-d) | 0.560 | 0.560 | 0.634 | 0.65 |
 | **masked AE (256-d, no labels)** | **0.789** | **0.874** | **0.770** | **0.829** |
 | masked + abundance (272-d) | **0.879** | **0.874** | 0.712 | **0.915** |
 
-† **Degenerate.** The clusterer returned 2 groups with 64–67% of stars in one
-of them — 0.269 is the collapse floor, not a measured baseline. Verify with
+† **Degenerate.** The clusterer returned 2 groups with 64 to 67% of stars in one
+of them: 0.269 is the collapse floor, not a measured baseline. Verify with
 `cluster head-to-head`, which flags these rows automatically. **Do not quote
 ratios against these numbers**; "3× better than PCA" is 3× better than a
 crash.
@@ -130,7 +130,7 @@ over 7 seeds (42, 0, 1, 2, 7, 13, 99):
 | abundances (16-d) | 0.48 ± 0.00 | 0.48 ± 0.00 | 0.64 ± 0.08 |
 | **masked AE 256-d** | **0.79 ± 0.00** | **0.87 ± 0.00** | **0.70 ± 0.08** |
 
-**45 stars, 4 clusters** — adding the supervised CNN arm costs NGC 188,
+**45 stars, 4 clusters**: adding the supervised CNN arm costs NGC 188,
 which its embedding does not cover:
 
 | features | t-SNE | UMAP | EVoC |
@@ -145,7 +145,7 @@ What survives the correction, and what does not:
 
 1. **t-SNE and UMAP: the masked AE wins clearly.** 0.79/0.87 vs 0.48 for
    abundances on the same 55 stars. This is the result.
-2. **EVoC: the win does not survive.** 0.70 ± 0.08 vs 0.64 ± 0.08 — the
+2. **EVoC: the win does not survive.** 0.70 ± 0.08 vs 0.64 ± 0.08. The
    error bars overlap. On the 4-cluster sample the *supervised* CNN takes
    EVoC outright (0.80 ± 0.03). Any claim that self-supervision beats
    supervision must be stated for t-SNE/UMAP only.
@@ -169,8 +169,8 @@ the four remaining **open** clusters (31 stars), 7 seeds:
 | abundances (16-d) | 0.204 ± 0.000 | 0.184 ± 0.089 | 0.232 ± 0.100 |
 | **masked AE (256-d)** | **0.756 ± 0.000** | **0.761 ± 0.000** | **0.714 ± 0.110** |
 
-**This is the strongest result in the project.** With the globular removed —
-all four clusters open, same metallicity regime, the hard case — the masked
+**This is the strongest result in the project.** With the globular removed,
+all four clusters open, same metallicity regime, the hard case: the masked
 latent still separates them ~3.7× better than ASPCAP abundances, and the gap
 is far outside the seed spread. The win is real chemical tagging, not a
 globular/open discriminator.
@@ -202,7 +202,7 @@ encodes which pipeline produced the spectrum:
 The first diagnosis called this a *data-release* effect. That was wrong, and
 the distinction changes the fix.
 
-**DR19 is not a disjoint sample from DR17 — it reanalyses and includes it.**
+**DR19 is not a disjoint sample from DR17: it reanalyses and includes it.**
 `astraAllStarASPCAP-0.6.0.fits.gz` carries **717,689 rows with
 `release='dr17'`**, all reduced by one pipeline (`v_astra=0.6.0`). Every one
 of the 738 backfilled members resolves to an `sdss_id` there, with finite
@@ -221,7 +221,7 @@ also 2-D (row 0 = combined spectrum) while `aspcapStar` is already 1-D, so the
 two paths differ before the model sees a pixel.
 
 **Paired control** (`scripts/diagnose_product_mismatch.py`). 253 stars were
-embedded through *both* pipelines — same star, same physics, only the product
+embedded through *both* pipelines: same star, same physics, only the product
 changes:
 
 ```
@@ -233,12 +233,12 @@ shared fraction of the offset : 74.9%
 
 A star is **1.7× farther from itself** across products than from a random
 different star within one product, and 75% of that displacement is a single
-shared direction. That is a pipeline offset, not astrophysics — which is why
+shared direction. That is a pipeline offset, not astrophysics, which is why
 the member-only probe hits AUC 0.999.
 
 ### The fix: re-run, don't caveat
 
-Because DR19 covers 100% of these stars, this does not need a caveat — it
+Because DR19 covers 100% of these stars, this does not need a caveat: it
 needs a re-download. `scripts/build_dr19_rerun_list.py` writes the 738
 `mwmStar` URLs (sharded on the **last four digits of `sdss_id`**, split 2+2):
 
@@ -248,7 +248,7 @@ https://data.sdss.org/sas/dr19/spectro/astra/0.6.0/spectra/star/<d1d2>/<d3d4>/mw
 
 **Status (2026-09-20).** The 736 mwmStar spectra are downloaded and verified
 (708 APO + 28 LCO, raw flux, 8575 px; two stars 404 on the SAS and are
-dropped — 0.3%). `scripts/embed_dr19_rerun.py` is ready: it reproduces the
+dropped: 0.3%). `scripts/embed_dr19_rerun.py` is ready: it reproduces the
 DR19 arm's preprocessing (nan→0, per-star standardisation) and embeds through
 the masked AE with a `--verify` gate that checks the checkpoint reproduces
 the published latents before anything is written.
@@ -257,10 +257,10 @@ the published latents before anything is written.
 published with the workshop asset bundle as `data/embeddings/masked_ae_rerun.pt`
 (plus `masked_ae.pt`, same architecture), so nothing here depends on the machine
 that trained it. Load it with the vendored `cluster.models.MaskedSpectralAE`
-(`uv sync --extra torch`) — the supervised `model*.pt` checkpoints are a
+(`uv sync --extra torch`): the supervised `model*.pt` checkpoints are a
 different architecture (`CnnLstmAttention`), and `scripts/embed_dr19_rerun.py`
 defaults to the masked autoencoder. Re-embedding needs those checkpoints, the
-736 DR19 `mwmStar` spectra, the torch extra, and — for the `--verify` gate — the
+736 DR19 `mwmStar` spectra, the torch extra, and (for the `--verify` gate) the
 training project's DR19 flux table:
 
 ```bash
@@ -275,7 +275,7 @@ uv run python scripts/embed_dr19_rerun.py          # full re-embed
 **DR19** arm: the gate re-embeds a few stars and compares them against the
 published `masked_latent.parquet`, so a different release's table simply does not
 contain those ids. The table is a data product of the training project and is not
-redistributed here — the published latents are what students need, and the DR19
+redistributed here: the published latents are what students need, and the DR19
 apStar **flux matrix** (2.9 GB) the checkpoint was pretrained on is likewise only
 required to *retrain*, which is out of scope.
 
@@ -294,8 +294,8 @@ On the mixed population, "member vs field" is substantially "DR17 vs DR19":
 One bit of "which product" reproduces almost the entire latent score. On a
 provenance-clean subsample the ordering **inverts** and abundances win.
 
-**Consequence — the retracted claim.** The previously published line
-*"spectral t-SNE field precision 0.435 vs abundances 0.199 — the masked
+**Consequence: the retracted claim.** The previously published line
+*"spectral t-SNE field precision 0.435 vs abundances 0.199: the masked
 latent is ~2× purer"* is **withdrawn**. Re-run on DR19-only rows it does not
 hold (spectral t-SNE precision collapses to 0.007 on 70 members). Field
 retrieval on the mixed population is not interpretable and must not be
@@ -319,7 +319,7 @@ uv run cluster provenance
 
 
 Per-cluster (Simbad referee): M 3 (globular) precision 1.00; open clusters
-0.05–0.94 — the globular/open split reproduces on the self-supervised latent.
+0.05 to 0.94: the globular/open split reproduces on the self-supervised latent.
 
 Training bugs fixed along the way (see memory): (1) exploding LSTM gradients
 → `clip_grad_norm_(1.0)`; (2) LSTM+attention head vanishes on the 31k-star
@@ -332,10 +332,10 @@ per-star standardization.
 > quoting any member-vs-field number computed on `masked_latent_all.parquet`.
 > Cluster-only scores are usable; field retrieval is not.
 > **This is fixable**: DR19 serves a uniform `mwmStar` spectrum for 738/738
-> of these members — run `scripts/build_dr19_rerun_list.py` and re-embed.
+> of these members. Run `scripts/build_dr19_rerun_list.py` and re-embed.
 
 The DR19 apStar star list used here (`allStar-1.3-apo25m.fits`) was APO-North
-only, so ~738 members had no spectrum in that particular list — **not**
+only, so ~738 members had no spectrum in that particular list: **not**
 because DR19 lacks them. They were instead embedded from their DR17
 aspcapStar spectra (`synspec/<tel>/<field>/aspcapStar-dr17-<id>.fits`), which
 are continuum-normalised while apStar is raw, giving
@@ -352,7 +352,7 @@ Cluster-only (24 clusters, 791 stars):
 | kinematics only (4-d) | 0.946 | 0.943 | 0.892 | 0.943 |
 
 Field retrieval (Simbad referee, 24 clusters / 716 members): spectral t-SNE
-precision 0.435 vs abundances 0.199. **⚠ WITHDRAWN — do not quote.** This
+precision 0.435 vs abundances 0.199. **⚠ WITHDRAWN. Do not quote.** This
 comparison is confounded by the data-product mismatch (see § Provenance):
 the members are 91% continuum-normalised `aspcapStar` while the field is 100%
 raw `apStar`, and a 1-bit product flag alone scores AUC 0.957 on the same
@@ -369,17 +369,17 @@ APOGEE abundances from the 8575-flux H-band spectrum, and
 
 ## Setup (clean head-to-head)
 
-Both feature sources scored on the **same relaxed population** —
-`STARFLAG==0`, `SNR≥100`, no `ASPCAPFLAG==0` gate — 21 clusters with ≥ 5
+Both feature sources scored on the **same relaxed population**,
+`STARFLAG==0`, `SNR≥100`, no `ASPCAPFLAG==0` gate: 21 clusters with ≥ 5
 members, 1029 stars. The ASPCAP gate is dropped because spectral embeddings
 read the raw spectrum and are valid even when ASPCAP flags abundance issues
 (this is itself an advantage: the spectral pipeline covers more stars).
 
 | features | dim | t-SNE homog | UMAP homog | EVoC homog |
 |---|---|---|---|---|
-| **Spectral — Phase A (attention)** | 256 | **0.576** | **0.617** | **0.555** |
+| **Spectral: Phase A (attention)** | 256 | **0.576** | **0.617** | **0.555** |
 | Abundances (ASPCAP) | 16 | 0.254 | 0.563 | 0.537 |
-| Spectral — Phase B (disentangled) | 16 | 0.314 | 0.277 | 0.362 |
+| Spectral: Phase B (disentangled) | 16 | 0.314 | 0.277 | 0.362 |
 
 v-measure / completeness:
 
@@ -393,11 +393,11 @@ v-measure / completeness:
 
 1. **The full-spectrum RNN latent beats ASPCAP abundances at separating
    clusters.** Phase A (256-d attention) gives the highest homogeneity for
-   every method — the biggest win is t-SNE: 0.576 vs 0.254 (2.3×). The paper's
+   every method. The biggest win is t-SNE: 0.576 vs 0.254 (2.3×). The paper's
    method (t-SNE) no longer collapses the open clusters into one blob when
    fed the spectral latent.
 2. **The gain is in purity, not completeness.** The spectral latent recovers
-   fewer members (completeness 0.40–0.47 vs 0.43–0.98) but the groups it
+   fewer members (completeness 0.40 to 0.47 vs 0.43 to 0.98) but the groups it
    finds are much purer. Homogeneity (precision) is the harder, more
    publishable axis.
 3. **Phase B (disentangled, 16-d) underperforms.** The abundance-free latent
@@ -452,15 +452,15 @@ Phase B 64-d full table:
 
 Conclusion: the supervised multi-task regression (Phase A, 256-d attention)
 is the best architecture tested. The disentangled AE (Phase B) improves with
-a larger latent but stays below Phase A — the Teff/logg removal also strips
+a larger latent but stays below Phase A: the Teff/logg removal also strips
 cluster-separating signal. Per-spectrum normalisation hurts (the continuum
-carries information). The shared multi-task latent — not depth, tap, or
-normalisation — is what makes the embedding competitive.
+carries information). The shared multi-task latent, not depth, tap, or
+normalisation: is what makes the embedding competitive.
 
 ## Combined features: spectral + abundance (the best)
 
 Concatenating the 256-d spectral latent with the 16-d ASPCAP abundances
-(272-d total, both standardised) beats either feature set alone — no
+(272-d total, both standardised) beats either feature set alone, no
 re-training required:
 
 | features | t-SNE homog | UMAP homog | t-SNE v-measure |
@@ -487,7 +487,7 @@ raw + abundance, as a control against the RNN embedding:
 
 Interpretation: the raw flux wins UMAP (its continuum carries global
 Teff/metallicity structure) but collapses for t-SNE (0.30, the continuum
-blob — t-SNE sees local structure and the continuum swamps the chemistry).
+blob: t-SNE sees local structure and the continuum swamps the chemistry).
 The RNN latent is a chemically-meaningful compression: it beats raw spectra
 on t-SNE 0.549 vs 0.301, and the combined RNN+abundance is the best balanced
 feature (t-SNE 0.611, UMAP 0.631, v-measure 0.596).
@@ -502,7 +502,7 @@ feature (t-SNE 0.611, UMAP 0.631, v-measure 0.596).
 
 Kinematics help UMAP/EVoC but are diluted by the 272-d chemical block
 (4 of 276 dims), so they don't dominate. And they are the *ground-truth*
-signal — membership is defined kinematically — so adding them is circular:
+signal (membership is defined kinematically) so adding them is circular:
 the honest chemical-tagging comparison is RNN+abundance (272-d) without
 kinematics.
 
@@ -526,10 +526,10 @@ regions (max(3 deg, 10 x diameter)) for the field benchmark.
 | spectral | 0.72 / 0.51 | 0.68 / 0.54 | 0.48 / 0.56 |
 
 **Verdict**: the de-M-dwarfed spectral embedding beats abundances on both
-experiments and both axes — homogeneity +0.13-0.18, precision ~2x at
+experiments and both axes: homogeneity +0.13-0.18, precision ~2x at
 comparable recall. Globulars near-perfect (M 15 0.97, M 71 0.98, M 92 1.00).
 
-## Kinematics — how close to 1?
+## Kinematics: how close to 1?
 
 Cluster-only homogeneity, same 878 stars:
 
@@ -543,7 +543,7 @@ Cluster-only homogeneity, same 878 stars:
 
 Field-retrieval precision (RNN vs RNN+kin): 0.51/0.54/0.56 -> 0.61/0.66/0.65.
 
-Kinematics alone nearly reach 1 (t-SNE 0.97, UMAP 0.96) but not exactly — a ~3%
+Kinematics alone nearly reach 1 (t-SNE 0.97, UMAP 0.96) but not exactly: a ~3%
 residual from kinematic overlap + HDBSCAN noise. Combined with the 256-d
 chemistry, the 4 kinematic dims are diluted and the score drops to 0.62-0.74.
 The clustering methods never re-weight the dimensions to let kinematics
@@ -557,8 +557,8 @@ dominate.
 | RNN + kin (260-d) | 0.80 / 0.61 | 0.63 / 0.66 | 0.60 / 0.65 |
 | kinematics only (4-d) | 0.93 / 0.63 | 0.75 / 0.67 | 0.68 / 0.65 |
 
-Kinematics alone give the best recall (0.93) — they recover almost every
-member — but precision still plateaus at 0.63-0.67: the field contains stars
+Kinematics alone give the best recall (0.93): they recover almost every
+member, but precision still plateaus at 0.63-0.67: the field contains stars
 kinematically indistinguishable from the cluster. Recall approaches 1, purity
 does not.
 
@@ -573,7 +573,7 @@ does not.
 | kinematics only | 4 | 0.93 / 0.63 | 0.75 / 0.67 | 0.68 / 0.65 |
 
 Corrections: the RNN field advantage over abundances is ~8% precision (0.51
-vs 0.47), not 2x — the earlier gap was a population artefact (full vs
+vs 0.47), not 2x: the earlier gap was a population artefact (full vs
 cross-matched field). Abundances+kin (20-d) ties RNN+kin (260-d): field
 precision is capped ~0.65 by kinematic doppelgangers, so dimensionality does
 not matter here. The curse of dimensionality shows in cluster-only

@@ -1,4 +1,4 @@
-"""Chapter 9, exercise 1 — the two limits of homogeneity and completeness.
+"""Chapter 9, exercise 1: the two limits of homogeneity and completeness.
 
     Show that a clustering that puts every star in a single group has
     h = 0 and c = 1, and that a clustering that gives every star its own
@@ -7,8 +7,8 @@
 \\S 9.2 pairs \\textbf{Equation~\\ref{eq:merits}}'s $h$ and $c$ deliberately:
 each one is trivially maximised by a degenerate partition, so quoting either
 alone lets a collapse read as a discovery. This exercise proves the two limits
-from the definitions and then checks them numerically — on toy labels and on
-the real 1 002-row member matrix — so the floor and the ceiling of every score
+from the definitions and then checks them numerically: on toy labels and on
+the real 1 002-row member matrix, so the floor and the ceiling of every score
 in \\textbf{Table~\\ref{tab:honest}} are known before any of them is read.
 """
 
@@ -59,9 +59,9 @@ def accuracy_limits(true_labels: np.ndarray) -> dict[str, float]:
 
     Under the Hungarian matching of ``cluster.baseline._accuracy``:
 
-    * ``single`` — the one predicted group can only be matched to one true
+    * ``single``: the one predicted group can only be matched to one true
       cluster, so accuracy is the largest cluster's share of the sample;
-    * ``singleton`` — each singleton group matches at most one star, and only
+    * ``singleton``: each singleton group matches at most one star, and only
       one singleton per true cluster can be used, so accuracy is
       (number of true clusters) / n.
     """
@@ -102,7 +102,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Bar chart of h, c, V and accuracy in the three reference partitions."""
     import matplotlib.pyplot as plt
 
@@ -135,7 +135,7 @@ ANSWER: dict[str, object] = {
         "scores exactly h = 0.000000, c = 1.000000, V = 0.000000; the toy "
         "3x3 example gives the same. Note scikit-learn "
         f"{cite('Pedregosa:11')} returns c = 1 here by "
-        "convention — H(K) = 0 too, so the ratio is 0/0 and the library "
+        "convention: H(K) = 0 too, so the ratio is 0/0 and the library "
         "defines it as the perfect value."
     ),
     "the singleton limit": (
@@ -143,7 +143,7 @@ ANSWER: dict[str, object] = {
         "and therefore its true cluster, so H(C|K) = 0 and h = 1 exactly. "
         "Completeness is 1 - H(K|C)/H(K), and here H(K) = log n while "
         "H(K|C) = sum_c p_c log n_c, so c = 1 - (sum_c p_c log n_c)/log n. It "
-        "is *not* zero — it only tends to zero as the clusters get large "
+        "is *not* zero: it only tends to zero as the clusters get large "
         "relative to log n. Measured: on the member matrix (n = 1 002, 25 "
         "clusters of 6-230 stars) c = 0.397, so V = 0.569. On the 3x3 toy "
         "c = 0.500. The 'c ≈ 0' of the exercise statement is the asymptotic "
@@ -159,7 +159,7 @@ ANSWER: dict[str, object] = {
         "most one singleton, so accuracy = (number of clusters)/n = "
         "25/1002 = 0.0250 (0.333 on the toy). Both closed forms are confirmed "
         "by solve(). Accuracy is the one metric of the four that punishes both "
-        "degeneracies, which is why it belongs in the table — but it is also "
+        "degeneracies, which is why it belongs in the table, but it is also "
         "the one most sensitive to the number of groups returned, so it cannot "
         "referee on its own either."
     ),
@@ -168,14 +168,14 @@ ANSWER: dict[str, object] = {
         "bottoms out the other: h = 0/c = 1 for the collapse, h = 1/c = 0.40 "
         "for the shatter. A method reporting h = 0.95 has told you nothing "
         "until you see its c, and vice versa. This is §9.3's failure mode 1 "
-        "made arithmetic — the two PCA rows that sat at homogeneity 0.269 were "
+        "made arithmetic: the two PCA rows that sat at homogeneity 0.269 were "
         "not measuring a method, they were measuring a collapse, and the draft "
         "that called the spectral latent 'three times better than PCA' was "
         "comparing against a crash. The V-measure hides it too: the singleton "
         "partition above scores V = 0.569, indistinguishable from the real "
         "t-SNE result on abundances (V = 0.513, solve() of exercise 9.2). "
-        "The cluster-only protocol these scores come from — take the known "
-        "members, cluster them, compare the partition with the true one — "
+        "The cluster-only protocol these scores come from: take the known "
+        "members, cluster them, compare the partition with the true one: "
         f"follows {cite('GarciaDias:19')}, and §9.4's rule 6 supplies the "
         "matching warning that the chance level moves with the sample: "
         "shuffling the 175 stars and 31 mostly tiny clusters of "
@@ -184,7 +184,7 @@ ANSWER: dict[str, object] = {
     ),
     "the operational rule": (
         "Print h, c, the number of predicted groups and the largest-group "
-        "fraction together, always — rule 5 of §9.4. The two degenerate rows "
+        "fraction together, always: rule 5 of §9.4. The two degenerate rows "
         "computed here are the floor and ceiling every real row has to be read "
         "against, and they cost one line of code: cluster.stability.degeneracy "
         "flags a partition whose largest group holds ≥ 60% of the stars, which "

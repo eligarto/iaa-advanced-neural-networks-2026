@@ -1,15 +1,15 @@
-# Region-mode sweep — benchmark results
+# Region-mode sweep: benchmark results
 
 > **Historical (APOGEE DR17).** These numbers were produced on
 > `allStar-dr17-synspec_rev1.fits`, which `cluster download` no longer
-> fetches — the project moved to SDSS-V DR19 (`docs/data_releases.md`).
+> fetches: the project moved to SDSS-V DR19 (`docs/data_releases.md`).
 > The commands below need that DR17 file supplied manually; they will
 > not reproduce against a fresh checkout. For current numbers see
 > `docs/dr19_rerun_results.md` and `docs/spectral_benchmark_results.md`.
 >
 > **DR19 status (2026-09-24): the table below has not been regenerated.** One
-> 30° region on DR19 — even with the field capped at 25 000 stars, as the
-> reference runs do — takes ≈3 minutes to embed and score, so a 25-cluster
+> 30° region on DR19: even with the field capped at 25 000 stars, as the
+> reference runs do: takes ≈3 minutes to embed and score, so a 25-cluster
 > sweep is a ~1.5-hour run, and an uncapped one (`scripts/region_sweep.py`,
 > no `--fast`) is considerably longer. The current single-cluster reading is in
 > `docs/reference_runs/`: M 67, 30°, t-SNE ≈0.03/0.02, UMAP ≈0.02/0.02,
@@ -30,13 +30,13 @@ standardisation · `NORMALIZE_ROWS` (L2-normalise so Euclidean ≡ cosine) ·
 `random_state=42`.
 
 **Metrics**:
-- **recall** — fraction of a cluster's true members recovered by the best-overlapping predicted cluster (HDBSCAN for t-SNE/UMAP; EVoC labels).
-- **precision** — purity of that predicted cluster.
-- **kNN purity** — parameter-free chemical cohesion: fraction of a member's 10 nearest neighbours in the embedding that share its cluster (t-SNE/UMAP only; mirrors the paper's visual-polygon test).
+- **recall**: fraction of a cluster's true members recovered by the best-overlapping predicted cluster (HDBSCAN for t-SNE/UMAP; EVoC labels).
+- **precision**: purity of that predicted cluster.
+- **kNN purity**: parameter-free chemical cohesion: fraction of a member's 10 nearest neighbours in the embedding that share its cluster (t-SNE/UMAP only; mirrors the paper's visual-polygon test).
 
 >
 > **Running these:** the commands below are written in the native form. In the
-> Docker setup (the default — see `docs/docker.md`) prefix them with
+> Docker setup (the default. See `docs/docker.md`) prefix them with
 > `docker run --rm -it $DAY4 $IMG`, e.g.
 > `docker run --rm -it $DAY4 $IMG uv run cluster baseline --kinematics`; scripts
 > become `… $IMG uv run python scripts/…`, and pass knobs with `-e`
@@ -48,7 +48,7 @@ standardisation · `NORMALIZE_ROWS` (L2-normalise so Euclidean ≡ cosine) ·
 |---|---|---|---|
 | t-SNE | 0.30 | **0.15** | **0.11** |
 | UMAP | 0.55 | 0.06 | 0.09 |
-| EVoC | 0.45 | 0.02 | — |
+| EVoC | 0.45 | 0.02 |: |
 
 ## Per cluster
 
@@ -76,25 +76,25 @@ standardisation · `NORMALIZE_ROWS` (L2-normalise so Euclidean ≡ cosine) ·
 | M 15 | globular | 11 | 7807 | 0.82 / 0.05 / **0.42** | 1.00 / 0.00 / 0.46 | 0.09 / 0.00 |
 | M 71 | globular | 25 | 17716 | 0.12 / 0.50 / 0.12 | 0.12 / 0.07 / 0.08 | 0.12 / 0.00 |
 | M 107 | globular | 10 | 17948 | 0.20 / 0.03 / 0.01 | 1.00 / 0.00 / 0.00 | 0.90 / 0.00 |
-| M 92 | globular | 2 | 27278 | — | — | — |
+| M 92 | globular | 2 | 27278 |: |: |: |
 
 ## What it teaches
 
 1. **Globulars tag cleanly, open clusters do not.** M 5 / M 3 / M 15 reach
-   kNN-purity ≈ 0.4–0.5 — chemically distinct (metal-poor, homogeneous).
+   kNN-purity ≈ 0.4 to 0.5: chemically distinct (metal-poor, homogeneous).
    Open clusters sit in a chemically similar solar-metallicity field, so
    purity stays ≲ 0.2. This mirrors the target paper (globulars recovered,
    open clusters harder; 47 Tuc untaggable).
 2. **L2-normalisation is the precision lever.** Without `NORMALIZE_ROWS`,
    HDBSCAN merges the whole dense field into one blob (recall ≈ 1.0,
    precision ≈ 0.03 everywhere). Normalising makes Euclidean distance equal
-   cosine (EVoC's native metric) and breaks the blob: precision rises ~3–5×
+   cosine (EVoC's native metric) and breaks the blob: precision rises ~3 to 5×
    (t-SNE 0.10 → 0.15; M 67 0.06 → 0.47) at a recall cost. A genuine
    precision/recall trade-off, and the reason the paper's t-SNE uses angular
    structure rather than raw Euclidean.
 3. **t-SNE isolates best** (highest precision + purity), the reason the paper
    chose it. UMAP still shows residual recall-1.0 blobs on several open
-   clusters — watch its precision column collapse to ≈ 0. EVoC is fast and
+   clusters: watch its precision column collapse to ≈ 0. EVoC is fast and
    competitive on recall, but its clusters are coarse at these sizes.
 4. **M 15 / M 92 need imputation.** Their metal-poor members have several
    `NaN` abundances (weak, undetected lines). Strict complete-case drops them

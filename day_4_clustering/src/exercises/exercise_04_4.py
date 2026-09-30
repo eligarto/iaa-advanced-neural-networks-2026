@@ -1,4 +1,4 @@
-"""Chapter 4, exercise 4 — cosine assignment with a Euclidean mean update.
+"""Chapter 4, exercise 4: cosine assignment with a Euclidean mean update.
 
     Replace the Euclidean distance in the assignment step with cosine
     distance, keeping the mean update. What happens to the objective's
@@ -289,7 +289,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The cosine objective along the hybrid loop on the counterexample."""
     import matplotlib.pyplot as plt
 
@@ -317,7 +317,7 @@ ANSWER: dict[str, object] = {
         "centre minimises every term separately. That holds for cosine "
         "distance, Manhattan distance, or any dissimilarity at all. So with "
         "J redefined as sum of cosine distances to the assigned centre, the "
-        "assignment step still cannot increase J — measured over 200 "
+        "assignment step still cannot increase J: measured over 200 "
         "synthetic runs, not one increase was ever attributable to it. Only "
         "the second half of the two-move loop "
         f"{cite('Lloyd:82')} is at risk."
@@ -330,7 +330,7 @@ ANSWER: dict[str, object] = {
         f"{cite('MacQueen:67', parenthetical=False)} wrote down with the "
         "sum-of-squares objective, and the two belong together. "
         "The cosine objective sum (1 - x.mu/(||x|| ||mu||)) is a different "
-        "function of mu, and the arithmetic mean is not its minimiser — it "
+        "function of mu, and the arithmetic mean is not its minimiser: it "
         "is not even a stationary point in general, since cosine distance is "
         "scale-invariant in mu while the mean is a statement about "
         "magnitude. So the update step can move the centre to a place where "
@@ -345,12 +345,12 @@ ANSWER: dict[str, object] = {
         "mechanism is visible in the numbers: point (2.7, -1.1) points "
         "almost opposite to the others, and averaging it with a point that "
         "points the other way produces a mean vector whose *direction* is a "
-        "poor summary of either — which is all cosine distance can see. "
+        "poor summary of either, which is all cosine distance can see. "
         "solve() replays the whole trace."
     ),
     "how often it happens": (
         "Not rare. Over 200 synthetic datasets (120 points, 5 blobs in 3-D, "
-        "K=5, seeded from data points), 32 runs — 16% — contained at least "
+        "K=5, seeded from data points), 32 runs (16%) contained at least "
         "one step where J_cos rose, with 57 increasing moves in total and a "
         "largest single increase of 1.431896. All 57 were attributed to the "
         "update step and none to the assignment step, exactly as the theory "
@@ -362,7 +362,7 @@ ANSWER: dict[str, object] = {
         "proof no longer applies'. The finiteness argument of §4.2 runs: J "
         "is non-increasing, bounded below, and takes finitely many values, "
         "so it must become constant. Drop the monotonicity and the first "
-        "premise is gone, and with it the whole argument — nothing forbids "
+        "premise is gone, and with it the whole argument: nothing forbids "
         "the loop from cycling between two assignments forever. The same "
         "dependence shows up in the EM algorithm "
         f"{cite('Dempster:77')}, whose convergence rests entirely on the "
@@ -375,14 +375,14 @@ ANSWER: dict[str, object] = {
         "rather than on a theorem, and code that depends on it needs an "
         "explicit iteration cap. Note also what the counterexample's own "
         "trace shows: J_cos goes 1.926 -> 3.697 -> 0.205 -> 0.087, so a "
-        "single bad update can be repaired by the next assignment — the "
+        "single bad update can be repaired by the next assignment: the "
         "loop is not monotone but it is not obviously divergent either, "
         "which is exactly why the empirical answer and the provable answer "
         "come apart here."
     ),
     "on this workbook's own matrix it never triggers": (
         "A useful special case. §2.3 step 5 L2-normalises every row, so the "
-        "member matrix already lives on the unit sphere — verified: all "
+        "member matrix already lives on the unit sphere: verified: all "
         "1 002 row norms are 1 to machine precision. On unit vectors "
         "exercise 2.1's identity applies, ||x-y||^2 = 2 d_cos, so cosine and "
         "Euclidean rank the same pairs and the two assignment steps produce "
@@ -391,7 +391,7 @@ ANSWER: dict[str, object] = {
         "every run (16-24 iterations, J_cos falling from ~258-291 to "
         "~176-180). The guarantee is restored not because the hybrid is "
         "fixed but because the data was preprocessed into the one case where "
-        "the two metrics agree — which is another way of saying what §2.3 "
+        "the two metrics agree, which is another way of saying what §2.3 "
         "says about why the row normalisation is there."
     ),
     "the fix": (
@@ -400,7 +400,7 @@ ANSWER: dict[str, object] = {
         "of unit vectors is the *normalised* mean direction, "
         "mu = sum(x)/||sum(x)||. Normalising the centroid after the mean "
         "update restores the update step's optimality, hence the monotone "
-        "decrease, hence the finiteness argument, hence termination — all "
+        "decrease, hence the finiteness argument, hence termination: all "
         "three come back together because they were always one argument. "
         "Verified on the real matrix: spherical k-means at K=25 runs 20 "
         "iterations with zero increasing moves, J_cos 265.996 -> 179.720. "

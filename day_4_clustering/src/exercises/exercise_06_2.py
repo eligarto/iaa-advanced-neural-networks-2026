@@ -1,4 +1,4 @@
-"""Chapter 6, exercise 2 — the k-distance plot and the missing knee.
+"""Chapter 6, exercise 2: the k-distance plot and the missing knee.
 
     Produce the k-distance plot for the DR19 member-plus-field matrix at k=5
     and locate the knee. Repeat for k=2 and k=20. How does the knee move, and
@@ -48,7 +48,7 @@ def kneedle(curve: np.ndarray) -> tuple[int, float]:
 
 
 def max_curvature(curve: np.ndarray) -> tuple[int, float]:
-    """Knee by maximum discrete curvature — the textbook alternative.
+    """Knee by maximum discrete curvature: the textbook alternative.
 
     Included because it *disagrees* with Kneedle on these data, which is
     itself part of the answer: a knee that two reasonable rules locate in
@@ -137,7 +137,7 @@ def solve(k_values: tuple[int, ...] = K_VALUES) -> dict[str, object]:
     }
 
 
-def plot(k_values: tuple[int, ...] = K_VALUES):  # pragma: no cover — figure
+def plot(k_values: tuple[int, ...] = K_VALUES):  # pragma: no cover (figure)
     """The three sorted k-distance curves with their Kneedle knees."""
     import matplotlib.pyplot as plt
 
@@ -160,24 +160,24 @@ def plot(k_values: tuple[int, ...] = K_VALUES):  # pragma: no cover — figure
 ANSWER: dict[str, object] = {
     "where the knee is": (
         "Located with the Kneedle rule (maximum deviation from the chord) on "
-        "the 25 000-star member+field matrix — the sorted k-distance graph is "
+        "the 25 000-star member+field matrix: the sorted k-distance graph is "
         f"the epsilon-selection heuristic of {cite('Ester:96', bare=True)} "
         "itself: k=2 gives eps = 0.582 at rank "
         "fraction 0.901, k=5 gives eps = 0.632 at 0.903, k=20 gives eps = "
-        "0.707 at 0.897. The knee moves up with k, as it must — the k-th "
-        "neighbour is further away for larger k — but it moves by only 21% "
+        "0.707 at 0.897. The knee moves up with k, as it must: the k-th "
+        "neighbour is further away for larger k, but it moves by only 21% "
         "(0.582 to 0.707) across a factor of ten in k. That is the reassuring "
         "half of the result and the one usually quoted."
     ),
     "why it is not a knee": (
         "The rank fraction is the tell: all three 'knees' sit at 0.90 of the "
         "sorted curve, to within 0.006. A real knee marks a change of regime "
-        "— bulk data below, outliers above. A feature that lands at the same "
+        ", bulk data below, outliers above. A feature that lands at the same "
         "90th percentile regardless of k is not a regime change; it is the "
         "Kneedle rule reporting the widest part of a smooth convex curve. The "
         "independent check confirms it: maximum discrete curvature puts the "
         "knee at rank fraction 0.997 (eps = 0.739) for k=2, 0.991 for k=5 and "
-        "0.002 (eps = 0.170) for k=20 — the two rules disagree by a factor of "
+        "0.002 (eps = 0.170) for k=20: the two rules disagree by a factor of "
         "four in epsilon and by the entire width of the dataset in rank. Two "
         "defensible rules that disagree that badly mean the feature they are "
         "both looking for is not there."
@@ -188,7 +188,7 @@ ANSWER: dict[str, object] = {
         f"{cite('Pedregosa:11', bare=True)}) with minPts=5, the k=5 knee "
         "value eps = 0.632 "
         "produces 2 clusters, the largest containing 96.8% of all 25 000 "
-        "stars — the 'one enormous cluster' failure of S 6.3, flagged "
+        "stars: the 'one enormous cluster' failure of S 6.3, flagged "
         "degenerate by cluster.stability.degeneracy(). Going up to 1.25x the "
         "knee (eps = 0.790) gives a single cluster containing 100.0% of the "
         "data with 2 noise points. Going down: 0.75x (eps = 0.474) still "
@@ -202,7 +202,7 @@ ANSWER: dict[str, object] = {
         "member and field median k-distances differ by 4-6% (k=2: 0.382 vs "
         "0.408; k=5: 0.427 vs 0.450; k=20: 0.502 vs 0.522). The two "
         "populations S 6.3 says are 'at very different densities' are, in "
-        "this metric, at nearly the same density — and what separation there "
+        "this metric, at nearly the same density, and what separation there "
         "is shrinks as k grows (ratio 0.937 -> 0.948 -> 0.962). There is no "
         "epsilon between the member scale and the field scale because those "
         "two scales overlap. This is the same measurement exercise 5.1 makes "
@@ -216,7 +216,7 @@ ANSWER: dict[str, object] = {
         "it never has to pick the one value that does not exist. PLSCAN "
         f"(S 8, {cite('Bot:25', bare=True)}) "
         "goes further and drops the size floor too. Note the failure here is "
-        "*not* that the knee-finding code is bad — both rules are correctly "
+        "*not* that the knee-finding code is bad: both rules are correctly "
         "implemented and reproduce their textbook behaviour on data that has "
         "a knee. The failure is that the assumption behind the recipe (two "
         "separable density regimes) is false for this dataset, which is "
@@ -225,7 +225,7 @@ ANSWER: dict[str, object] = {
     "a reading caution": (
         "These numbers are for the row-normalised matrix, the pipeline "
         "default. Without row normalisation the absolute distances change "
-        "completely and so does every epsilon quoted above — see exercise 7.3 "
+        "completely and so does every epsilon quoted above. See exercise 7.3 "
         "for what that lever does to HDBSCAN. A k-distance plot is only "
         "interpretable alongside the preprocessing that produced it, and an "
         "epsilon copied from a paper that normalised differently is a "

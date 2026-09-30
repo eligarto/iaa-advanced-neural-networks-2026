@@ -1,4 +1,4 @@
-# Companion workbook — chemical tagging (IAA-SO 2026)
+# Companion workbook: chemical tagging (IAA-SO 2026)
 
 Long-form companion to the lecture deck at
 `garciadias.github.io/#/presentations/iaa-so-chemical-tagging-2026`, built from
@@ -30,11 +30,11 @@ The output is `workbook.pdf` (~63 pp, A4/letter single column, ~23 000 words).
 
 The workbook quotes three kinds of result, and the text says which is which:
 
-1. **The repository's own benchmark**, at a recorded commit — the cluster-only
+1. **The repository's own benchmark**, at a recorded commit: the cluster-only
    tables (§13), the field-retrieval table (§13), the lever sweep (§13, DR17),
    the two-stage pipeline and isochrone fits (§15, DR17 study). Sources are
    named in the sections that use them.
-2. **The repository's own diagnostics**, reported as they stand — the
+2. **The repository's own diagnostics**, reported as they stand: the
    duplicate-`APOGEE_ID` audit and the row-order sensitivity (§9), the
    data-product mismatch and the withdrawn field-retrieval claim (§14).
 3. **One new measurement**, `scripts/kmeans_baseline.py`: K-means on the same
@@ -55,7 +55,7 @@ are patched in `workbook.tex`, with comments explaining why:
    width stays under the column width.
 2. **The running footer prints `www.annualreviews.org`.** The class calls
    `\pagestyle{headings}` while loading, which *executes* its footer
-   definition, so replacing `\ps@headings` is not enough — the replacement must
+   definition, so replacing `\ps@headings` is not enough. The replacement must
    be followed by another `\pagestyle{headings}`.
 3. **The contents list is one unbreakable 36 pc box.** Fine for six sections;
    a 17-chapter contents overflows it by ~490 pt and bleeds off the page. The

@@ -1,4 +1,4 @@
-"""Chapter 10, exercise 2 — the perplexity sweep.
+"""Chapter 10, exercise 2: the perplexity sweep.
 
     Embed the member matrix with perplexities 5, 30 and 100, and for each
     compute the kNN purity of \\S 5 plus the cluster-only homogeneity. Which
@@ -27,7 +27,7 @@ PERPLEXITIES: tuple[int, ...] = (5, 30, 100)
 
 #: Row orders per perplexity: the sorted one plus four permutations. Seeds
 #: would give zero spread here (init='pca' is deterministic), so the honest
-#: error bar is over row order — see exercise 9.2.
+#: error bar is over row order. See exercise 9.2.
 N_ORDERS: int = 5
 
 #: Neighbourhood size for kNN purity, matching the workbook's usage.
@@ -146,7 +146,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The tuned score and the parameter-free one, against perplexity."""
     import matplotlib.pyplot as plt
 
@@ -180,7 +180,7 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 ANSWER: dict[str, object] = {
     "what I measured": (
         "1 002 member rows, seed 42, HDBSCAN* min_cluster_size 5, five row "
-        "orders per perplexity (seeds would give zero spread — see §9.3):\n\n"
+        "orders per perplexity (seeds would give zero spread. See §9.3):\n\n"
         "  perp   homogeneity      kNN purity (k=15)   groups\n"
         "     5   0.587 ± 0.007    0.378 ± 0.002       41.4\n"
         "    30   0.473 ± 0.049    0.387 ± 0.003       27.2\n"
@@ -194,8 +194,8 @@ ANSWER: dict[str, object] = {
         "named before any number is read."
     ),
     "the two scores disagree, and that is the finding": (
-        "On homogeneity, perplexity 5 wins outright. On kNN purity — the "
-        "parameter-free score of §9.4 rule 4 — perplexity 30 is marginally "
+        "On homogeneity, perplexity 5 wins outright. On kNN purity: the "
+        "parameter-free score of §9.4 rule 4: perplexity 30 is marginally "
         "best and the three are effectively tied. They disagree because they "
         "measure different things: kNN purity asks whether members stay near "
         "members in the map, and t-SNE preserves neighbourhoods about equally "
@@ -210,16 +210,16 @@ ANSWER: dict[str, object] = {
         "stability rather than homogeneity. Three reasons. (1) The "
         "parameter-free score prefers it, marginally, and cannot be gamed. "
         "(2) Perplexity 5's homogeneity win comes with 41 predicted groups "
-        "against 25 true clusters — buying purity with fragmentation, which "
+        "against 25 true clusters: buying purity with fragmentation, which "
         "is exactly the 'best overlap is a best case' caveat of §9.2. "
         "(3) Perplexity 100 is actively unstable: its row-order spread is "
         "±0.088 and one of the five orders collapsed to two groups with 56% "
-        "of the stars in one of them (h = 0.203, c = 0.797) — a partition that "
+        "of the stars in one of them (h = 0.203, c = 0.797): a partition that "
         "would trip the degeneracy flag. Choosing 5 on homogeneity alone would "
         "be §9.3's failure mode 4, tuning on the score you then report. All "
         "three values sit inside the 5-50 range the original paper "
         f"{cite('vanderMaaten:08')} names as typical, and that paper offers "
-        "no rule for choosing within it — which is why the choice has to be "
+        "no rule for choosing within it, which is why the choice has to be "
         "made on measured evidence rather than inherited."
     ),
     "the most uncomfortable number": (
@@ -230,7 +230,7 @@ ANSWER: dict[str, object] = {
         "rearranging structure that was already weak, and every homogeneity "
         "difference in this sweep is a statement about HDBSCAN*'s behaviour on "
         "a 2-D scatter rather than about chemical tagging. That is the same "
-        "conclusion §10.5 reaches from a different direction — 'the "
+        "conclusion §10.5 reaches from a different direction: 'the "
         "neighbourhoods are preserved, and the neighbourhoods were not "
         "separated to begin with'."
     ),
@@ -238,8 +238,8 @@ ANSWER: dict[str, object] = {
         "Splitting kNN purity by cluster size makes the mechanism visible. "
         "Clusters with ≤ 25 members score 0.266, 0.290, 0.272 at perplexity "
         "5, 30, 100; clusters with ≥ 45 members score 0.619, 0.606, 0.590. "
-        "Large clusters do monotonically *worse* as perplexity grows — their "
-        "neighbourhoods get diluted by the field of other clusters — while "
+        "Large clusters do monotonically *worse* as perplexity grows: their "
+        "neighbourhoods get diluted by the field of other clusters, while "
         "small clusters peak at 30. The naive prediction, that a perplexity "
         "above a cluster's size should destroy it, is only half right: the "
         "small clusters are already so impure (0.27-0.29) that there is "
@@ -248,7 +248,7 @@ ANSWER: dict[str, object] = {
     ),
     "does it change the paper's conclusion": (
         "No, and it strengthens it. The workbook's claim is that abundances "
-        "alone separate these clusters poorly — Table 'honest' quotes t-SNE "
+        "alone separate these clusters poorly: Table 'honest' quotes t-SNE "
         "homogeneity 0.560 against 0.942 for kinematics-only. Every "
         "perplexity in this sweep lands between 0.34 and 0.59, all far below "
         "the kinematic ceiling, and the parameter-free score is flat at "

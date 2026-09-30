@@ -1,8 +1,8 @@
-"""Chapter 9, exercise 4 — circular chemical membership.
+"""Chapter 9, exercise 4: circular chemical membership.
 
     Design a sigma-clipped chemical membership and use it to score a
     kinematic clustering. Based on \\S 2, explain in three sentences why the
-    resulting number would be meaningless — and what the equivalent mistake
+    resulting number would be meaningless, and what the equivalent mistake
     would look like in your own field.
 
 This is circularity made explicit, and it is the mirror image of \\S 9.4's
@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 
 from exercises.citations import cite, reference_list
-
 from exercises.utils import SEEDS, settings
 
 #: Clipping thresholds swept by :func:`solve`. The point of sweeping is that
@@ -28,7 +27,7 @@ from exercises.utils import SEEDS, settings
 SIGMAS: tuple[float, ...] = (1.0, 1.5, 2.0, 3.0)
 
 #: The threshold quoted in the prose, chosen only because it maximises the
-#: circular labels' agreement with the truth — which is itself the mistake.
+#: circular labels' agreement with the truth, which is itself the mistake.
 SIGMA: float = 1.5
 
 #: Passes of the clip, matching ``config.N_REFINE_PASSES`` for the kinematic
@@ -67,7 +66,7 @@ def circular_labels(
 
     Each true cluster seeds one sigma-clipped chemical group; a star claimed
     by several goes to the nearest centroid. Everything unclaimed is 'field'.
-    The labels are therefore a function of C-space *and* of the answer key —
+    The labels are therefore a function of C-space *and* of the answer key,
     doubly dependent on things an honest reference may not touch.
     """
     names = [str(c) for c in np.unique(truth)]
@@ -91,7 +90,7 @@ def circular_labels(
 def sham_labels(
     X: np.ndarray, n_groups: int = 25, seed: int = SEEDS[0],
 ) -> np.ndarray:
-    """Equal-count slabs along a random C-space direction — the chance level.
+    """Equal-count slabs along a random C-space direction: the chance level.
 
     Constructed to carry no membership information whatsoever while having
     the same shape as a real label set (same n, comparable group sizes). Any
@@ -109,7 +108,7 @@ def sham_labels(
 def kinematic_clustering(
     df: pd.DataFrame, seed: int = SEEDS[0],
 ) -> np.ndarray:
-    """Cluster the stars on kinematics alone — the thing being 'validated'."""
+    """Cluster the stars on kinematics alone: the thing being 'validated'."""
     from cluster.baseline import KINEMATIC_COLUMNS
     from cluster.benchmark import cluster_embedding, fit_umap
 
@@ -173,7 +172,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Bar chart: the same clustering scored against every label set."""
     import matplotlib.pyplot as plt
 
@@ -200,7 +199,7 @@ ANSWER: dict[str, object] = {
     "the design": (
         "Seed one group per known cluster, take the median C-space vector and "
         "the robust per-element scatter of its members, keep every star within "
-        "sigma robust standard deviations, iterate three times — the identical "
+        "sigma robust standard deviations, iterate three times: the identical "
         "recipe the pipeline uses for kinematic membership "
         "(config.REFINE_SIGMA = 2.5, N_REFINE_PASSES = 3), applied to "
         "abundances instead of astrometry. Then cluster the 1 002 members on "
@@ -212,11 +211,11 @@ ANSWER: dict[str, object] = {
     "the numbers I measured": (
         "Seed 42, 52 predicted kinematic groups, 70 noise points. Scored "
         "against the real §2 labels the clustering gives h = 0.915, c = 0.668, "
-        "V = 0.772 — the kinematic ceiling of §9.4 rule 3. Scored against the "
+        "V = 0.772: the kinematic ceiling of §9.4 rule 3. Scored against the "
         "circular chemical labels at 1.5 sigma it gives h = 0.496, c = 0.364, "
-        "V = 0.420. Scored against the sham labels — equal-count slabs along a "
+        "V = 0.420. Scored against the sham labels: equal-count slabs along a "
         "random C-space direction, carrying no membership information by "
-        "construction — it still gives h = 0.280, V = 0.258. So more than half "
+        "construction: it still gives h = 0.280, V = 0.258. So more than half "
         "of the circular 'result' is reproduced by labels that are definitionally "
         "meaningless, and none of that is visible in the number itself."
     ),
@@ -224,7 +223,7 @@ ANSWER: dict[str, object] = {
         "Sweeping the clip over sigma = 1.0, 1.5, 2.0, 3.0 moves the circular "
         "homogeneity across 0.475, 0.496, 0.482, 0.739. The best-looking "
         "number, h = 0.739 at 3 sigma, comes from the labels that agree with "
-        "the true membership *least* — 4.5% of stars, against 18.9% at 1.5 "
+        "the true membership *least*: 4.5% of stars, against 18.9% at 1.5 "
         "sigma. A generous clip produces few, huge chemical groups, and "
         "homogeneity rewards that shape regardless of whether the groups mean "
         "anything. This is §9.3's failure mode 4 with the lever moved into the "
@@ -232,13 +231,13 @@ ANSWER: dict[str, object] = {
     ),
     "the three sentences": (
         "(1) The chemical labels are derived from the same 16 abundances that "
-        "any chemical method under test would use — carrying the membership "
+        "any chemical method under test would use: carrying the membership "
         "information is the founding premise of chemical tagging "
-        f"{cite('Freeman:02')} — so reference and prediction "
+        f"{cite('Freeman:02')}, so reference and prediction "
         "are not independent and the 'validation' measures how well two "
         "functions of one dataset agree with each other. (2) Worse, the clip is "
         "seeded from the true membership, so the labels inherit the answer key "
-        "and then re-derive a degraded copy of it — at the best threshold they "
+        "and then re-derive a degraded copy of it: at the best threshold they "
         "still disagree with the truth about 81% of the time, so the reference "
         "is both circular and wrong. (3) §2's reason for using kinematics as "
         "ground truth is that proper motion, parallax and radial velocity are "
@@ -251,14 +250,14 @@ ANSWER: dict[str, object] = {
         "the same library call, on the same stars, quoted with the same "
         "seven-seed protocol, and h = 0.74 would read as a strong result next "
         "to the 0.52-0.58 the real chemical arms achieve. The circularity lives "
-        "in the *provenance of the labels* — a sentence in the methods section, "
+        "in the *provenance of the labels*: a sentence in the methods section, "
         "not a column in the table. That is why §9.4's rule 3 constrains inputs "
         "rather than scores: kinematics define the labels, so kinematics can "
         "never be a feature of a method scored against them, and symmetrically "
         "abundances can never define the labels for a chemical method."
     ),
     "the equivalent mistake elsewhere": (
-        "The shape is always the same — the label is a function of the feature. "
+        "The shape is always the same. The label is a function of the feature. "
         "In medical imaging: segmenting a lesion by thresholding the same "
         "intensity channel your classifier reads, then reporting Dice against "
         "that segmentation. In NLP: building a sentiment gold set with a "
@@ -266,7 +265,7 @@ ANSWER: dict[str, object] = {
         "defining cell types by marker-gene expression, then reporting that "
         "clustering on expression recovers the cell types. In photometric "
         "redshifts: calibrating on a spectroscopic sample selected by the same "
-        "colour cuts the photometric method uses. The test is one question — "
+        "colour cuts the photometric method uses. The test is one question: "
         "*could the label have been assigned without looking at any feature the "
         "method uses?* If not, the number is a consistency check, and should be "
         "called one."
@@ -275,7 +274,7 @@ ANSWER: dict[str, object] = {
         "Chemical labels are not useless; they are just not independent of a "
         "chemical method. Two honest uses. (1) Ask explicitly 'do chemistry and "
         "kinematics agree?' and report it as an agreement statistic between two "
-        "definitions, with neither called ground truth — and report the sham "
+        "definitions, with neither called ground truth, and report the sham "
         "floor alongside it, because here that floor is h = 0.28. (2) Use an "
         "external catalogue: the pipeline's Simbad referee column, or a "
         "literature membership list built by people who never saw your matrix "

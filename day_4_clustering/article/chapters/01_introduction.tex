@@ -1,8 +1,9 @@
-% 01 · Introduction — the science question and the plan of the workbook
+% 01 · Introduction: the science question and the plan of the workbook
 \section{INTRODUCTION}
 \label{sec:intro}
 
-\deckslides{slides 1--3 --- the science question, the data, and the clustering problem --- and slide 51 for the reference list.}
+\deckslides{slides 1--3 (the science question, the data, and the clustering
+problem) and slide 51 for the reference list.}
 
 Every star that exists today was born in a cloud of gas and dust, and most of
 them were born in the company of thousands of siblings. A cluster forms from
@@ -11,20 +12,20 @@ composition: element ratios that agree to better than 0.1 dex, far below the
 spread between one cluster and the next. Then the cluster dissolves. Tidal
 fields, encounters with giant molecular clouds and the shear of the Galactic
 disc peel the members away one by one, and after a few hundred million years
---- billions, for the most massive clusters --- the stars are scattered across
+(billions, for the most massive clusters) the stars are scattered across
 kiloparsecs of the disc, moving on orbits that no longer have anything in
 common. Their chemistry, however, is frozen. A star keeps the composition it
 was born with, because nothing in a stellar interior efficiently mixes the
 surface layers. \emph{Chemical tagging} is the attempt to use that frozen
 fingerprint to put dispersed siblings back together: to look at a field of
-stars, all of them currently unrelated, and work out which of them were born
-in the same lost cluster \citep{Freeman:02, BlandHawthorn:16}.
+stars, all of them currently unrelated, and work out which of them were born in
+the same lost cluster \citep{Freeman:02, BlandHawthorn:16}.
 
 This workbook is the long-form companion to the IAA-SO 2026 lecture on that
 problem. The lecture is a tour of the unsupervised-learning toolbox with one
-astronomical question attached to it; the workbook goes deeper on both halves
---- the mathematics of each algorithm, and the measurements we made with it on
-25 real open and globular clusters.
+astronomical question attached to it; the workbook goes deeper on both halves:
+the mathematics of each algorithm, and the measurements we made with it on 25
+real open and globular clusters.
 
 \begin{marginnote}[]
 \entry{Chemical tagging}{Using the element abundances of stars to recover
@@ -47,19 +48,18 @@ Two things make the reconstruction hard, and both are properties of the data
 rather than of the algorithms.
 
 \begin{enumerate}
-\item \textbf{Precision.} The abundance differences between clusters of
-  similar age and birth radius are small. At $0.05$--$0.1$ dex per element
-  --- roughly the precision of a modern survey pipeline --- the chemical
-  differences between two coeval solar-metallicity open clusters can be
-  smaller than the measurement noise for the elements in question
-  \citep{GarciaDias:19, Casamiquela:21}. Measured differentially --- same
-  instrument, same lines, cluster members only --- the internal coherence
-  improves to $0.03$ dex, and the cluster-to-cluster differences do not improve
-  with it: the gas the clusters formed from was already mixed to a comparable
-  level, $0.02$--$0.03$ dex of scatter in nearby spiral discs, correlated over
-  scales below $600$\,pc \citep{Kreckel:20}. The same efficient mixing that
-  makes one cluster chemically coherent is what limits how different two
-  clusters can be.
+\item \textbf{Precision.} The abundance differences between clusters of similar
+age and birth radius are small. At $0.05$--$0.1$ dex per element (roughly the
+precision of a modern survey pipeline) the chemical differences between two
+coeval solar-metallicity open clusters can be smaller than the measurement
+noise for the elements in question \citep{GarciaDias:19, Casamiquela:21}.
+Measured differentially (same instrument, same lines, cluster members only) the
+internal coherence improves to $0.03$ dex, and the cluster-to-cluster
+differences do not improve with it: the gas the clusters formed from was
+already mixed to a comparable level, $0.02$--$0.03$ dex of scatter in nearby
+spiral discs, correlated over scales below $600$\,pc \citep{Kreckel:20}. The
+same efficient mixing that makes one cluster chemically coherent is what limits
+how different two clusters can be.
 \item \textbf{Contamination.} The field is crowded. In the sample used here,
   1\,002 stars belong to the 25 target clusters and 357\,056 do not: roughly
   one member in every 300 stars. Any search that returns a group has to be
@@ -84,17 +84,16 @@ distinction has consequences which reappear throughout the workbook.
   chapters spend as much time on \emph{what the knob means} as on the
   mathematics that uses it.
 \item Feature choice is part of the model. In this problem the same algorithm
-  run on abundances, on a spectral latent, or on kinematics answers different
-  questions --- and concatenating two such spaces does not combine their
-  strengths, it dilutes the smaller one
-  (\textbf{Section~\ref{sec:benchmark}}).
+run on abundances, on a spectral latent, or on kinematics answers different
+questions, and concatenating two such spaces does not combine their strengths,
+it dilutes the smaller one (\textbf{Section~\ref{sec:benchmark}}).
 \end{enumerate}
 \end{issues}
 
 \subsection{Two published verdicts, and the one this workbook adds}
 
-The literature is not unanimous, and the disagreement is instructive because
-it is not about methods --- it is about tasks and precision.
+The literature is not unanimous, and the disagreement is instructive because it
+is not about methods. It is about tasks and precision.
 
 \citet{Kos:17} ran t-SNE on GALAH abundances around the Pleiades and reported
 success: seven of nine clusters recovered, plus two new Pleiades members six
@@ -112,12 +111,11 @@ different things of the answer.
 
 A third result belongs on the table too, because it cuts against the
 pessimistic reading. \citet{Hogg:16} clustered 15 \emph{Cannon} abundances for
-$\sim\!10^5$ APOGEE stars with K-means, using no positional information at
-all, and showed that abundance-space overdensities really are phase-space
-clusters. Their abundances reach $\sim\!0.04$ dex, comfortably inside the
-scatter of the pipeline used here. The scope of any negative result in this
-field is therefore \emph{these abundances, these clusters} --- never
-``abundances cannot tag''.
+$\sim\!10^5$ APOGEE stars with K-means, using no positional information at all,
+and showed that abundance-space overdensities really are phase-space clusters.
+Their abundances reach $\sim\!0.04$ dex, comfortably inside the scatter of the
+pipeline used here. The scope of any negative result in this field is therefore
+\emph{these abundances, these clusters}, never ``abundances cannot tag''.
 
 The current state of the art sits in between. \citet{Spina:25} trained a graph
 attention autoencoder on chemistry, orbital similarity and age for
@@ -126,24 +124,22 @@ of six open clusters. It is the natural competitor to this work and we have
 not benchmarked against it; \textbf{Section~\ref{sec:spectral}} says what we
 expect a like-for-like comparison to change.
 
-\begin{marginnote}[]
-\entry{Strong tagging}{Recovering a specific lost birth cluster from chemistry
-alone: the hard version, and the one this workbook benchmarks.}
-\entry{Weak tagging}{Grouping stars into chemical families --- populations
-that share a formation epoch rather than a common birth site. The realistic
-outcome at current precision.}
+\begin{marginnote}[] \entry{Strong tagging}{Recovering a specific lost birth
+cluster from chemistry alone: the hard version, and the one this workbook
+benchmarks.} \entry{Weak tagging}{Grouping stars into chemical families.
+Populations that share a formation epoch rather than a common birth site. The
+realistic outcome at current precision.}
 \end{marginnote}
 
 \subsection{What this workbook measures}
 
-The second half is a benchmark we ran ourselves. We take 25 clusters
-(18 open, 7 globular) with kinematic membership from Gaia DR3, cut the APOGEE
-DR19 sample around them, and ask three families of method --- t-SNE, UMAP and
-EVoC --- to recover members from 16 abundances, from a 256-dimensional latent
-of the full spectrum, or from kinematics, all scored against the same
-kinematic truth. On top of that we train a masked spectral autoencoder that
-never sees an abundance label and ask whether it tags better than the
-abundances themselves.
+The second half is a benchmark we ran ourselves. We take 25 clusters (18 open,
+7 globular) with kinematic membership from Gaia DR3, cut the APOGEE DR19 sample
+around them, and ask three families of method (t-SNE, UMAP and EVoC) to recover
+members from 16 abundances, from a 256-dimensional latent of the full spectrum,
+or from kinematics, all scored against the same kinematic truth. On top of that
+we train a masked spectral autoencoder that never sees an abundance label and
+ask whether it tags better than the abundances themselves.
 
 Four findings organise the results, each developed in its own section:
 
@@ -156,10 +152,10 @@ Four findings organise the results, each developed in its own section:
   once buries every cluster in field stars. The published t-SNE tagging
   operated on $30$--$45^\circ$ regions, and reproduces only there.
 \item \textbf{The full spectrum beats the element ratios.} A self-supervised
-  latent of 8\,575 spectral pixels separates the same stars better than the
-  16 ASPCAP abundances, and the gap survives removing the globular cluster
-  that dominates the sample. A linear compression (PCA) sits in between ---
-  which is the honest way to state the result.
+latent of 8\,575 spectral pixels separates the same stars better than the 16
+ASPCAP abundances, and the gap survives removing the globular cluster that
+dominates the sample. A linear compression (PCA) sits in between, which is the
+honest way to state the result.
 \item \textbf{Chemical tagging is a two-survey problem.} APOGEE sees the
   giants that pin the distance; GALAH sees the main sequence that pins the
   age. Neither survey alone recovers both cluster parameters.
@@ -167,11 +163,11 @@ Four findings organise the results, each developed in its own section:
 
 \subsection{How to read this workbook}
 
-Deck and workbook are complements. The deck carries the animations ---
-K-means converging, DBSCAN growing, the density sweep, the t-SNE descent, the
-UMAP layout, the PLSCAN persistence barcode --- and the workbook carries the
-equations, the hyperparameter reasoning and the measured numbers. Where a deck
-figure moves, the workbook prints a filmstrip of key frames and says so in the
+Deck and workbook are complements. The deck carries the animations (K-means
+converging, DBSCAN growing, the density sweep, the t-SNE descent, the UMAP
+layout, the PLSCAN persistence barcode) and the workbook carries the equations,
+the hyperparameter reasoning and the measured numbers. Where a deck figure
+moves, the workbook prints a filmstrip of key frames and says so in the
 caption.
 
 \begin{figure}[htbp]\centering

@@ -10,28 +10,28 @@ tags:
 - sdss-apogee
 - galah
 - embeddings
-pretty_name: Chemical tagging of star clusters — IAA-SO school 2026
+pretty_name: Chemical tagging of star clusters. IAA-SO school 2026
 size_categories:
 - 1K<n<100K
 ---
 
-# Chemical tagging of star clusters — embeddings & checkpoints
+# Chemical tagging of star clusters: embeddings & checkpoints
 
 Data artifacts behind the **Unsupervised & Semi-Supervised Learning** session of the
 [IAA-CSIC Severo Ochoa School on AI/ML in Astronomy 2026](https://www.granadacongresos.com/ai-ml)
-(Granada, 28 Sep – 2 Oct 2026): latent embeddings, PCA baselines and model checkpoints for
+(Granada, 28 Sep: 2 Oct 2026): latent embeddings, PCA baselines and model checkpoints for
 benchmarking **t-SNE / UMAP / EVoC** on **chemical tagging** of star clusters
 (APOGEE + Gaia + GALAH), reproducing and extending Kos et al. (2017).
 
 The code lives in the workshop repository
 [`iaa-so-training/iaa-advanced-neural-networks-2026`](https://github.com/iaa-so-training/iaa-advanced-neural-networks-2026/tree/main/day_4_clustering)
-(run it with `docker run … ghcr.io/iaa-so-training/day4-clustering uv run cluster …`, or natively with `uv`). These files have **no public upstream** — they were
+(run it with `docker run … ghcr.io/iaa-so-training/day4-clustering uv run cluster …`, or natively with `uv`). These files have **no public upstream**. They were
 produced on a GPU machine from public survey data and are published here so students can
 reproduce the published tables without retraining.
 
 ## Download
 
-**Recommended — one command inside the workshop repo:**
+**Recommended: one command inside the workshop repo:**
 
 ```bash
 cluster download --assets            # ~1.0 GB, resumable, sha256-verified
@@ -61,9 +61,9 @@ checkpoints in `data/embeddings/`, the optional archive in `data/`.
 | `embeddings/attention_dr19*.parquet` | 46 + 46 + 12 MB | supervised DR19 arms |
 | `embeddings/masked_latent_dr17*.parquet` | 53 + 1 MB | DR17 arms used by the DR17-vs-DR19 provenance check |
 | `embeddings/members_rawflux.parquet` | 40 MB | raw 8 575-px flux control arm |
-| `models/masked_ae_rerun.pt`, `models/masked_ae.pt` | 35 MB each | **masked autoencoder** checkpoints — load with `cluster.models.MaskedSpectralAE`; `masked_ae_rerun.pt` is what `scripts/embed_dr19_rerun.py` uses |
-| `models/model_dr19.pt`, `model.pt`, `model_long.pt` | 10 MB each | **supervised CNN-LSTM-attention** checkpoints — load with `cluster.models.CnnLstmAttention` |
-| `models/model_convpool.pt` | 8 MB | supervised conv-pool checkpoint — `cluster.models.ConvPoolRegressor` |
+| `models/masked_ae_rerun.pt`, `models/masked_ae.pt` | 35 MB each | **masked autoencoder** checkpoints: load with `cluster.models.MaskedSpectralAE`; `masked_ae_rerun.pt` is what `scripts/embed_dr19_rerun.py` uses |
+| `models/model_dr19.pt`, `model.pt`, `model_long.pt` | 10 MB each | **supervised CNN-LSTM-attention** checkpoints: load with `cluster.models.CnnLstmAttention` |
+| `models/model_convpool.pt` | 8 MB | supervised conv-pool checkpoint: `cluster.models.ConvPoolRegressor` |
 | `optional/mwmstar.tar` | 237 MB | the 736 DR19 `mwmStar` FITS behind the uniform re-run |
 
 Every parquet is keyed by `APOGEE_ID` plus one column per latent dimension (`z0…zN`).
@@ -94,13 +94,13 @@ loads every `.pt` in this bundle strictly, architecture-checked.
 | DR17 arms | SDSS-IV DR17 `allStar` + `aspcapStar` (kept for the provenance story) |
 | GALAH (Track C) | GALAH DR4 (`galah_dr4_allstar_240705.fits` + Gaia DR3 VAC) |
 
-## Caveats — read before quoting numbers
+## Caveats: read before quoting numbers
 
 1. **Superseded arms.** The `*_v1` / `dr17` / `all_mixed_v1` files are historical. The
    comparable, uniform DR19 numbers come from `masked_latent.parquet` +
    `pca_{64,256}.parquet` on the 994 members / 39 945 field stars of one product.
 2. **Product mismatch.** The old DR17-vs-DR19 split was a *data-product* artifact
-   (raw `apStar` vs continuum-normalised `aspcapStar`), not a real batch effect — see the
+   (raw `apStar` vs continuum-normalised `aspcapStar`), not a real batch effect. See the
    workshop `docs/spectral_benchmark_results.md`.
 3. **PCA is competitive.** On the uniform sample the linear baseline is close to the
    autoencoder on t-SNE/UMAP; the gap is only clear on EVoC/UMAP. Quote the re-run tables,

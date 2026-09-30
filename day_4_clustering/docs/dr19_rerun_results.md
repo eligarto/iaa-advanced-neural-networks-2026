@@ -2,7 +2,7 @@
 
 >
 > **Running these:** the commands below are written in the native form. In the
-> Docker setup (the default — see `docs/docker.md`) prefix them with
+> Docker setup (the default. See `docs/docker.md`) prefix them with
 > `docker run --rm -it $DAY4 $IMG`, e.g.
 > `docker run --rm -it $DAY4 $IMG uv run cluster baseline --kinematics`; scripts
 > become `… $IMG uv run python scripts/…`, and pass knobs with `-e`
@@ -38,10 +38,10 @@ CLUSTER_FAST=0 uv run cluster run                 # field retrieval, all-sky
 
 Re-verified 2026-09-24 on the reference laptop (native, 16 threads): both
 baseline tables below reproduce **to the last printed digit** (36 s and 35 s),
-while the full all-sky `cluster run` takes **≈57 min** (3418 s) — budget an hour
+while the full all-sky `cluster run` takes **≈57 min** (3418 s): budget an hour
 for it, not a coffee break.
 
-## Paper baseline — cluster-only separation (1002 member stars, 25 clusters)
+## Paper baseline: cluster-only separation (1002 member stars, 25 clusters)
 
 | features | method | homogeneity | completeness | v-measure | accuracy |
 |---|---|---|---|---|---|
@@ -52,10 +52,10 @@ for it, not a coffee break.
 | abundances + kinematics | UMAP | 0.748 | 0.666 | 0.705 | 0.506 |
 | abundances + kinematics | EVoC | 0.680 | 0.683 | 0.681 | 0.520 |
 
-## Field retrieval — all-sky (25 clusters scored, 1002 true members)
+## Field retrieval: all-sky (25 clusters scored, 1002 true members)
 
 Two readings of the same command on the same data, different machines and thread
-settings — the spread is the subject of `docs/reproducibility.md`, and both
+settings. The spread is the subject of `docs/reproducibility.md`, and both
 readings keep the shape:
 
 | features | method | recall (2026-08 → 2026-09-24) | precision (2026-08 → 2026-09-24) |
@@ -70,5 +70,5 @@ near-zero precision. Full per-cluster tables are in `results/dr19_*.txt`.
 
 The second reading is the `cluster run` of the re-verification above (reference
 laptop, native, 16 threads, `SEED=42`); the first is the run that produced this
-table. Neither is portable to the last printed digit on other hardware — quote
+table. Neither is portable to the last printed digit on other hardware: quote
 them as ranges.

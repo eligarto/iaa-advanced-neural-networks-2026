@@ -1,4 +1,4 @@
-"""Chapter 11, exercise 4 — negative sampling makes "far" an artefact.
+"""Chapter 11, exercise 4: negative sampling makes "far" an artefact.
 
     UMAP's repulsion term acts on sampled non-edges, so its notion of "far"
     is an artefact of negative sampling. Construct a small dataset in which
@@ -7,7 +7,7 @@
     published UMAP figure?
 
 \\S 11.2 states that the objective is the cross-entropy between the two edge
-distributions, minimised by SGD *with negative sampling* — a handful of random
+distributions, minimised by SGD *with negative sampling*: a handful of random
 non-edges repelled per real edge. This exercise makes the consequence concrete
 and measurable: construct a dataset whose clusters the graph cannot
 distinguish from the field, flip only the seed, and watch the layout's
@@ -25,7 +25,7 @@ from exercises.citations import cite, reference_list
 from exercises.utils import SEEDS, settings
 
 #: Seeds to scan. A wide net is needed because the effect is not guaranteed
-#: to appear at any particular seed — which is itself the finding.
+#: to appear at any particular seed, which is itself the finding.
 SEED_SCAN: tuple[int, ...] = SEEDS
 
 #: How many randomly generated datasets to try before reporting failure.
@@ -37,7 +37,7 @@ def construction(seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
 
     The two close blobs are the ones the exercise asks to invert. They are
     separated by a modest gap in the input (2.5 sigma) so that the graph
-    contains few or no edges between them — the layout is then free to place
+    contains few or no edges between them. The layout is then free to place
     them either side by side or on top of each other, because nothing in the
     objective constrains a pair that is not connected by an edge or sampled
     as a negative.
@@ -117,7 +117,6 @@ def solve(
     index, table, _ = search_for_inversion(n_datasets)
     X, labels = construction(index if index is not None else 0)
 
-    n_neighbors = int(settings().umap["n_neighbors"])
     neighbours = NearestNeighbors(n_neighbors=2).fit(X[:50])
     distances, _ = neighbours.kneighbors(X[:50])
     gap = float(distances[:, 1].max())
@@ -159,7 +158,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The two layouts at the extreme seeds, side by side."""
     import matplotlib.pyplot as plt
 
@@ -196,7 +195,7 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 ANSWER: dict[str, object] = {
     "the construction": (
         "Three 6-D Gaussian blobs of 25 points each, unit variance: A and B "
-        "with centres 2.5 apart (2.5 sigma — the graph usually has no edge "
+        "with centres 2.5 apart (2.5 sigma: the graph usually has no edge "
         "between them), C 15 away. The input ratio A-B / A-C is therefore "
         "2.5/15 = 0.1667, so any layout with a ratio above 1 has placed the "
         "close pair farther apart than the distant one. Everything but the "
@@ -212,19 +211,19 @@ ANSWER: dict[str, object] = {
         f"{cite('McInnes:18')}: a pair "
         "of points with no graph edge and which never draws a negative sample "
         "contributes exactly zero to the gradient, wherever the layout puts "
-        "it. A-B is precisely such a pair — 2.5 sigma apart in a 6-D space, "
-        "so it is outside k = 15's reach — while A-C is even further, so it "
+        "it. A-B is precisely such a pair: 2.5 sigma apart in a 6-D space, "
+        "so it is outside k = 15's reach, while A-C is even further, so it "
         "is *never* an edge either. Both distances are therefore set by "
         "whatever the optimiser drifted into, and the only reason the map "
         "usually looks right is that the repulsion, acting on the negatives "
         "that do get sampled, tends to spread disjoint components out. Which "
         "ones end up spread, and how far, is set by the negative-sampling "
-        "stream — i.e. by the seed."
+        "stream: i.e. by the seed."
     ),
     "what the scan shows": (
         "The scan found the requested inversion, on the second construction "
         "tried (``inversion_found: True``, ``inversion_dataset: 1``). At fixed "
-        "input geometry — A-B 2.5 apart, A-C 15 apart, ratio 0.167 — the seven "
+        "input geometry (A-B 2.5 apart, A-C 15 apart, ratio 0.167) the seven "
         "seeds give:\n\n"
         "  seed   A-B (close in)   A-C (far in)   ratio\n"
         "    42       31.24           31.50       0.99\n"
@@ -237,17 +236,17 @@ ANSWER: dict[str, object] = {
         "Four of the seven seeds place the *close* pair farther apart than the "
         "distant one; the ratio spans 0.53 to 1.81, a factor of 3.4 in a "
         "quantity whose true value is 0.167. The A-B distance alone varies "
-        "from 21.6 to 31.2 — a 44% swing — with the data, the graph, "
+        "from 21.6 to 31.2 (a 44% swing) with the data, the graph, "
         "n_neighbors and min_dist all identical. Only ``random_state`` moved."
     ),
     "when it does and does not appear": (
-        "An earlier construction — three blobs with wider gaps and fewer "
-        "points — did *not* invert at any of the seven seeds, which is worth "
+        "An earlier construction: three blobs with wider gaps and fewer "
+        "points: did *not* invert at any of the seven seeds, which is worth "
         "reporting rather than hiding: with strongly separated blobs UMAP "
         "reliably keeps them apart, because the two clusters' cross-pairs get "
         "sampled as negatives often enough to push them apart. The effect "
-        "becomes reliable when the graph is disconnected across the pair — "
-        "small n, small k, or a modest input gap — which is the regime §11.1 "
+        "becomes reliable when the graph is disconnected across the pair: "
+        "small n, small k, or a modest input gap, which is the regime §11.1 "
         "describes for a k that is too small ('too few neighbours gives a "
         "graph that fragments the field'). On the construction that works, "
         "cluster A's internal nearest-neighbour distances top out at 3.15, so "
@@ -259,10 +258,10 @@ ANSWER: dict[str, object] = {
     "what it implies for published figures": (
         "Five things, all of them quotable rules. (1) An inter-cluster "
         "distance in a UMAP figure is not a distance and not even a robust "
-        "ordering — it is an unconstrained output of the negative-sampling "
+        "ordering. It is an unconstrained output of the negative-sampling "
         "stream. (2) The same is true of *gaps*: a wide empty space between "
         "two blobs says only that some negative samples separated them. "
-        "(3) Cluster *sizes* and densities are equally unreadable — §10.2's "
+        "(3) Cluster *sizes* and densities are equally unreadable: §10.2's "
         "caveats (i) and (ii) apply to UMAP verbatim, for a different "
         "mechanism; the t-SNE originals are stated in "
         f"{cite('vanderMaaten:08', parenthetical=False)}. (4) 'The clusters "
@@ -274,7 +273,7 @@ ANSWER: dict[str, object] = {
         "graph demanded or the one the sampler happened to produce."
     ),
     "the connection back to the workbook's own results": (
-        "This is the mechanism behind §11.4's third bullet — that UMAP "
+        "This is the mechanism behind §11.4's third bullet: that UMAP "
         "recovers all 978 members at a precision of 0.0013 by declaring most "
         "of the field to be cluster members. If the layout's spacing is not "
         "constrained by the graph, then a downstream clusterer reading density "

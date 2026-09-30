@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Two stages: the build tools stay in `builder`, the published image is
 # python:3.13-slim + the synced virtualenv. The 1.17 GB APOGEE catalogue is NOT
-# baked in — students download it into a mounted volume on first run, and the
+# baked in: students download it into a mounted volume on first run, and the
 # embedding parquets/checkpoints come from the mounted Hugging Face bundle.
 
 # --- builder: needs a C/C++ toolchain -------------------------------------
@@ -37,7 +37,7 @@ COPY notebooks ./notebooks
 COPY scripts ./scripts
 COPY hf ./hf
 # The default image is the workshop core. `--build-arg WITH_TORCH=1` adds the
-# optional torch extra (CPU wheels, ~200 MB) for the re-embedding extension —
+# optional torch extra (CPU wheels, ~200 MB) for the re-embedding extension,
 # it is left out by default so the pull 30 students do stays ~1.5 GB.
 ARG WITH_TORCH=""
 RUN uv sync --frozen --no-dev ${WITH_TORCH:+--extra torch} --no-cache
@@ -46,7 +46,7 @@ RUN uv sync --frozen --no-dev ${WITH_TORCH:+--extra torch} --no-cache
 # builds its `references` block from `article/references.bib` as it is imported,
 # so without this file every deck cell dies with
 #   FileNotFoundError: bibliography not found: /app/article/references.bib
-# Only the .bib is needed to run the decks — the workbook sources, figures and
+# Only the .bib is needed to run the decks: the workbook sources, figures and
 # PDF are not (.dockerignore drops *.pdf anyway). Copied after `uv sync` on
 # purpose: editing the bibliography must not invalidate the dependency layer.
 COPY article/references.bib ./article/references.bib
@@ -54,14 +54,14 @@ COPY article/references.bib ./article/references.bib
 # --- runtime: the slim image students pull ---------------------------------
 FROM python:3.13.15-slim
 
-# numba (pulled in by umap-learn, hdbscan and — the real offender — EVoC's
+# numba (pulled in by umap-learn, hdbscan and, above all, EVoC's
 # pynndescent KNN graph) needs a threadsafe threading layer. Without libgomp it
 # silently falls back to the *workqueue* layer and the nested parallel regions in
 # EVoC abort the process mid-benchmark (exit 139).
 #
 # libgomp1 gives numba the OpenMP layer. Do NOT set NUMBA_THREADING_LAYER=omp
 # here: pynndescent has a workaround (numba#3341) that rewrites an explicit
-# "omp" request to "tbb", and to "workqueue" when TBB is missing — putting the
+# "omp" request to "tbb", and to "workqueue" when TBB is missing: putting the
 # crash straight back. Leaving the layer at "default" makes numba pick omp.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgomp1 \
@@ -69,7 +69,7 @@ RUN apt-get update \
 
 # GIT_PYTHON_REFRESH=quiet: there is no git binary in the image and mlflow's
 # GitPython probe prints two "Failed to import Git" warnings per run without it.
-# PYTHONHASHSEED is belt-and-braces next to cluster.seeding — the pipeline seeds
+# PYTHONHASHSEED is belt-and-braces next to cluster.seeding: the pipeline seeds
 # its own RNGs, this only removes dict/set iteration order as a source of drift.
 ENV UV_NO_SYNC=1 \
     UV_CACHE_DIR=/tmp/day4-uv \

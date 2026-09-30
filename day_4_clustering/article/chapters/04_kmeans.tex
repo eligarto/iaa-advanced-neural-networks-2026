@@ -1,14 +1,14 @@
-% 04 · K-means — the default tool, and its assumptions
+% 04 · K-means: the default tool, and its assumptions
 \section{K-MEANS: THE DEFAULT TOOL}
 \label{sec:kmeans}
 
-\deckslides{slides 4--11 --- the K-means tour, ending on its limits.}
+\deckslides{slides 4--11: the K-means tour, ending on its limits.}
 
 K-means is where every clustering analysis starts, and it is worth
-understanding precisely, because its failure modes are the ones the rest of
-the toolbox was invented to repair. The method was proposed by
-\citet{MacQueen:67} and its modern formulation --- the one everyone implements
---- is due to \citet{Lloyd:82}.
+understanding precisely, because its failure modes are the ones the rest of the
+toolbox was invented to repair. The method was proposed by \citet{MacQueen:67}
+and its modern formulation (the one everyone implements) is due to
+\citet{Lloyd:82}.
 
 \subsection{The objective}
 
@@ -55,13 +55,13 @@ other. K-means partitions the plane into Voronoi cells by construction.}
 
 Lloyd's algorithm is a two-move loop. \emph{Assign} every point to its nearest
 centre; \emph{update} every centre to the mean of its members; repeat. Each
-move can only reduce $J$: the assignment step is optimal for fixed centres,
-and the update step is optimal for fixed assignment. $J$ is bounded below by
-zero and takes finitely many values (there are finitely many partitions of
-$n$ points into $K$ groups), so the loop must terminate --- in practice after
-a few dozen iterations. It terminates at a \emph{local} minimum, and the
-distinction matters: K-means is a coordinate-descent algorithm on a
-non-convex objective, so different starting centres end in different answers.
+move can only reduce $J$: the assignment step is optimal for fixed centres, and
+the update step is optimal for fixed assignment. $J$ is bounded below by zero
+and takes finitely many values (there are finitely many partitions of $n$
+points into $K$ groups), so the loop must terminate, in practice after a few
+dozen iterations. It terminates at a \emph{local} minimum, and the distinction
+matters: K-means is a coordinate-descent algorithm on a non-convex objective,
+so different starting centres end in different answers.
 
 \begin{figure}[htbp]\centering
   \fig[0.94]{kmeans_film.png}
@@ -83,7 +83,7 @@ non-convex objective, so different starting centres end in different answers.
   centres, dots the data: \panel{a} all points unassigned with $K$ centres
   dropped at random; \panel{b} assignment to the nearest centre; \panel{c}
   centres moved to the mean of their members; \panel{d} the fixed point of the
-  iteration --- no point changes hands, so the loop stops.}
+  iteration, no point changes hands, so the loop stops.}
   \label{fig:kmeanssteps}
 \end{figure}
 
@@ -105,15 +105,15 @@ warning:
   a ratio of within- to between-cluster distance, so it also penalises
   non-convex clusters.
 \item \textbf{Model selection.} Compare $K$ by held-out likelihood under a
-  Gaussian mixture fitted by EM \citep{Dempster:77}. K-means is the hard
-  assignment limit of that model with spherical, equal-variance components ---
-  which is precisely the assumption list of \textbf{Table~\ref{tab:assumptions}}.
+Gaussian mixture fitted by EM \citep{Dempster:77}. K-means is the hard
+assignment limit of that model with spherical, equal-variance components, which
+is precisely the assumption list of \textbf{Table~\ref{tab:assumptions}}.
 \end{enumerate}
 
 The warning is that in this project we \emph{cheat}, deliberately. The
 catalogue tells us there are 25 clusters, so the benchmarking arms are handed
-the true number of groups. That makes the comparison between methods clean,
-and it flatters all of them relative to a blind search --- which is why
+the true number of groups. That makes the comparison between methods clean, and
+it flatters all of them relative to a blind search, which is why
 \S\ref{sec:benchmark} reports field retrieval (a discovery-like task) and
 cluster-only separation (a $K$-known task) separately.
 
@@ -129,24 +129,23 @@ fewer restarts.
 \begin{figure}[htbp]\centering
   \fig[0.58]{kmeans_init.png}
   \caption{Initialisation sensitivity (from the deck): the same data, two
-  random starts, two different final partitions --- and one of them splits a
-  real group. Nothing about the algorithm changed; only the seed did. In a
+  random starts, two different final partitions, and one of them splits a real
+  group. Nothing about the algorithm changed; only the seed did. In a
   clustering paper this is the first thing a referee will ask about, and it is
-  why every number in this workbook is reported as a mean over seeds (seven,
-  in the head-to-head of \S\ref{sec:spectral}).}
+  why every number in this workbook is reported as a mean over seeds (seven, in
+  the head-to-head of \S\ref{sec:spectral}).}
   \label{fig:kmeansinit}
 \end{figure}
 
 \subsection{What it assumes, and when it breaks}
 
-\begin{issues}[THE ASSUMPTION LIST]
-K-means assumes that clusters are (i) separable by a centre, (ii) roughly
-convex, (iii) of comparable size and variance, (iv) all present in equal
-proportion, and (v) that $K$ is known. It additionally assumes that the metric
-is meaningful --- that the dimensions have been standardised, or that the
-scales carry physical meaning. When it fails, it fails in a characteristic
-way: it splits large or elongated groups and merges neighbouring small ones,
-and it never returns ``noise''.
+\begin{issues}[THE ASSUMPTION LIST] K-means assumes that clusters are (i)
+separable by a centre, (ii) roughly convex, (iii) of comparable size and
+variance, (iv) all present in equal proportion, and (v) that $K$ is known. It
+additionally assumes that the metric is meaningful: that the dimensions have
+been standardised, or that the scales carry physical meaning. When it fails, it
+fails in a characteristic way: it splits large or elongated groups and merges
+neighbouring small ones, and it never returns ``noise''.
 \end{issues}
 
 \begin{figure}[htbp]\centering
@@ -169,28 +168,28 @@ and it never returns ``noise''.
 
 \subsection{Is K-means useful for chemical tagging?}
 
-Yes --- with the right expectations, and in the literature it has been used
-twice in ways that matter here.
+Yes: with the right expectations, and in the literature it has been used twice
+in ways that matter here.
 
 \citet{Hogg:16} clustered $\sim\!10^5$ APOGEE stars in a 15-dimensional
 abundance space with K-means, with no positional information, and recovered
 groups that are genuinely phase-space structures. That result defines what
 abundance-space overdensities can be at $\sim\!0.04$ dex precision. And
-\citet{GarciaDias:18} applied K-means to $153\,847$ normalised APOGEE
-spectra for spectral classification rather than for tagging, and the classes it
-returns do track the stellar parameters --- dwarfs separate from giants, bulge
-from halo. But the same paper's conclusion is the opposite of tidy: flux space
-has no obvious groups, a discrete classification does not organise parameter
-space neatly, and the solution moves with the initialisation. That is the same
-warning as the row-order result of \S\ref{sec:validation}, in a different space.
-K-means is useful when the groups are blobs; the spectra are not blobs, and the
-abundance space of \S\ref{sec:benchmark} is only partly one.
+\citet{GarciaDias:18} applied K-means to $153\,847$ normalised APOGEE spectra
+for spectral classification rather than for tagging, and the classes it returns
+do track the stellar parameters. Dwarfs separate from giants, bulge from halo.
+But the same paper's conclusion is the opposite of tidy: flux space has no
+obvious groups, a discrete classification does not organise parameter space
+neatly, and the solution moves with the initialisation. That is the same
+warning as the row-order result of \S\ref{sec:validation}, in a different
+space. K-means is useful when the groups are blobs; the spectra are not blobs,
+and the abundance space of \S\ref{sec:benchmark} is only partly one.
 
 In \textbf{Section~\ref{sec:benchmark}} the same algorithm is run on the same
-member matrix as the other arms --- the 1\,002-row matrix of
+member matrix as the other arms (the 1\,002-row matrix of
 \textbf{Table~\ref{tab:clusters}} in this chapter's summary box, and the
 982-star deduplicated population of \textbf{Table~\ref{tab:honest}} and
-\textbf{Table~\ref{tab:literature}} --- so that the comparison between ``the
+\textbf{Table~\ref{tab:literature}}) so that the comparison between ``the
 classical tool'' and the newer ones is measured rather than asserted.
 
 \begin{summary}[K-MEANS ON OUR MEMBER MATRIX]
@@ -199,14 +198,14 @@ same member-only matrix the other benchmark arms use ($1\,002$ stars, 16
 abundances, 25 clusters, $\geq\!5$ members), runs K-means with $n_{\rm
 init}=10$ and reports the paper's merit functions alongside the SSE curve. The
 measured result is worth stating plainly, because it is not the one the gospel
-predicts: at $K=25$, K-means reaches \textbf{homogeneity 0.449}
-(completeness 0.493, v-measure 0.470, accuracy 0.296) --- higher than t-SNE's
-0.292 and EVoC's 0.409 on the same stars, and within reach of UMAP's 0.547.
-Two caveats travel with it. At $K=2$ the same matrix gives homogeneity 0.228
-with completeness 0.954: the ``families'' reading, in which almost everything
-lands in one group. And raising $K$ to 40 lifts homogeneity to 0.505 while
-completeness falls to 0.474 --- over-splitting buys homogeneity, which is why
-the paper's metric pair must always be quoted together.
+predicts: at $K=25$, K-means reaches \textbf{homogeneity 0.449} (completeness
+0.493, v-measure 0.470, accuracy 0.296) (higher than t-SNE's 0.292 and EVoC's
+0.409 on the same stars, and within reach of UMAP's 0.547. Two caveats travel
+with it. At $K=2$ the same matrix gives homogeneity 0.228 with completeness
+0.954: the ``families'' reading, in which almost everything lands in one group.
+And raising $K$ to 40 lifts homogeneity to 0.505 while completeness falls to
+0.474) over-splitting buys homogeneity, which is why the paper's metric pair
+must always be quoted together.
 \end{summary}
 
 \begin{issues}[EXERCISES]

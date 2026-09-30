@@ -1,4 +1,4 @@
-% 05 · KNN — the nearest-neighbour primitive
+% 05 · KNN: the nearest-neighbour primitive
 \section{THE kNN PRIMITIVE}
 \label{sec:knn}
 
@@ -58,9 +58,9 @@ normalisation chosen in \S\ref{sec:data}.
   \end{tabular}
   \caption{The primitive, in four steps (deck figures): \panel{a} measure every
   pairwise distance from the query point (black); \panel{b} keep the $k$
-  smallest --- the neighbourhood; \panel{c} the $k$-th distance is the core
-  distance $\kappa_k$, a density estimate read off the data; \panel{d} keep
-  the edges and you have a graph, which is all the rest of the toolbox needs.}
+  smallest. The neighbourhood; \panel{c} the $k$-th distance is the core
+  distance $\kappa_k$, a density estimate read off the data; \panel{d} keep the
+  edges and you have a graph, which is all the rest of the toolbox needs.}
   \label{fig:knnsteps}
 \end{figure}
 
@@ -68,8 +68,8 @@ normalisation chosen in \S\ref{sec:data}.
 
 Exact $k$NN costs $O(n^2 d)$ for $n$ points in $d$ dimensions when computed
 brute force, which for $3.6\times10^5$ field stars and $d = 16$ is about
-$10^{12}$ distance evaluations --- feasible on a cluster, painful on a laptop.
-The practical answers are spatial indices (KD-trees, ball trees, which degrade
+$10^{12}$ distance evaluations: feasible on a cluster, painful on a laptop. The
+practical answers are spatial indices (KD-trees, ball trees, which degrade
 badly above roughly 20 dimensions) and approximate graphs (NN-descent, the
 algorithm UMAP uses, which is what makes it fast). This distinction matters
 when reading performance claims: ``UMAP is fast'' is a statement about its
@@ -78,7 +78,7 @@ graph construction, not about exact $k$NN.
 The choice of $k$ is the usual bias--variance trade: small $k$ gives a
 high-variance density estimate that fragments clusters; large $k$ smooths away
 small ones. Our pipeline uses $k = 15$ for both the UMAP graph and EVoC's
-internal graph, and $k = 10$ for the purity score below --- all three are
+internal graph, and $k = 10$ for the purity score below. All three are
 conventional defaults, and all three are knobs a careful user should vary to
 see whether the conclusion moves. \textbf{Section~\ref{sec:benchmark}} reports
 one such variation: UMAP at $n_{\rm neighbours} = 5$ performs measurably worse
@@ -89,7 +89,7 @@ than at the default 15.
 The one place where $k$NN enters our results directly is validation. For each
 star that is a known member of a cluster, count the fraction of its 10 nearest
 neighbours in the embedding that belong to the same cluster; average over
-members. The result --- \emph{kNN purity} --- is a cohesion score with no
+members. The result (\emph{kNN purity}) is a cohesion score with no
 hyperparameters beyond $k$, no clustering step, and no way to tune yourself a
 good answer:
 
@@ -99,12 +99,12 @@ good answer:
 \mathrm{cluster}(i) \right\} \right|}{10},
 \end{equation}
 
-where $\mathcal{M}$ is the set of known members. It is the automated version
-of the manual test in \citet{Kos:17} --- draw a polygon around the visual group
-in the embedding and see whether the members are inside it --- and it is
-reported for every method in \S\ref{sec:benchmark}. A purity near 1 means the
-members of a cluster genuinely occupy a neighbourhood of the space; a purity
-near the field fraction means the embedding knows nothing about them.
+where $\mathcal{M}$ is the set of known members. It is the automated version of
+the manual test in \citet{Kos:17} (draw a polygon around the visual group in
+the embedding and see whether the members are inside it) and it is reported for
+every method in \S\ref{sec:benchmark}. A purity near 1 means the members of a
+cluster genuinely occupy a neighbourhood of the space; a purity near the field
+fraction means the embedding knows nothing about them.
 
 \begin{issues}[EXERCISES]
 \begin{enumerate}

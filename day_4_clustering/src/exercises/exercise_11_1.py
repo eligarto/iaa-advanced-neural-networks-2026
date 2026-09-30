@@ -1,12 +1,12 @@
-"""Chapter 11, exercise 1 — UMAP's per-point sigma, and the role of rho.
+"""Chapter 11, exercise 1: UMAP's per-point sigma, and the role of rho.
 
     Implement the per-point binary search for sigma_i in
     \\textbf{Equation~\\ref{eq:umapw}} that fixes sum_j w_ij = log_2 k, and
     verify numerically on a random dataset. Where does the local-connectivity
     term rho_i matter most: dense regions or sparse ones?
 
-\\S 11.1 sets UMAP's bandwidth by the same device t-SNE uses — a per-point
-binary search — but against a different target: a fixed *total edge weight*
+\\S 11.1 sets UMAP's bandwidth by the same device t-SNE uses: a per-point
+binary search, but against a different target: a fixed *total edge weight*
 rather than a fixed entropy, and with a local-connectivity offset rho_i
 subtracted first. This module implements both halves, diffs them against the
 installed ``umap.umap_.smooth_knn_dist``, and then answers the rho question by
@@ -46,7 +46,7 @@ def binary_search_sigma(
 
     ``distances`` are the point's k nearest-neighbour distances (self
     excluded). The summand is clipped at 1 for ``d <= rho``, which is what
-    makes the nearest neighbour's edge weight exactly 1 — the "local
+    makes the nearest neighbour's edge weight exactly 1: the "local
     connectivity" guarantee that every point has at least one full-strength
     edge, so the graph cannot fragment.
 
@@ -107,7 +107,7 @@ def smooth_knn(
 def edge_weights(
     solved: dict[str, np.ndarray],
 ) -> np.ndarray:
-    """Realised w_ij per point — the check that the search hit its target."""
+    """Realised w_ij per point: the check that the search hit its target."""
     d = solved["knn_distances"]
     rho = solved["rho"][:, None]
     sigma = solved["sigma"][:, None]
@@ -119,7 +119,7 @@ def cross_check(X: np.ndarray, k: int = K) -> dict[str, float]:
 
     The library's convention is that ``distances[:, 0]`` is self (distance 0)
     and its inner loop runs from column 1, i.e. over exactly the k real
-    neighbours — so it must be handed the full ``(n, k+1)`` block, not the
+    neighbours, so it must be handed the full ``(n, k+1)`` block, not the
     ``(n, k)`` slice our own search uses.
     """
     from sklearn.neighbors import NearestNeighbors
@@ -223,7 +223,7 @@ def solve(k: int = K, n: int = 400, seed: int = 0) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """sigma with and without rho, split by local density."""
     import matplotlib.pyplot as plt
 
@@ -268,13 +268,13 @@ ANSWER: dict[str, object] = {
         "quadratic. And the sense of the search is reversed: total weight "
         "*increases* with sigma (slower decay, more weight), whereas t-SNE's "
         "entropy *decreases* with beta. Only the k nearest neighbours enter "
-        "the sum at all — UMAP never sees a long-range distance, which is the "
+        "the sum at all: UMAP never sees a long-range distance, which is the "
         "point §11.1 makes about its 'global structure' claims."
     ),
     "the implementation is verified": (
         "solve() checks it twice. (1) The realised total weight per point "
         "matches the target log2(15) = 3.906891 to within 9.98e-06 for every "
-        "point — the 1e-5 bisection tolerance — with and without rho. (2) Our "
+        "point (the 1e-5 bisection tolerance) with and without rho. (2) Our "
         "sigma_i and rho_i are diffed element-by-element against the installed "
         "``umap.umap_.smooth_knn_dist`` on the same 400-point dataset: maximum "
         "absolute difference 1.9e-06 in sigma (7.5e-06 relative) and 2.4e-07 "
@@ -295,11 +295,11 @@ ANSWER: dict[str, object] = {
         "test set: with rho the minimum nearest-neighbour weight is 1.000; "
         "without it the median is 0.358 and the minimum 0.272. That is the "
         "local-connectivity guarantee "
-        f"{cite('McInnes:18')}, quantified — the fuzzy graph is "
+        f"{cite('McInnes:18')}, quantified. The fuzzy graph is "
         "connected by construction, so no point can be orphaned and no region "
         "dropped for having large distances."
     ),
-    "where rho matters most — the answer": (
+    "where rho matters most: the answer": (
         "In *sparse* regions. The ablation makes it quantitative. On a "
         "two-population test set (a tight core at scale 0.2 and a diffuse halo "
         "at scale 2.0), the median bandwidth is:\n\n"
@@ -307,7 +307,7 @@ ANSWER: dict[str, object] = {
         "  dense       0.335     0.071        0.333        4.86     4.94\n"
         "  sparse      3.522     0.631        3.387        5.55     5.82\n\n"
         "Two readings agree. In absolute terms rho changes sigma by 0.26 in "
-        "the dense core and by 2.76 in the halo — an order of magnitude more. "
+        "the dense core and by 2.76 in the halo: an order of magnitude more. "
         "In relative terms the ratio sigma_without/sigma_with is 4.9 in the "
         "core and 5.5 in the halo, so the term is also doing *proportionally* "
         "more work where the data are thin. And the rho/sigma column shows "

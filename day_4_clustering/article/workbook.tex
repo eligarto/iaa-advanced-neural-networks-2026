@@ -1,5 +1,5 @@
 % Companion workbook for the IAA-SO School on AI/ML in Astronomy 2026
-%   Unsupervised Learning pillar — chemical tagging of star clusters.
+%   Unsupervised Learning pillar: chemical tagging of star clusters.
 %
 % Built on the Annual Reviews ar-1col class (vendored, unmodified) with the
 % publisher's yoke replaced by the school's own information; see README.md.
@@ -149,24 +149,23 @@ EVoC) and clustering algorithms applied to chemical tagging of star clusters}
 \author{Rafael Garcia-Dias\affil{King's College London;
 \texttt{rafaelagd@gmail.com}}}
 
-\begin{abstract}
-Stars born in the same cluster share a chemical fingerprint, and that
-fingerprint outlives the cluster: the stars disperse, their element ratios do
-not. Recovering dispersed siblings from abundances alone --- \emph{chemical
-tagging} --- is a clustering problem in a noisy, high-dimensional space, and
-this workbook is the long-form companion to the IAA-SO 2026 lecture on it. It
-builds the toolbox one algorithm at a time, each chosen to repair the failure
-mode of the previous one: K-means, the $k$-nearest-neighbour primitive,
-DBSCAN, HDBSCAN$^*$, PLSCAN, t-SNE, UMAP and EVoC, with the mathematics
-written out, the hyperparameters interpreted, and the assumptions of each
-method stated rather than hidden. The second half applies the toolbox to
-25 open and globular clusters in APOGEE DR19, Gaia DR3 and GALAH DR4, scoring
-every method against kinematic membership, and reports the result the project
-actually found: abundances narrow the candidate list, kinematics decide, and a
-masked spectral autoencoder trained with no abundance labels at all separates
-clusters better than the ASPCAP abundances do. Every number is reproducible
-from the accompanying repository, and the failures --- including one of our
-own, withdrawn --- are reported next to the successes.
+\begin{abstract} Stars born in the same cluster share a chemical fingerprint,
+and that fingerprint outlives the cluster: the stars disperse, their element
+ratios do not. Recovering dispersed siblings from abundances alone
+(\emph{chemical tagging}) is a clustering problem in a noisy, high-dimensional
+space, and this workbook is the long-form companion to the IAA-SO 2026 lecture
+on it. It builds the toolbox one algorithm at a time, each chosen to repair the
+failure mode of the previous one: K-means, the $k$-nearest-neighbour primitive,
+DBSCAN, HDBSCAN$^*$, PLSCAN, t-SNE, UMAP and EVoC, with the mathematics written
+out, the hyperparameters interpreted, and the assumptions of each method stated
+rather than hidden. The second half applies the toolbox to 25 open and globular
+clusters in APOGEE DR19, Gaia DR3 and GALAH DR4, scoring every method against
+kinematic membership, and reports the result the project actually found:
+abundances narrow the candidate list, kinematics decide, and a masked spectral
+autoencoder trained with no abundance labels at all separates clusters better
+than the ASPCAP abundances do. Every number is reproducible from the
+accompanying repository, and the failures (including one of our own, withdrawn)
+are reported next to the successes.
 \end{abstract}
 
 \begin{keywords}

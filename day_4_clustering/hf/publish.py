@@ -40,7 +40,7 @@ def main() -> int:
     args = ap.parse_args()
 
     if not MANIFEST.exists():
-        print("hf/MANIFEST.json missing — run `python hf/make_manifest.py` first.", file=sys.stderr)
+        print("hf/MANIFEST.json missing. Run `python hf/make_manifest.py` first.", file=sys.stderr)
         return 2
 
     manifest = json.loads(MANIFEST.read_text())
@@ -54,7 +54,7 @@ def main() -> int:
             missing.append(entry["source"])
             continue
         if _sha256_local(local) != entry["sha256"]:
-            print(f"!! {local} changed since the manifest was built — rerun make_manifest.py", file=sys.stderr)
+            print(f"!! {local} changed since the manifest was built: rerun make_manifest.py", file=sys.stderr)
             return 2
         uploads.append((local, entry["path"]))
 
@@ -68,7 +68,7 @@ def main() -> int:
             print(f"  {name}")
 
     if args.dry_run:
-        print("\n(dry run — nothing uploaded)")
+        print("\n(dry run: nothing uploaded)")
         return 0
 
     if not args.repo_id:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Build ``hf/MANIFEST.json`` — the single source of truth for the HF bundle.
+"""Build ``hf/MANIFEST.json``: the single source of truth for the HF bundle.
 
 Walks the curated file list, hashes each local file, records parquet
 shape, and writes the manifest the downloader (`cluster download --assets`)
@@ -90,7 +90,7 @@ FILES: dict[str, tuple[str, str]] = {
     # --- linear + disentangled arms ------------------------------------------
     "embeddings/pca_64.parquet": (
         "data/embeddings/pca_64.parquet",
-        "PCA 64-d linear baseline (competes with the AE — key result)",
+        "PCA 64-d linear baseline (competes with the AE: key result)",
     ),
     "embeddings/pca_256.parquet": (
         "data/embeddings/pca_256.parquet",
@@ -137,7 +137,7 @@ FILES: dict[str, tuple[str, str]] = {
     ),
     "models/model_dr19.pt": (
         "data/embeddings/model_dr19.pt",
-        "supervised CNN-LSTM-attention checkpoint (DR19) — load with "
+        "supervised CNN-LSTM-attention checkpoint (DR19). Load with "
         "cluster.models.CnnLstmAttention, NOT the masked AE",
     ),
     "models/model.pt": (
@@ -206,7 +206,7 @@ def main() -> None:
         files.append(entry)
 
     manifest = {
-        "dataset": "chemical tagging of star clusters — IAA-SO school 2026",
+        "dataset": "chemical tagging of star clusters. IAA-SO school 2026",
         "generated_from": "iaa-advanced-neural-networks-2026-draft",
         "total_bytes": total,
         "n_files": len(files),
@@ -214,7 +214,7 @@ def main() -> None:
     }
     OUT.write_text(json.dumps(manifest, indent=2) + "\n")
 
-    print(f"wrote {OUT} — {len(files)} files, {total / 1e6:.0f} MB")
+    print(f"wrote {OUT}: {len(files)} files, {total / 1e6:.0f} MB")
     for m in missing:
         print(f"  MISSING (not staged): {m}")
 

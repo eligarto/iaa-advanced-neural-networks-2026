@@ -30,7 +30,7 @@ htmlcov/
 # Ralph loop state
 .ralph/
 
-# LaTeX build artifacts — article/workbook.pdf is the deliverable, these are not.
+# LaTeX build artifacts. article/workbook.pdf is the deliverable, these are not.
 article/*.aux
 article/*.log
 article/*.blg

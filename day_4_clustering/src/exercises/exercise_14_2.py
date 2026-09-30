@@ -1,4 +1,4 @@
-"""Chapter 14, exercise 2 — the linear provenance probe.
+"""Chapter 14, exercise 2: the linear provenance probe.
 
     Reproduce the linear probe of §14.5: fit a logistic regression from a
     256-dimensional latent to a binary flag identifying the data product, and
@@ -6,8 +6,8 @@
     trained on a single product. What is the AUC you would consider acceptable
     before publishing a field-retrieval number?
 
-The probe is :func:`cluster.provenance.provenance_auc` — the module was written
-for this exercise — run three ways: on the mixed latent the disaster was
+The probe is :func:`cluster.provenance.provenance_auc`. The module was written
+for this exercise. Run three ways: on the mixed latent the disaster was
 measured on, on the single-product re-run, and against a permuted-label null
 that shows the AUC is not an artefact of 256 dimensions on ~800 stars. Two of
 those three runs are cheats on the *label*, and the module says which: the
@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 from exercises.citations import cite, reference_list
-from exercises.utils import DataNotAvailable, embedding_path, member_field, members
+from exercises.utils import embedding_path, member_field, members
 
 #: The mixed latent the §14.5 disaster was measured on: DR19 ``apStar`` spectra
 #: for the field plus a DR17 ``aspcapStar`` backfill for members.
@@ -64,7 +64,7 @@ def _embedding(path_name: str) -> pd.DataFrame:
 
 def _members() -> pd.DataFrame:
     """The member frame, one row per star."""
-    members().df  # ensure the shared cache is warm before the fields are used
+    _ = members().df  # ensure the shared cache is warm before the fields are used
     frame = member_field().df
     frame = pd.DataFrame(frame[frame["cluster"] != "field"]).copy()
     frame["APOGEE_ID"] = frame["APOGEE_ID"].astype(str)
@@ -91,7 +91,9 @@ def probe(
     field is a different population".
     """
     from cluster.provenance import (
-        PROVENANCE_AUC_CEILING, provenance_auc, separating_dimensions,
+        PROVENANCE_AUC_CEILING,
+        provenance_auc,
+        separating_dimensions,
     )
 
     frame = _members()
@@ -130,8 +132,8 @@ def probe(
 def physics_control(seed: int = 0) -> dict[str, object]:
     """Can the *stellar parameters* recover the product flag, without a latent?
 
-    The backfilled members are the stars DR19's APO-North star list missed —
-    fainter, hotter, lower-SNR ones — so the label partly encodes physics.
+    The backfilled members are the stars DR19's APO-North star list missed,
+    fainter, hotter, lower-SNR ones, so the label partly encodes physics.
     Two answers are reported. ``univariate`` is the direct ROC AUC of one raw
     parameter against the flag, which is the honest version of "how much of
     the label is this parameter". ``four_parameters`` is the same logistic
@@ -224,7 +226,7 @@ def solve(n_null: int = N_NULL) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The probe AUCs against their permuted nulls and the acceptable ceiling."""
     import matplotlib.pyplot as plt
 
@@ -266,17 +268,17 @@ ANSWER: dict[str, object] = {
         "same matrix gives 0.507 ± 0.042 (95th percentile 0.564), so 0.9997 is "
         "not 256 dimensions memorising 806 stars: it is a real, near-perfect "
         "linear signature of the pipeline that produced the spectrum. The "
-        "chapter's other measured number reproduces too — the one-bit product "
+        "chapter's other measured number reproduces too: the one-bit product "
         "flag alone separates members from field stars at AUC 0.957."
     ),
     "the single-product repeat, and why it cannot be a clean zero": (
-        "On the re-run latent — one product, DR19 mwmStar for every star — the "
+        "On the re-run latent (one product, DR19 mwmStar for every star) the "
         "same label gives AUC 0.9729 ± 0.0141 over 804 member stars (37 of 256 "
         "dimensions separating), against a permuted null of 0.485 ± 0.053. That "
         "looks like the fix failed, and it is not, because the label is no "
         "longer a product label: it is 'was this star in the DR17 backfill "
         "list'. The backfill exists for the members DR19's APO-North star list "
-        "missed, and those are systematically different stars — the three "
+        "missed, and those are systematically different stars: the three "
         "strongest single-parameter signatures of the label are SNR at AUC "
         "0.647, [Fe/H] at 0.408 and Teff at 0.218 (logg 0.253), and a probe on "
         "those four parameters with no latent at all already reaches AUC 0.7966 "
@@ -286,7 +288,7 @@ ANSWER: dict[str, object] = {
         "0.973 sits at it. The mixed latent encodes the product; the re-run "
         "latent encodes the selection. And a single-product probe can never "
         "prove the absence of a product effect, because there is no second "
-        "product inside it to separate — which is exactly why the fix is a "
+        "product inside it to separate, which is exactly why the fix is a "
         "re-run (uniform mwmStar spectra for everything) rather than a caveat."
     ),
     "the AUC to demand before publishing": (
@@ -294,7 +296,7 @@ ANSWER: dict[str, object] = {
         "right kind of answer: below it a member-vs-field score cannot be "
         "dominated by the product, because the product is barely recoverable at "
         "all. Three qualifications the exercise should carry. First, the "
-        "ceiling applies to the members-only probe — on a mixed population the "
+        "ceiling applies to the members-only probe: on a mixed population the "
         "member/field imbalance alone gives the flag AUC 0.957, which the "
         "chapter quotes as the size of the confound rather than as a probe "
         "result. Second, 0.65 is a convention, not a derivation, so the "

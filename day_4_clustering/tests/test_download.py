@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import http.server
 import json
-import subprocess
 import threading
 from pathlib import Path
 from types import SimpleNamespace
@@ -15,7 +14,6 @@ import pytest
 
 from cluster import download as download_module
 from cluster.download import _already_downloaded, download_allstar, stream_to_file
-
 
 # --------------------------------------------------------------------------- #
 # A local HTTP server that speaks Range requests, so the resumable downloader
@@ -246,7 +244,7 @@ def test_download_click_command(monkeypatch: Any) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# Asset bundle (embeddings + checkpoints) — no network, fake Hub
+# Asset bundle (embeddings + checkpoints): no network, fake Hub
 # --------------------------------------------------------------------------- #
 
 
@@ -337,7 +335,7 @@ def test_download_assets_fetches_missing_and_skips_valid(
 
     out = capsys.readouterr().out
     assert "embeddings/a.parquet" in calls and "models/m.pt" in calls
-    assert "MANIFEST.json" not in calls, "the manifest ships with the code — no network"
+    assert "MANIFEST.json" not in calls, "the manifest ships with the code, no network"
     assert "bundle ready" in out
 
     calls.clear()

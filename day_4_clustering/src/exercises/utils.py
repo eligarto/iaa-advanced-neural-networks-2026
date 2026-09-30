@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 
 from cluster import config
-from cluster.clusters import CLUSTERS, CLUSTER_BY_NAME, Cluster
+from cluster.clusters import CLUSTER_BY_NAME, CLUSTERS, Cluster
 from cluster.config import Settings
 from cluster.data import PreparedData, prepare
 
@@ -176,7 +176,7 @@ class MemberData:
         sub = pd.DataFrame(self.df[mask]).reset_index(drop=True)
         return MemberData(df=sub, X=self.X[mask], elements=list(self.elements))
 
-    def __repr__(self) -> str:  # pragma: no cover — display only
+    def __repr__(self) -> str:  # pragma: no cover (display only)
         labels = self.labels
         n_clusters = len({str(c) for c in labels if str(c) != "field"})
         return (
@@ -333,7 +333,7 @@ def _print_entry(key: str, value: Any) -> None:
         width = max((len(str(k)) for k in value), default=0)
         for k, v in value.items():
             print(f"  {str(k):<{width}}  {_fmt(v)}")
-    elif isinstance(value, (list, tuple)) and len(value) > 8:
+    elif isinstance(value, (list, tuple)) and len(value) > 8:  # noqa: UP038 (the tuple form keeps the element type legible to pyrefly)
         print(f"  {type(value).__name__} of {len(value)}: "
               f"{', '.join(_fmt(v) for v in list(value)[:6])}, …")
     elif isinstance(value, str):

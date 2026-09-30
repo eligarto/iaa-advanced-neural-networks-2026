@@ -1,4 +1,4 @@
-"""Chapter 10, exercise 3 — HDBSCAN* min_cluster_size on a fixed t-SNE map.
+"""Chapter 10, exercise 3: HDBSCAN* min_cluster_size on a fixed t-SNE map.
 
     Take the t-SNE embedding of the abundances and run HDBSCAN* with
     min_cluster_size = 5, 15 and 50. Report the number of groups and the
@@ -7,7 +7,7 @@
 
 \\S 10.3's point is that a "t-SNE row" in the workbook's tables is really
 "t-SNE followed by HDBSCAN*", and both steps contribute to the score. This
-exercise holds the first step fixed — one embedding, computed once — and moves
+exercise holds the first step fixed (one embedding, computed once) and moves
 only the second, so the whole spread is attributable to the clusterer. It is
 also the cheapest demonstration of \\S 9.4's rule 5: the number of groups and
 the largest-group fraction move far more than the headline score does.
@@ -130,7 +130,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Score, group count and largest-group fraction against the size floor."""
     import matplotlib.pyplot as plt
 
@@ -163,7 +163,7 @@ ANSWER: dict[str, object] = {
     "the design matters": (
         "The t-SNE map is computed *once* and reused for every size floor. "
         "That is the only way to attribute the spread to HDBSCAN* rather than "
-        "to the embedding — and given §9.3's row-order result, re-embedding "
+        "to the embedding, and given §9.3's row-order result, re-embedding "
         "per setting would have confounded the two sources of variation "
         "completely. Note also that t-SNE with init='pca' is seed-deterministic "
         "here, so quoting a seed spread for this sweep would be quoting zero. "
@@ -184,8 +184,8 @@ ANSWER: dict[str, object] = {
         "Homogeneity falls by 43% from mcs = 5 to mcs = 50 while completeness "
         "mostly *rises*, which is the h/c trade-off of exercise 9.1 playing "
         "out along a hyperparameter: bigger groups are more complete and less "
-        "pure. The group count collapses from 31 — more than the 25 true "
-        "clusters — to 4. Most of the damage is done between 5 and 15."
+        "pure. The group count collapses from 31: more than the 25 true "
+        "clusters: to 4. Most of the damage is done between 5 and 15."
     ),
     "which run is degenerate": (
         "None of the five is flagged by cluster.stability.degeneracy, and that "
@@ -193,8 +193,8 @@ ANSWER: dict[str, object] = {
         "largest group holds ≥ 60% of the stars, and the worst run here peaks "
         "at 33.3% (mcs = 25). Yet the mcs = 25 and mcs = 50 runs return 4 "
         "groups for 25 true clusters, and mcs = 50 sends 32% of the sample to "
-        "noise. Those runs are degenerate in the sense the exercise means — "
-        "they have stopped resolving the structure — while passing the "
+        "noise. Those runs are degenerate in the sense the exercise means: "
+        "they have stopped resolving the structure, while passing the "
         "automated test, because HDBSCAN*'s noise label absorbs the stars that "
         "would otherwise have inflated the largest group. Lesson: a degeneracy "
         "check on largest_fraction alone is defeated by any method with a "
@@ -204,13 +204,13 @@ ANSWER: dict[str, object] = {
     "what the degeneracy looks like in the map": (
         "At mcs = 50 the largest predicted group holds 280 stars and its "
         "composition is the whole story: it contains *sixteen* different true "
-        "clusters, and they are all open clusters — NGC 7789 entire (47/47), "
+        "clusters, and they are all open clusters: NGC 7789 entire (47/47), "
         "NGC 1245 (90%), NGC 6819 (90%), NGC 188 (84%), Collinder 261 (77%), "
         "NGC 1798 (69%), plus fractions of M 67, IC 166, NGC 6791, NGC 2420 "
         "and five more. That is not one cluster with stragglers; it is the "
         "metal-rich open-cluster continent of the map read as a single density "
         "peak. Contrast mcs = 5, where the largest group is 146 stars and is "
-        "recognisably globular — M 3 (58% of it), M 5, M 15, M 13, M 92 — a "
+        "recognisably globular (M 3 (58% of it), M 5, M 15, M 13, M 92) a "
         "real if impure structure. (The open/globular split is the one in the "
         f"standard catalogues, {cite('Dias:02', 'Harris:96', bare=True)}.) "
         "Raising the floor did not merge "
@@ -226,7 +226,7 @@ ANSWER: dict[str, object] = {
         "clusters have 25 members or fewer and NGC 2158 has 6, so mcs = 50 "
         "makes 21 of the 25 clusters unfindable *by construction* before any "
         "data is seen. It is also the one genuinely free parameter of the "
-        f"HDBSCAN* formulation {cite('Campello:13')} — everything "
+        f"HDBSCAN* formulation {cite('Campello:13')}. Everything "
         "else is read off the condensed hierarchy. The workbook's DR17 sweep "
         "found the same lever moving t-SNE recall from 0.087 to 0.404 between "
         "5 and 10 (§12), which is why §12 treats EVoC's lack of a size floor "
@@ -236,7 +236,7 @@ ANSWER: dict[str, object] = {
     ),
     "the reporting rule": (
         "Never print a homogeneity without the group count and the "
-        "largest-group fraction next to it (§9.4 rule 5) — here the score "
+        "largest-group fraction next to it (§9.4 rule 5): here the score "
         "moves by 0.23 while the group count moves by a factor of eight, and "
         "the group count is the more informative number. And state "
         "min_cluster_size in the caption: 'clustered with HDBSCAN*' describes "

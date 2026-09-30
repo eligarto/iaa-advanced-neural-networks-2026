@@ -1,4 +1,4 @@
-"""Chapter 10, exercise 1 — the binary search for sigma_i.
+"""Chapter 10, exercise 1: the binary search for sigma_i.
 
     Implement the binary search for sigma_i in
     \\textbf{Equation~\\ref{eq:perplexity}} that fixes perplexity at a target
@@ -60,7 +60,7 @@ def binary_search_sigma(
 
     Entropy is monotonically *decreasing* in beta: a larger precision means a
     tighter neighbourhood and therefore a lower entropy. So the bracket is
-    updated the opposite way round from the naive reading — this sign is the
+    updated the opposite way round from the naive reading: this sign is the
     one thing people get wrong when they write this by hand.
     """
     target_entropy = float(np.log(target_perplexity))
@@ -145,7 +145,7 @@ def solve(
 
     # A "did it work?" check the scatter plot cannot show: the entropy is
     # equalised, but the *count* of neighbours inside a fixed multiple of
-    # sigma_i is not — that residual is the density the rescaling absorbed.
+    # sigma_i is not: that residual is the density the rescaling absorbed.
     from scipy.spatial.distance import pdist, squareform
 
     distances = squareform(pdist(X))
@@ -195,9 +195,9 @@ def solve(
 def _sklearn_cross_check(
     X: np.ndarray, target_perplexity: float,
 ) -> dict[str, float]:
-    """Compare our P matrix with sklearn's on a small slice — trust, verify."""
-    from sklearn.manifold import _utils
+    """Compare our P matrix with sklearn's on a small slice: trust, verify."""
     from scipy.spatial.distance import pdist, squareform
+    from sklearn.manifold import _utils
 
     small = X[: min(120, len(X))]
     sq = squareform(pdist(small)) ** 2
@@ -215,7 +215,7 @@ def _sklearn_cross_check(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """sigma_i against local density, with the achieved-perplexity check."""
     import matplotlib.pyplot as plt
 
@@ -257,7 +257,7 @@ ANSWER: dict[str, object] = {
         "resulting P matrix is compared element-by-element against "
         "scikit-learn's own ``_binary_search_perplexity`` on a 120-star slice; "
         "the maximum absolute difference is 2.2e-06, which is the float32 "
-        "precision of sklearn's internal representation — the two "
+        "precision of sklearn's internal representation: the two "
         "implementations agree. Reimplementing a library routine is only worth "
         "anything if you diff it against the library, so that check is part of "
         "the answer, not an extra."
@@ -266,7 +266,7 @@ ANSWER: dict[str, object] = {
         "Measured on a 600-star subsample of the 1 002-row member matrix at "
         "perplexity 30: sigma_i runs from 0.139 to 0.371 (median 0.232), a "
         "factor of 2.7 between the tightest and loosest bandwidth, and it "
-        "tracks local density — Spearman correlation 0.85 against the distance "
+        "tracks local density: Spearman correlation 0.85 against the distance "
         "to the 30th nearest neighbour, 0.76 against the mean distance to the "
         "30 nearest, and only 0.41 against the distance to the single nearest. "
         "That ordering is itself informative: the bandwidth responds to the "
@@ -274,7 +274,7 @@ ANSWER: dict[str, object] = {
         "which is exactly what Equation (perplexity) asks for. So yes, the "
         "adaptive bandwidth does what §10.1 says it does."
     ),
-    "the catch — what it costs": (
+    "the catch: what it costs": (
         "Equalising entropy is the same operation as *erasing density*. The "
         "underlying density varies more than the bandwidth compensates for: "
         "the mean distance to a point's 30 nearest neighbours spans 0.341 to "
@@ -282,7 +282,7 @@ ANSWER: dict[str, object] = {
         "the ratio sigma_i / (mean 30-NN distance) still moves between 0.20 "
         "and 0.55 across points. Concretely, the number of neighbours inside "
         "3 sigma_i ranges from 0 to 55 (median 20) and inside 4 sigma_i from 0 "
-        "to 427 (median 87) — the entropy is identical for all of them. That "
+        "to 427 (median 87). The entropy is identical for all of them. That "
         "residual is the formal reason behind caveat (ii) of 'How to read a "
         "t-SNE map': cluster sizes and densities are not readable from the "
         "picture, because the first step of the algorithm normalised them away."
@@ -292,7 +292,7 @@ ANSWER: dict[str, object] = {
         "a chemically homogeneous cluster is precisely a region of C-space "
         "that is denser than the field. t-SNE normalises that away per point "
         "and then asks a density-based clusterer (HDBSCAN*) to find density in "
-        "the output — which is why §10.3 insists that a 't-SNE row' in the "
+        "the output, which is why §10.3 insists that a 't-SNE row' in the "
         "tables is really 't-SNE followed by HDBSCAN*', with both steps "
         "contributing. EVoC (§12) and raw-space kNN purity (§5) keep the "
         "density, which is one reason the workbook reports them alongside."
@@ -301,14 +301,14 @@ ANSWER: dict[str, object] = {
         "Perplexity is not a smoothing knob, it is a statement about the scale "
         "of structure you are looking for: it is the effective number of "
         "neighbours every point is *forced* to have. Set it above a cluster's "
-        "size and the cluster cannot be resolved — its members are compelled "
+        "size and the cluster cannot be resolved: its members are compelled "
         "to spread probability onto non-members. With the DR19 member "
         "population that is a live risk: the default 30 exceeds the total "
         "membership of 14 of the 25 clusters (NGC 188 and M 92 have 25 stars, "
         "NGC 2158 only 6). The original paper "
         f"{cite('vanderMaaten:08')} calls the method 'fairly robust to "
         "changes in the perplexity' and gives typical values between 5 and "
-        "50, but no rule for choosing inside that range — which is why the "
+        "50, but no rule for choosing inside that range, which is why the "
         "value has to be justified per dataset rather than inherited. "
         "Exercise 10.2 sweeps it and shows what happens."
     ),

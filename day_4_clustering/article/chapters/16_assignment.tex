@@ -9,8 +9,8 @@ execute it; everything you need to execute it is in this repository.
 
 \subsection{What you are producing}
 
-One object each --- your assigned cluster --- and one short report. The report
-makes exactly three claims, each with evidence:
+One object each (your assigned cluster) and one short report. The report makes
+exactly three claims, each with evidence:
 
 \begin{enumerate}
 \item \textbf{A membership list} for your cluster, with the criterion stated
@@ -20,10 +20,9 @@ makes exactly three claims, each with evidence:
   (kinematic selection and Simbad memberships), reported as recall
   \emph{and} precision, and with the degenerate cases printed
   (\S\ref{sec:validation}).
-\item \textbf{One physical parameter} derived from the list --- an isochrone
-  age and distance, or a red-clump distance --- with its uncertainty, and a
-  sentence on how the answer would change if your membership were 20\% larger
-  or smaller.
+\item \textbf{One physical parameter} derived from the list (an isochrone age
+and distance, or a red-clump distance) with its uncertainty, and a sentence on
+how the answer would change if your membership were 20\% larger or smaller.
 \end{enumerate}
 
 A report that claims a method is ``better'' without stating the population,
@@ -52,36 +51,22 @@ to cap the field sample; every number quoted in this workbook was produced with
 \centering
 \small
 \tabcolsep4pt
-\begin{tabular}{@{}llll@{}}
-\toprule
-cluster & kind & note & suggested track \\
-\midrule
-M~3 & globular & metal-poor ($-1.6$) & A --- spectral wins \\
-M~5 & globular & & A \\
-M~13 & globular & & A \\
-M~15 & globular & metal-poor ($-2.2$), southern & A or C \\
-M~71 & globular & & A \\
-M~107 & globular & southern (DEC $-13^\circ$) & C \\
-M~92 & globular & metal-poor ($-2.3$) & A \\
-Pleiades & open & young ($0.1$ Gyr); chemistry fails here & A (expect a null) \\
-King~7 & open & sparse, faint & A \\
-Berkeley~71 & open & sparse & A \\
-IC~166 & open & sparse, contaminated & A \\
-NGC~2158 & open & & A \\
-NGC~1245 & open & & A \\
-King~5 & open & & A \\
-NGC~7789 & open & giant-rich ($1.4$ Gyr) & B --- clump \\
-NGC~1798 & open & & A \\
-NGC~2420 & open & & A \\
-NGC~6819 & open & giant-rich; clump residual $+0.01$ & B \\
-M~67 & open & the workhorse; most data to beat & C (or A) \\
-Berkeley~66 & open & sparse & A \\
-NGC~188 & open & old ($7.6$ Gyr) & B \\
-NGC~6791 & open & old, metal-rich ($+0.4$) & B (or A) \\
-Berkeley~17 & open & & A \\
-NGC~2243 & open & the sweet spot: main sequence \emph{and} clump & B or C \\
-Collinder~261 & open & the sweet spot: 214 GALAH members & C \\
-\bottomrule
+\begin{tabular}{@{}llll@{}} \toprule cluster & kind & note & suggested track \\
+\midrule M~3 & globular & metal-poor ($-1.6$) & A (spectral wins \\ M~5 &
+globular & & A \\ M~13 & globular & & A \\ M~15 & globular & metal-poor
+($-2.2$), southern & A or C \\ M~71 & globular & & A \\ M~107 & globular &
+southern (DEC $-13^\circ$) & C \\ M~92 & globular & metal-poor ($-2.3$) & A \\
+Pleiades & open & young ($0.1$ Gyr); chemistry fails here & A (expect a null)
+\\ King~7 & open & sparse, faint & A \\ Berkeley~71 & open & sparse & A \\
+IC~166 & open & sparse, contaminated & A \\ NGC~2158 & open & & A \\ NGC~1245 &
+open & & A \\ King~5 & open & & A \\ NGC~7789 & open & giant-rich ($1.4$ Gyr) &
+B) clump \\ NGC~1798 & open & & A \\ NGC~2420 & open & & A \\ NGC~6819 & open &
+giant-rich; clump residual $+0.01$ & B \\ M~67 & open & the workhorse; most
+data to beat & C (or A) \\ Berkeley~66 & open & sparse & A \\ NGC~188 & open &
+old ($7.6$ Gyr) & B \\ NGC~6791 & open & old, metal-rich ($+0.4$) & B (or A) \\
+Berkeley~17 & open & & A \\ NGC~2243 & open & the sweet spot: main sequence
+\emph{and} clump & B or C \\ Collinder~261 & open & the sweet spot: 214 GALAH
+members & C \\ \bottomrule
 \end{tabular}
 \caption{The 25 clusters and the track each one suggests. Track assignments
 are advisory; the reasons are in the notes and in
@@ -92,13 +77,13 @@ including the literature ages and distances you will be scored against, is in
 \end{table}
 
 Pair up on the open clusters; they are the hard part. Globulars tag cleanly
-already, which makes them a faster and solo-friendly track --- and it is worth
+already, which makes them a faster and solo-friendly track, and it is worth
 asking, while you work on one, why that is (\S\ref{sec:benchmark}: metallicity,
 age and the absence of recent star formation all push in the same direction).
 
 \subsection{The three tracks}
 
-\textbf{Track A --- spectral embeddings.} Compare the 16 abundances with the
+\textbf{Track A: spectral embeddings.} Compare the 16 abundances with the
 256-dimensional spectral latent on your cluster:
 
 \begin{verbatim}
@@ -109,7 +94,7 @@ Best on the metal-poor globulars, where element ratios lose discriminating
 power and the spectrum retains it. Expect a null result on the Pleiades, and
 report it as a result.
 
-\textbf{Track B --- isochrones and the red clump.} Recover age and distance:
+\textbf{Track B: isochrones and the red clump.} Recover age and distance:
 
 \begin{verbatim}
 uv run python scripts/red_clump.py
@@ -120,7 +105,7 @@ Best on the giant-rich open clusters (NGC~6819, NGC~7789). Compare against
 \texttt{src/cluster/literature.py} and be explicit about the age--metallicity
 degeneracy of \S 15.1.
 
-\textbf{Track C --- two surveys.} GALAH main sequence plus APOGEE giants:
+\textbf{Track C: two surveys.} GALAH main sequence plus APOGEE giants:
 
 \begin{verbatim}
 uv run python scripts/build_galah_apogee.py
@@ -134,7 +119,7 @@ be reconciled before the combined fit means anything.
 
 \subsection{Levers you may turn}
 
-One axis at a time, and log the configuration each time --- the sweep in
+One axis at a time, and log the configuration each time: the sweep in
 \textbf{Table~\ref{tab:levers}} was only interpretable because every run
 recorded its settings.
 
@@ -172,12 +157,12 @@ your report. If you used a subsample, say how it was drawn.
 
 \textbf{Empirical care (40\%).} Both referees. Both halves of recall and
 precision. Mean $\pm$ s.d. over at least three seeds for any stochastic step.
-The largest-group fraction printed. A null result reported as a null result ---
-a cluster that chemistry cannot separate is a finding, not a failure.
+The largest-group fraction printed. A null result reported as a null result: a
+cluster that chemistry cannot separate is a finding, not a failure.
 
 \textbf{Physics (20\%).} One parameter with an uncertainty, a comparison with
-the literature value, and an honest statement of the dominant systematic ---
-which in most cases will be your membership list, not your photometry.
+the literature value, and an honest statement of the dominant systematic, which
+in most cases will be your membership list, not your photometry.
 \end{issues}
 
 \begin{issues}[EXERCISES]
@@ -185,10 +170,10 @@ which in most cases will be your membership list, not your photometry.
 \item Write the one-paragraph methods section of your report before you run
   anything: the population, the cuts, the method, the seed, the metrics, the
   referees. If you cannot write it, you are not ready to run.
-\item Take a published tagging result in the field --- a table of members, or a
-  claimed purity --- and try to score it with this workbook's protocol. What
-  information is missing from the paper, and what would you have asked the
-  authors for?
+\item Take a published tagging result in the field (a table of members, or a
+claimed purity) and try to score it with this workbook's protocol. What
+information is missing from the paper, and what would you have asked the
+authors for?
 \item Your cluster is listed with a suggested track. Write two sentences
   arguing for the other track, using only the cluster's properties (age,
   metallicity, declination, richness).

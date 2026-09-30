@@ -8,7 +8,7 @@ feature set that was handed the easier task.
 
 :func:`head_to_head` intersects the ``APOGEE_ID`` sets of every arm first,
 then scores all of them on exactly those stars and those clusters. Rows are
-only comparable when ``n_stars`` and ``n_clusters`` match across them — the
+only comparable when ``n_stars`` and ``n_clusters`` match across them: the
 returned frame always carries both so the reader can check.
 """
 

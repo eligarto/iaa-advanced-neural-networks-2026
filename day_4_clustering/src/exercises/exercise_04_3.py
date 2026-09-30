@@ -1,4 +1,4 @@
-"""Chapter 4, exercise 3 — K=2 asks a different question from K=25.
+"""Chapter 4, exercise 3: K=2 asks a different question from K=25.
 
     K-means with K=2 on our member matrix asks a different question from
     K=25: not "which cluster is this star in" but "which family". Run both
@@ -6,7 +6,7 @@
     support strong chemical tagging, and why is that the wrong number?
 
 \\S 4.6's summary box quotes homogeneity 0.228 at K=2 with completeness
-0.954, and 0.449 at K=25 — the trap being that a reader who wanted an
+0.954, and 0.449 at K=25: the trap being that a reader who wanted an
 optimistic headline would reach for the completeness. This exercise
 reproduces both, adds the seed spread and the chance floor the workbook's
 own \\S 9 demands, and shows what the K=2 split is actually cutting on: it
@@ -188,7 +188,7 @@ def solve(
     return out
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Homogeneity and completeness against K, with the chance floor."""
     import matplotlib.pyplot as plt
 
@@ -228,14 +228,14 @@ ANSWER: dict[str, object] = {
         "summary box actually used (cluster.baseline.baseline_matrix, no row "
         "normalisation) the same protocol gives K=2 homogeneity 0.229 / "
         "completeness 0.954 and K=25 homogeneity 0.459 +- 0.009 / "
-        "completeness 0.492 — and at the box's own single seed 42 it "
+        "completeness 0.492, and at the box's own single seed 42 it "
         "reproduces exactly: 0.2285/0.9545 at K=2 and 0.4490/0.4933 at K=25. "
         "Both conventions are reported here because they differ by far more "
         "than the seed noise, and a number quoted without its matrix "
         "convention is not reproducible."
     ),
     "which number an optimist would quote": (
-        "Completeness at K=2 — 0.954 on the standardised matrix. It is the "
+        "Completeness at K=2: 0.954 on the standardised matrix. It is the "
         "highest number on the whole table and it sounds like 'we recovered "
         "95% of the structure'. It is the wrong number for two independent "
         "reasons. First, completeness measures whether each true cluster's "
@@ -246,7 +246,7 @@ ANSWER: dict[str, object] = {
         "nothing, so completeness at small K is a near-degenerate statistic. "
         "Second, it answers the wrong question: strong tagging is the claim "
         "that you can name the birth cluster, and a two-way split cannot "
-        "name anything — the metric that speaks to that claim is homogeneity "
+        "name anything: the metric that speaks to that claim is homogeneity "
         "(is each found group chemically one cluster?), which at K=2 is "
         "0.188-0.228, the worst on the table."
     ),
@@ -256,7 +256,7 @@ ANSWER: dict[str, object] = {
         "catalogue tells us there are 25 clusters "
         f"({cite('Dias:02', 'Harris:96', bare=True)}), so K=25 hands the "
         "algorithm the answer to the hardest part of the question. And "
-        "homogeneity rises monotonically with K by construction — measured "
+        "homogeneity rises monotonically with K by construction: measured "
         "here: 0.188 at K=2, 0.246 at K=3, 0.338 at K=5, 0.449 at K=10, "
         "0.560 at K=25, 0.614 at K=40, while completeness falls 0.750, "
         "0.630, 0.589, 0.548, 0.500, 0.475 over the same range. You can "
@@ -271,21 +271,21 @@ ANSWER: dict[str, object] = {
         "floors. Shuffling the true labels into groups of the observed sizes "
         "(200 draws, seed 42) gives chance homogeneity 0.0045 (p95 0.0069) "
         "at K=2 and 0.1072 (p95 0.1148) at K=25. So K=2's 0.188 sits 0.18 "
-        "above its floor and K=25's 0.560 sits 0.45 above its — K=25 wins on "
+        "above its floor and K=25's 0.560 sits 0.45 above its: K=25 wins on "
         "the excess too, but note that a naive reading of 0.560 against the "
         "'1/25 = 0.04' intuition overstates it by more than a factor of two. "
         "Always subtract the floor for the partition shape you actually "
         "produced, not the one you intended."
     ),
     "what the K=2 split is really cutting on": (
-        "Not families of birth sites — chemistry's oldest and coarsest axis. "
+        "Not families of birth sites: chemistry's oldest and coarsest axis. "
         "The K=2 partition on the normalised matrix separates 362 of 365 "
         "globular-cluster stars into one group and 547 of 637 open-cluster "
         "stars into the other: accuracy 0.907 against the open/globular "
         "label, homogeneity 0.628 and completeness 0.599 with respect to "
         "cluster *kind*. The two groups have median [Fe/H] of -1.31 and "
         "-0.00. So K-means at K=2 is a 91%-accurate metallicity cut, and it "
-        "touches 22 and 20 of the 25 clusters respectively — no cluster is "
+        "touches 22 and 20 of the 25 clusters respectively, no cluster is "
         "cleanly isolated. That is precisely §1.3's *weak* tagging: grouping "
         "stars into chemical families that share a formation epoch, not "
         "recovering birth sites. The distinction belongs to the chemical "
@@ -309,11 +309,11 @@ ANSWER: dict[str, object] = {
         "Choosing K is choosing the question. K=2 asks 'which chemical "
         "family', K=25 asks 'which birth cluster', and no single score "
         "compares answers to two different questions. §4.3's three "
-        "heuristics pick K without labels — the elbow in J, the silhouette "
+        "heuristics pick K without labels: the elbow in J, the silhouette "
         f"score ({cite('Rousseeuw:87', bare=True)}), and model selection "
         "under a Gaussian mixture fitted by EM "
         f"({cite('Dempster:77', bare=True)}), of which K-means is the "
-        "hard-assignment limit — but none of them can pick the *question*; "
+        "hard-assignment limit, but none of them can pick the *question*; "
         "that is a scientific choice "
         "that has to be made and stated before the clustering runs. The "
         "monotone homogeneity/completeness trade-off measured above is the "

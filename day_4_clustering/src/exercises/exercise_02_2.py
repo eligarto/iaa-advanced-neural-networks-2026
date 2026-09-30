@@ -1,4 +1,4 @@
-"""Chapter 2, exercise 2 — strict complete-case, and a claim that no longer holds.
+"""Chapter 2, exercise 2: strict complete-case, and a claim that no longer holds.
 
     MIN_FINITE_ELEMENTS defaults to 8 of 16. Set it to 16 (strict
     complete-case) and count how many of the 25 clusters survive with at
@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 from exercises.citations import cite, reference_list
-from exercises.utils import DataNotAvailable, settings
+from exercises.utils import settings
 
 #: The floor the exercise asks for: every one of the 16 elements finite.
 STRICT_FLOOR = 16
@@ -166,7 +166,7 @@ def solve(floors: tuple[int, ...] = FLOORS) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Member rows kept against the finite-element floor."""
     import matplotlib.pyplot as plt
 
@@ -212,10 +212,10 @@ ANSWER: dict[str, object] = {
         "sample every single one of their stars already has all 16 elements "
         "finite. Report the measurement, not the expectation. The claim is "
         "very likely true of the DR17 ASPCAP catalogue the project started "
-        f"on {cite('Abdurrouf:22')} — §2.1 notes DR19 "
+        f"on {cite('Abdurrouf:22')}. §2.1 notes DR19 "
         f"{cite('Almeida:23')} reanalyses rather than replaces DR17, and the "
         "Astra pipeline's abundance coverage for metal-poor giants is "
-        "visibly different — but it is not true of the data this workbook "
+        "visibly different, but it is not true of the data this workbook "
         "actually ships, and the chapter text should be corrected or scoped "
         "to the release it came from."
     ),
@@ -228,8 +228,8 @@ ANSWER: dict[str, object] = {
         "356 453 rows have all 16, 34 610 have exactly 2, 6 868 have 0, and "
         "fewer than 2 000 rows sit anywhere in between. Astra either fits "
         "the abundances or it does not. A floor of 8 and a floor of 16 "
-        "therefore select almost the same rows — 89.1% complete against "
-        "89.5% with at least 8 — which is why the lever the chapter treats "
+        "therefore select almost the same rows: 89.1% complete against "
+        "89.5% with at least 8, which is why the lever the chapter treats "
         "as decisive is nearly inert on this release."
     ),
     "the cut that does delete M 15 and M 92": (
@@ -237,7 +237,7 @@ ANSWER: dict[str, object] = {
         "on together with strict complete-case and the sample collapses from "
         "1 002 member rows in 25 clusters to 705 rows in 23: M 15 and M 92 "
         "are gone, exactly the objects §2.3 warns about, and the survivors "
-        "are gutted too — M 3 falls 154 -> 64, M 5 67 -> 40, M 13 34 -> 17, "
+        "are gutted too: M 3 falls 154 -> 64, M 5 67 -> 40, M 13 34 -> 17, "
         "and the Pleiades 23 -> 7. So the chapter's *physics* is right (weak "
         "lines in metal-poor giants are the mechanism, and it is the "
         "metal-poor globulars that pay) while its attribution to the NaN "
@@ -252,7 +252,7 @@ ANSWER: dict[str, object] = {
         f"{cite('Harris:96')}; every "
         "remaining cluster is within about 1.5 dex of solar, so any claim "
         "about tagging 'across metallicity' loses the half of the axis that "
-        "made it interesting, and — per chapter 1's exercise 1 — the "
+        "made it interesting, and (per chapter 1's exercise 1) the "
         "globular/open contrast that the sample mean rests on is thinned "
         "from seven globulars to five. (2) Selection on the outcome. The "
         "stars that survive a strict cut are the ones with the best spectra, "
@@ -261,14 +261,14 @@ ANSWER: dict[str, object] = {
         "an easier problem, and comparing it with a number from the "
         "permissive sample compares two different populations. Measured: "
         "K-means at K=25 gives homogeneity 0.4490 on the 1 002-row default "
-        "and 0.4271 on the 998-row strict sample — a small move here, but "
+        "and 0.4271 on the 998-row strict sample: a small move here, but "
         "the point is that it moved at all from deleting 4 rows."
     ),
     "the methodological rule": (
         "Re-measure inherited claims after a data release changes. This "
         "exercise exists because §2.3 calls the missing-value rule 'the "
         "difference between a sample that contains the interesting objects "
-        "and one that does not' — a strong, checkable, load-bearing claim, "
+        "and one that does not': a strong, checkable, load-bearing claim, "
         "and on DR19 it is false as stated. The claim was not careless; it "
         "was true once. Data-handling defaults carry the fingerprint of the "
         "catalogue they were tuned on, and §2.1's warning that the DR17 to "

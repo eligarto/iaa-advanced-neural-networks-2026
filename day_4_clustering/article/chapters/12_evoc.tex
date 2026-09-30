@@ -1,8 +1,8 @@
-% 12 · EVoC — embedding, density, and persistence in one object
+% 12 · EVoC: embedding, density, and persistence in one object
 \section{EVoC: ONE FIT, THREE STAGES}
 \label{sec:evoc}
 
-\deckslides{slides 43--45 --- the fusion, the pipeline, and why C-space.}
+\deckslides{slides 43--45: the fusion, the pipeline, and why C-space.}
 
 The three methods so far are composed by hand: t-SNE or UMAP produces an
 embedding, then HDBSCAN$^*$ (or a persistence-driven variant of it) produces
@@ -20,7 +20,7 @@ three stages share one objective rather than being tuned against each other.
   built from the raw data with a native metric, the graph is embedded into a
   low-dimensional space by a graph-embedding objective, and the embedded points
   are clustered with a density-based method whose candidate clusterings are
-  scored by persistence. The output is labels --- not a picture.}
+  scored by persistence. The output is labels, not a picture.}
   \label{fig:evocpipeline}
 \end{figure}
 
@@ -54,7 +54,7 @@ artefact of the abundance sum.
 
 \subsection{Stage 2: an embedding for clustering, not for looking at}
 
-The embedding stage optimises a graph-embedding objective --- adjacent nodes
+The embedding stage optimises a graph-embedding objective: adjacent nodes
 close, non-adjacent nodes apart, with the dimension chosen by the algorithm
 rather than by the user. It is worth being explicit about what this is
 \emph{not}. It is not a visualisation; there is no meaningful scatter plot at
@@ -65,19 +65,17 @@ different objective from t-SNE's or UMAP's two-dimensional layout problem.
 This is also where the most common confusion in the literature arises. When a
 paper says ``UMAP followed by HDBSCAN$^*$'', there are two algorithms and
 therefore two independent sources of error; when a paper says ``EVoC'', the
-cluster structure is chosen inside the fit, by persistence, from the same
-graph that the embedding was built on. The distinction is not about quality
-but about where the arbitrary decisions live --- and it is why our benchmark
-reports all three, since each one answers a different question about the same
-data.
+cluster structure is chosen inside the fit, by persistence, from the same graph
+that the embedding was built on. The distinction is not about quality but about
+where the arbitrary decisions live, and it is why our benchmark reports all
+three, since each one answers a different question about the same data.
 
 \subsection{Stage 3: layers, persistence, and no \texttt{min\_cluster\_size}}
 
 The clustering stage produces not one answer but a family of them, indexed by
 scale. Each candidate layer is scored by the total persistence of the clusters
-it contains --- the PLSCAN criterion of \S\ref{sec:plscan} --- and the
-best-scoring layer's labels are returned. Consequences that matter in
-practice:
+it contains (the PLSCAN criterion of \S\ref{sec:plscan}) and the best-scoring
+layer's labels are returned. Consequences that matter in practice:
 
 \begin{itemize}
 \item \textbf{No size floor to set.} The user is never asked for
@@ -87,9 +85,9 @@ practice:
   internal persistence criterion, which is more stable across datasets but
   less inspectable: you cannot see which layers were considered.
 \item \textbf{The number of clusters is an output.} On the field runs, EVoC
-  returns a few dozen groups on average, none of them large --- one of the
-  reasons its recall is high and its precision catastrophic
-  (\textbf{Table~\ref{tab:field}}).
+returns a few dozen groups on average, none of them large: one of the reasons
+its recall is high and its precision catastrophic
+(\textbf{Table~\ref{tab:field}}).
 \item \textbf{The returned layer is a model-selection decision.} Persistence
   is a principled criterion, not a guarantee: if the field and the clusters
   are not separated in the graph's geometry, the best-scoring layer is the one
@@ -108,19 +106,18 @@ seeds on the same 982 stars as the other arms.
 Now the part that took us a while to accept. Two results in the literature
 around this method, and two of ours, all point the same way:
 
-\begin{issues}[WHAT WE HAVE TO SAY AGAINST OUR OWN FAVOURITE]
-\textbf{The seed spread is larger than several of the gaps.} EVoC's
-homogeneity on abundances is $0.420 \pm 0.043$ over seven seeds --- a spread
-that overlaps with the t-SNE and UMAP arms. In the five-cluster head-to-head
-the spread is $\pm0.08$--$0.11$. Any ranking that depends on differences of
-that size is not a ranking.
+\begin{issues}[WHAT WE HAVE TO SAY AGAINST OUR OWN FAVOURITE] \textbf{The seed
+spread is larger than several of the gaps.} EVoC's homogeneity on abundances is
+$0.420 \pm 0.043$ over seven seeds: a spread that overlaps with the t-SNE and
+UMAP arms. In the five-cluster head-to-head the spread is $\pm0.08$--$0.11$.
+Any ranking that depends on differences of that size is not a ranking.
 
-\textbf{The self-supervision claim is a t-SNE/UMAP result, not an EVoC
-result.} On the corrected same-population table, the masked autoencoder scores
-$0.70 \pm 0.08$ against $0.64 \pm 0.08$ for abundances on EVoC ---
-overlapping within errors --- while the \emph{supervised} CNN wins EVoC
-outright at $0.80 \pm 0.03$ on the four-cluster sample. We withdrew the
-sentence that said the abundance-free latent wins everywhere.
+\textbf{The self-supervision claim is a t-SNE/UMAP result, not an EVoC result.}
+On the corrected same-population table, the masked autoencoder scores $0.70 \pm
+0.08$ against $0.64 \pm 0.08$ for abundances on EVoC (overlapping within
+errors) while the \emph{supervised} CNN wins EVoC outright at $0.80 \pm 0.03$
+on the four-cluster sample. We withdrew the sentence that said the
+abundance-free latent wins everywhere.
 
 \textbf{High recall at near-zero precision.} On the all-sky field-retrieval
 task, EVoC recovers $0.557$ of the true members at a precision of $0.0033$:

@@ -25,7 +25,7 @@ from .config import Settings
 DEFAULT_SEEDS: tuple[int, ...] = (42, 0, 1, 2, 7, 13, 99)
 
 #: A partition this concentrated means the clusterer collapsed rather than
-#: found structure — the score is a floor artifact, not a result.
+#: found structure. The score is a floor artifact, not a result.
 DEGENERACY_FRACTION = 0.6
 
 

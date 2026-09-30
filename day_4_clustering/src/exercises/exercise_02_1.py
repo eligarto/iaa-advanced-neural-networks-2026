@@ -1,4 +1,4 @@
-"""Chapter 2, exercise 1 — why row normalisation makes the metrics agree.
+"""Chapter 2, exercise 1: why row normalisation makes the metrics agree.
 
     Take the 16-element vector for one star in the sample. Standardise it and
     then row-normalise it. Show algebraically that after row normalisation
@@ -126,7 +126,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Euclidean against cosine distance, with and without the step."""
     import matplotlib.pyplot as plt
     from scipy.spatial.distance import pdist
@@ -165,7 +165,7 @@ ANSWER: dict[str, object] = {
         "1 - x.y. Substituting: ||x - y||^2 = 2 d_cos, i.e. "
         "d_euclid = sqrt(2 d_cos). Since sqrt is strictly increasing on "
         "[0, inf) and d_cos in [0, 2] here, d_euclid is a strictly monotone "
-        "function of d_cos — it preserves not just the ordering of pairs but "
+        "function of d_cos: it preserves not just the ordering of pairs but "
         "the identity of every rank. Note the standardisation step plays no "
         "part in the proof; it is the *row* normalisation that does the "
         "work. Standardisation matters for a different reason (§2.3 step 4): "
@@ -175,7 +175,7 @@ ANSWER: dict[str, object] = {
     "the numerical check": (
         "Verified on the real 1 002 x 16 matrix over all 501 501 pairs: "
         "max |d_euclid^2 - 2 d_cos| = 2.7e-15 and "
-        "max |d_euclid - sqrt(2 d_cos)| = 1.9e-15 — machine precision, as an "
+        "max |d_euclid - sqrt(2 d_cos)| = 1.9e-15: machine precision, as an "
         "identity should be. Row norms deviate from 1 by at most 3.3e-16. "
         "Spearman's rank correlation between the two distance vectors is "
         "1.000000000000: the orderings are identical, which is the "
@@ -185,7 +185,7 @@ ANSWER: dict[str, object] = {
         "Every method in this workbook starts by building a k-nearest-"
         "neighbour graph, so 'the same geometry' cashes out as 'the same "
         "graph'. Measured: with row normalisation, the Euclidean and cosine "
-        "kNN graphs are identical for 100.00% of stars at k = 5, 15 and 30 — "
+        "kNN graphs are identical for 100.00% of stars at k = 5, 15 and 30: "
         "same neighbour set *and* same neighbour order. Without it, only "
         "6.4% of stars get the same neighbour set at k = 15, and the rank "
         "correlation between the two distance vectors falls to 0.361. So "
@@ -198,7 +198,7 @@ ANSWER: dict[str, object] = {
         f"{cite('vanderMaaten:08')} and UMAP {cite('McInnes:18')} are run on "
         "Euclidean (§2.3, §12). Without row normalisation the three arms "
         "would differ in *metric* as well as in method, so any gap between "
-        "them in the §13 benchmark would be unattributable — you could not "
+        "them in the §13 benchmark would be unattributable. You could not "
         "say whether EVoC lost because its algorithm is worse or because it "
         "was handed a different geometry. After the step the metric "
         "difference is provably nil, so the comparison isolates the "
@@ -207,7 +207,7 @@ ANSWER: dict[str, object] = {
     ),
     "the second reason, which is physical": (
         "Normalising to the unit sphere throws away the *magnitude* of the "
-        "abundance vector and keeps only its direction — the "
+        "abundance vector and keeps only its direction: the "
         "abundance *pattern*. That is the right invariance for chemical "
         "tagging as the programme defines it "
         f"{cite('Freeman:02', 'BlandHawthorn:16')}: two stars from the same "
@@ -225,7 +225,7 @@ ANSWER: dict[str, object] = {
         "it, density-based clustering merges the whole field into one blob "
         "(measured on M 67: recall 1.00 / precision 0.03 without, recall "
         "0.34 / precision 0.12 with). The geometric reason is in the numbers "
-        "above — on the unit sphere all pairwise distances live in "
+        "above: on the unit sphere all pairwise distances live in "
         "[0, sqrt(2)] and the density contrast a clusterer needs survives; "
         "in the unnormalised space a 19x spread in row norm means the "
         "densest region is simply wherever the norms are small."
@@ -233,8 +233,8 @@ ANSWER: dict[str, object] = {
     "the caveat": (
         "Monotone is not the same as equal. d_euclid = sqrt(2 d_cos) is a "
         "*nonlinear* map, so anything that depends on distance ratios or "
-        "differences rather than rank — a fixed DBSCAN epsilon, a kernel "
-        "bandwidth, an absolute silhouette value — still changes between the "
+        "differences rather than rank: a fixed DBSCAN epsilon, a kernel "
+        "bandwidth, an absolute silhouette value: still changes between the "
         "two metrics. What is preserved exactly is the neighbour ordering, "
         "which is what kNN-graph methods consume; the guarantee does not "
         "extend to methods that consume distances directly."

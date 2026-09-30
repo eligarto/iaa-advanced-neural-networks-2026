@@ -1,4 +1,4 @@
-"""Chapter 3, exercise 1 — the concentration of distances.
+"""Chapter 3, exercise 1: the concentration of distances.
 
     Sample n=1000 points uniformly in R^d, compute for each point the ratio
     of the distance to its nearest and to its furthest neighbour, and plot
@@ -23,7 +23,7 @@ DIMENSIONS: tuple[int, ...] = tuple(range(1, 51))
 
 #: "Meaningfully nearer" threshold: the nearest neighbour is no longer
 #: meaningfully nearer once it sits above this fraction of the furthest.
-#: 0.5 is a reading convention, not a theorem — :func:`solve` reports the
+#: 0.5 is a reading convention, not a theorem. :func:`solve` reports the
 #: whole curve so a different convention can be applied to the same numbers.
 MEANINGFUL_RATIO = 0.5
 
@@ -38,7 +38,7 @@ def concentration_curve(
     For each ``d`` the points are drawn uniformly in the unit cube
     :math:`[0,1]^d`; for each point the ratio is
     ``min_j d(i,j) / max_j d(i,j)`` over the other points. Averaged over
-    points, then over seeds — the spread across seeds is returned too, so the
+    points, then over seeds: the spread across seeds is returned too, so the
     curve can be read against its own noise.
     """
     from scipy.spatial.distance import pdist, squareform
@@ -75,7 +75,7 @@ def first_dimension_above(
     return int(above[0]) if above.size else 0
 
 
-def plot(curve: dict[str, np.ndarray] | None = None):  # pragma: no cover — figure
+def plot(curve: dict[str, np.ndarray] | None = None):  # pragma: no cover (figure)
     """Plot the curve; returns the matplotlib figure."""
     import matplotlib.pyplot as plt
 
@@ -117,7 +117,7 @@ ANSWER: dict[str, object] = {
         "The mean nearest/furthest ratio rises monotonically with d. In 1-D "
         "the nearest neighbour is ~1000x closer than the furthest (ratio "
         "0.001); by d=10 it is 0.26, by d=16 it is 0.37, and by d=50 it is "
-        "0.60. Nothing is broken — the points really are uniformly spread. "
+        "0.60. Nothing is broken: the points really are uniformly spread. "
         "What degrades is the *contrast* the algorithms rely on: the rise is "
         "steepest over d=1-10 and then flattens, so most of the damage is "
         "already done by the time you reach a dozen dimensions."
@@ -126,7 +126,7 @@ ANSWER: dict[str, object] = {
         "Under the 0.5 convention the crossing is at d = 30: beyond that, the "
         "nearest neighbour is less than twice as close as the furthest point. "
         "But the number to take away is the shape, not the crossing. At the "
-        "16 dimensions of this workbook's C-space the ratio is already 0.37 — "
+        "16 dimensions of this workbook's C-space the ratio is already 0.37: "
         "the nearest neighbour is under 3x closer than the most distant star "
         "in the sample, against ~1000x in one dimension. There is no sharp d "
         "at which geometry breaks, only a steady erosion, which is why the "

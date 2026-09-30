@@ -32,6 +32,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from headtohead_extras import ARMS  # noqa: E402
+
 from cluster import config  # noqa: E402
 from cluster.baseline import (  # noqa: E402
     _fit_all,
@@ -46,8 +48,6 @@ from cluster.cli import _prepared_for  # noqa: E402
 from cluster.headtohead import Arm, _arm_frame, common_population  # noqa: E402
 from cluster.spectral import ID_COLUMN  # noqa: E402
 from cluster.stability import DEFAULT_SEEDS  # noqa: E402
-
-from headtohead_extras import ARMS  # noqa: E402
 
 N_ORDERS = 8
 METRICS = ("homogeneity", "completeness", "v_measure", "accuracy")
@@ -128,7 +128,7 @@ def main() -> None:
         yp = part["cluster"].to_numpy()
         cm = confusion_matrix_frame(yp, preds[tag])
         suffix = "kin" if use_kin else "chem"
-        title = f"t-SNE — {'abundances + kinematics' if use_kin else 'abundances only'}"
+        title = f"t-SNE: {'abundances + kinematics' if use_kin else 'abundances only'}"
         plot_confusion(cm, outdir / f"confusion_tsne_{suffix}.png", title=title)
         cm.to_csv(outdir / f"confusion_tsne_{suffix}.csv")
         print(f"{label}: t-SNE cluster counts over row orders {dict(counts)}; "

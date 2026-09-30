@@ -4,25 +4,25 @@ Step-by-step to go from the lightsurf RNN to a spectral-embedding benchmark
 in the workshop repo. Training needs a GPU; everything downstream is CPU.
 
 > The training steps below run the **upstream** project (`lightsurf`), which is a
-> separate, private repository — its `scripts/train_embedding_model.py`,
+> separate, private repository: its `scripts/train_embedding_model.py`,
 > `combine_fits.py` and friends are deliberately not shipped here. What this
 > repository ships instead are the **artifacts** they produced: the checkpoints in
 > the Hugging Face bundle, loadable with the vendored `cluster.models`
 > (`uv sync --extra torch`), plus the CPU-side embedding/benchmark code.
 
-## 0. Data (SDSS-V DR19 — updated)
+## 0. Data (SDSS-V DR19: updated)
 
 DR19 replaced the DR17 `aspcapStar` + `mdwarfs_DR17.fits` pair:
 
-* **Spectra** — `apStar` (APOGEE redux 1.3), HDU 1 = flux `(n_rows, 8575)`,
+* **Spectra**: `apStar` (APOGEE redux 1.3), HDU 1 = flux `(n_rows, 8575)`,
   **row 0 = pixel-weighted combined spectrum** (HDU 2 error, HDU 3 mask).
   Exact filename comes from `allStar-1.3-apo25m.fits` column `file`
   (e.g. `apStar-1.3-apo25m-2M00002479+6025311-59830.fits`).
-* **Labels** — `astraAllStarASPCAP-0.6.0.fits.gz` (`[X/H]` abundances, converted
+* **Labels**: `astraAllStarASPCAP-0.6.0.fits.gz` (`[X/H]` abundances, converted
   to `[X/Fe]` by the workshop loader `cluster.data.load_allstar`).
 
 Download apStar (the `allStar-1.3-apo25m.fits` `uri` column holds the exact
-relative path — use it directly; the SAS serves it under `spectro/apogee/`):
+relative path. Use it directly; the SAS serves it under `spectro/apogee/`):
 
 ```bash
 # URL = https://dr19.sdss.org/sas/dr19/ + uri.replace("apogee/spectro", "spectro/apogee", 1)
@@ -30,7 +30,7 @@ relative path — use it directly; the SAS serves it under `spectro/apogee/`):
 # ready-made: scripts/build_dr19_star_list.py + scripts/download_apstar_dr19.py
 ```
 
-Note: the field grouping is **not** `healpix//256` — the `uri` column is the
+Note: the field grouping is **not** `healpix//256`. The `uri` column is the
 only reliable source (it also carries the `{field}/{healpix}` pair).
 
 Build the star-list FITS (columns `APOGEE_ID`, `TEFF`, `LOGG`, `FE_H`,
@@ -39,7 +39,7 @@ Build the star-list FITS (columns `APOGEE_ID`, `TEFF`, `LOGG`, `FE_H`,
 `sdss_id`. Then `lightsurf combine_fits.py` (`extract_flux` already takes
 apStar row 0) produces `flux_abundances.csv` as before.
 
-## 1. On the GPU machine — train + export
+## 1. On the GPU machine: train + export
 
 ```bash
 cd lightsurf
@@ -69,7 +69,7 @@ scp <gpu>:lightsurf/data/embeddings/attention.parquet \
 #  for the benchmark itself)
 ```
 
-## 3. On this machine — benchmark abundances vs embeddings
+## 3. On this machine: benchmark abundances vs embeddings
 
 Both benchmarks now take a `--spectral <parquet>` flag (loads the artifact,
 inner-joins on `APOGEE_ID`, standardises + L2-normalises, and swaps the
@@ -103,7 +103,7 @@ dimension (8-d vs 16-d = a useful denoised compression).
 
 Implemented in lightsurf
 (`src/lightsurf/domain/models/disentangled_ae.py`, 2 smoke tests):
-`DisentangledSpectralAE` — CNN+LSTM encoder → chemical latent `z`;
+`DisentangledSpectralAE`: CNN+LSTM encoder → chemical latent `z`;
 decoder `z + Teff/logg → spectrum`; gradient-reversal head makes `z`
 uninformative about Teff/logg. `loss = MSE(spectrum) + λ · MSE(Teff/logg)`.
 

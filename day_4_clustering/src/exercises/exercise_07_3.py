@@ -1,4 +1,4 @@
-"""Chapter 7, exercise 3 — row normalisation and the "one blob" failure.
+"""Chapter 7, exercise 3: row normalisation and the "one blob" failure.
 
     Run HDBSCAN* on the DR19 member-plus-field matrix with row normalisation
     on and off. Record the number of clusters and the largest cluster
@@ -10,7 +10,7 @@ hierarchy but the space", and \\S 2 calls L2 row normalisation "the single
 biggest precision lever" in the pipeline. This is the measurement behind both
 claims, and it is the one experiment in this chapter that touches the real
 catalogue. The result is unambiguous in one direction and much less flattering
-in the other than the headline suggests — both halves are reported.
+in the other than the headline suggests: both halves are reported.
 """
 
 from __future__ import annotations
@@ -110,7 +110,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Largest-cluster fraction and cluster count, on and off."""
     import matplotlib.pyplot as plt
 
@@ -146,7 +146,7 @@ ANSWER: dict[str, object] = {
     ),
     "which setting is the 'one blob' failure": (
         "normalize_rows=False, unambiguously. 88.9% of all 25 000 stars land "
-        "in a single cluster, and 96.96% of that cluster is field stars — it "
+        "in a single cluster, and 96.96% of that cluster is field stars: it "
         "is the background, relabelled as a discovery. This is exactly the "
         "signature S 6.3 describes for a density threshold set too high for "
         "the background, reproduced here by HDBSCAN* rather than DBSCAN "
@@ -157,7 +157,7 @@ ANSWER: dict[str, object] = {
         "purely because the blob swallowed them."
     ),
     "the precision arithmetic": (
-        "Macro precision is 0.0399 without normalisation and 0.0410 with it — "
+        "Macro precision is 0.0399 without normalisation and 0.0410 with it: "
         "essentially identical, and both terrible. Macro recall is 0.771 "
         "without and 0.229 with. So on this sample, at these settings, row "
         "normalisation *costs* 0.54 in recall and buys 0.001 in precision. "
@@ -171,7 +171,7 @@ ANSWER: dict[str, object] = {
     "why the degeneracy flag is the number that matters": (
         "Precision and recall both lie here, in opposite directions. The "
         "unnormalised run looks *better* on recall (0.771 vs 0.229) and on "
-        "homogeneity (0.098 vs 0.087) and v-measure (0.086 vs 0.041) — every "
+        "homogeneity (0.098 vs 0.087) and v-measure (0.086 vs 0.041): every "
         "conventional score prefers the collapsed partition. Only "
         "largest_fraction exposes it: 0.889 against a 0.6 degeneracy "
         "threshold. This is S 9's central warning made concrete. A clusterer "
@@ -180,7 +180,7 @@ ANSWER: dict[str, object] = {
         "reward it for doing so."
     ),
     "what row normalisation actually buys": (
-        "It breaks the blob — that is the whole of it, and it is enough. "
+        "It breaks the blob. That is the whole of it, and it is enough. "
         "Projecting each star onto the unit sphere makes Euclidean distance "
         "a monotone function of cosine distance, so the comparison becomes "
         "one of abundance *patterns* rather than overall metallicity scale, "
@@ -202,13 +202,13 @@ ANSWER: dict[str, object] = {
         "this workbook: it is the same conclusion reached from APOGEE "
         "abundances and from open-cluster samples "
         f"{cite('GarciaDias:19', 'Casamiquela:21')}. Row normalisation is "
-        "necessary — without it nothing works at all — and nowhere near "
+        "necessary (without it nothing works at all) and nowhere near "
         "sufficient. That is the motivation for S 10-12: change the geometry "
         "first, then let HDBSCAN* work as designed."
     ),
     "reproducibility note": (
         "HDBSCAN* is deterministic given the matrix, so these numbers need "
-        "no seed averaging — but they *are* specific to the 25 000-star FAST "
+        "no seed averaging, but they *are* specific to the 25 000-star FAST "
         "sample (CLUSTER_MAX_STARS=25000). A different field cap changes the "
         "density of the background and therefore every number above. Quote "
         "the sample size with the result, always."

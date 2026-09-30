@@ -2,17 +2,17 @@
 
 Three figures, all computed from the real analysis data:
 
-1. ``headtohead_pca.png`` — a plain linear 2-D view (PCA) of the exact
+1. ``headtohead_pca.png``: a plain linear 2-D view (PCA) of the exact
    55-star head-to-head sample (the intersection the ``cluster head-to-head``
    command uses), left panel in the masked-AE 256-d latent, right panel in
    the 16 ASPCAP abundances. Silhouette scores in the panel titles quantify
    the visual difference without any projection distortion.
 
-2. ``proper_motions.png`` — the kinematic referee: pmRA vs pmDec for every
+2. ``proper_motions.png``: the kinematic referee: pmRA vs pmDec for every
    star in the five cluster fields (grey), with the cluster members
    (magenta) sitting in one compact clump at the cluster's mean motion.
 
-3. ``paired_control.png`` — the product-mismatch paired control: 253 stars
+3. ``paired_control.png``: the product-mismatch paired control: 253 stars
    embedded through both pipelines; the same star lands 1.7x farther from
    itself across products than from a different star within one product.
 
@@ -142,7 +142,7 @@ def fig_headtohead_pca(prepared: PreparedData) -> None:
             m = labels == name
             ax.scatter(Y[m, 0], Y[m, 1], s=58, c=CLUSTER_COLORS[name],
                        label=name, edgecolors="white", linewidths=0.8, zorder=3)
-        ax.set_title(f"{title} — 2-D PCA, silhouette {sil:.2f}", fontsize=11, pad=8)
+        ax.set_title(f"{title}: 2-D PCA, silhouette {sil:.2f}", fontsize=11, pad=8)
         ax.text(0.03, 0.96, tag, transform=ax.transAxes, fontsize=13,
                 fontweight="bold", va="top")
         ax.set_xticks([])
@@ -151,7 +151,7 @@ def fig_headtohead_pca(prepared: PreparedData) -> None:
             s.set_visible(False)
     fig.legend(loc="lower center", ncol=5, frameon=False, fontsize=9,
                bbox_to_anchor=(0.5, -0.02), handletextpad=0.4, columnspacing=1.2)
-    fig.suptitle("Five of the 25 clusters — a plain linear 2-D view of each space",
+    fig.suptitle("Five of the 25 clusters: a plain linear 2-D view of each space",
                  fontsize=13, y=0.99)
     fig.tight_layout(rect=(0, 0.03, 1, 0.94))
     out = DECK / "headtohead_pca.png"

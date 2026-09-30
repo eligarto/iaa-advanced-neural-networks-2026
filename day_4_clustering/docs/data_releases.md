@@ -12,11 +12,11 @@ and the exact column mapping used to migrate.
 | GALAH | DR3 (VizieR `J/MNRAS/506/150`) | DR4 `galah_dr4_allstar_240705.fits` (Data Central) | lowercase columns, built-in Gaia DR3 crossmatch |
 | Gaia | EDR3 (`GAIAEDR3_*` embedded in allStar) | DR3 | embedded in both new catalogs |
 
-## APOGEE DR19 — one file (`astraAllStarASPCAP`)
+## APOGEE DR19: one file (`astraAllStarASPCAP`)
 
 SDSS-V replaced the ASPCAP pipeline with the **Astra** framework. The single
 DR17 allStar (ASPCAP synspec) is now `astraAllStarASPCAP-0.6.0.fits.gz`
-(1.17 GB, 1 095 480 MWM targets — APOGEE + BOSS). It carries stellar params,
+(1.17 GB, 1 095 480 MWM targets: APOGEE + BOSS). It carries stellar params,
 `[X/H]` abundances, Gaia DR3 astrometry/photometry, and quality flags.
 
 Two schema changes matter:
@@ -36,7 +36,7 @@ compares the file against it. As fetched on 2026-09-24, at 1 171 102 556 bytes:
 ```
 
 `cluster doctor --deep` re-hashes both the catalogue and the asset bundle and
-checks them against these records — a size check alone catches a truncated
+checks them against these records: a size check alone catches a truncated
 transfer but not a corrupted one.
 
 ### Column mapping (Astra ASPCAP → internal schema)

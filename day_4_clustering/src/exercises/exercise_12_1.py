@@ -1,4 +1,4 @@
-"""Chapter 12, exercise 1 — why the fused fit is more self-consistent, and why
+"""Chapter 12, exercise 1: why the fused fit is more self-consistent, and why
 the split one is easier to diagnose.
 
     EVoC clusters an embedding built from the graph, and HDBSCAN* clusters
@@ -12,7 +12,7 @@ member matrix and instruments the thing the two sentences turn on: in EVoC
 there is one objective and one seed, so the sources of arbitrary choice are
 enumerable and countable; in t-SNE+UMAP -> HDBSCAN* there are two independent
 stochastic stages, so each stage's contribution to the final answer can be
-attributed separately — which is exactly what \\S 9.3's row-order audit did.
+attributed separately, which is exactly what \\S 9.3's row-order audit did.
 """
 
 from __future__ import annotations
@@ -37,12 +37,13 @@ def fused_fit(
     """EVoC: one fit, one seed, one set of decisions.
 
     Records the number of layers the fit considered and the persistence score
-    of the layer it returned — the internals of ``cluster.layers`` that
+    of the layer it returned: the internals of ``cluster.layers`` that
     \\S 12.3 says the user normally cannot see.
     """
+    from evoc import EVoC
+
     from cluster.baseline import separation_scores
     from cluster.stability import degeneracy
-    from evoc import EVoC
 
     cfg = settings()
     rows = []
@@ -176,7 +177,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Where each pipeline's variability lives."""
     import matplotlib.pyplot as plt
 
@@ -203,14 +204,14 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 
 
 ANSWER: dict[str, object] = {
-    "why EVoC is more self-consistent — three sentences": (
+    "why EVoC is more self-consistent: three sentences": (
         "(1) All three stages of the EVoC fit share one objective: the graph "
         "is built from the "
         "raw representation, the embedding is fitted to that same graph, and "
         "the clustering layers are read off that same embedding, so there is "
         "no point at which a decision made for stage n is invisible to stage "
         "n+1. (2) The number of clusters is an *output* of the fit rather than "
-        "a knob — there is no min_cluster_size to set — so the user is not "
+        "a knob (there is no min_cluster_size to set) so the user is not "
         "asked to supply a parameter whose value silently determines the "
         "answer, which §12.3 identifies as the single knob that most changed "
         "results in the DR17 sweeps. (3) The only free input left is "
@@ -219,11 +220,11 @@ ANSWER: dict[str, object] = {
         "spread is the 'fused_spread' and 'fused_groups_range' entries, with "
         "nothing hidden in a second stage."
     ),
-    "why the split pipeline is easier to diagnose — three sentences": (
+    "why the split pipeline is easier to diagnose: three sentences": (
         "(1) Because the failure is *localisable*: when 't-SNE -> HDBSCAN*' "
         "returns 4 groups for 25 clusters you can hold the embedding fixed, "
         "sweep min_cluster_size, and see whether the collapse is the "
-        "clusterer's doing or the map's — the 'variation_budget' table does "
+        "clusterer's doing or the map's: the 'variation_budget' table does "
         "exactly that and separates a stage-1 range from a stage-2 range. "
         "(2) Each stage has an interpretable output the other does not: the "
         "2-D map can be plotted and inspected for merged continents and "
@@ -235,7 +236,7 @@ ANSWER: dict[str, object] = {
         "so a reader can reproduce them one at a time; EVoC's persistence "
         "criterion is 'less inspectable: you cannot see which layers were "
         "considered' (§12.3), and even when you can reach "
-        "``model.persistence_scores_`` — as this module does — the criterion "
+        "``model.persistence_scores_`` (as this module does) the criterion "
         "still gives you no picture to look at, since §12.2 is explicit that "
         "the embedding is not for looking at."
     ),
@@ -251,13 +252,13 @@ ANSWER: dict[str, object] = {
     "what the instrumentation shows": (
         "solve() measures the free parameters rather than asserting them. "
         "EVoC's four seeds give homogeneity 0.4266, 0.4423, 0.4460 and 0.4774 "
-        "— a range of 0.051 — with the fit considering 3 or 4 candidate layers "
+        ", a range of 0.051: with the fit considering 3 or 4 candidate layers "
         "each time and reporting which one persistence picked. The two-stage "
         "pipeline on the same data has *two* independent knobs: the row order "
         "(four orders, homogeneity 0.0732 to 0.5199, range 0.447) and the size "
         "floor (three values, 0.2945 to 0.5199, range 0.225). Put end to end, "
         "one fitted method's whole uncertainty is 0.05 and the two-stage "
-        "pipeline's is 0.45 then another 0.23 — and they are *separable*, "
+        "pipeline's is 0.45 then another 0.23, and they are *separable*, "
         "which is the diagnostic property. One degree of freedom is not the "
         "same as no variability: EVoC's spread is small here but it is real, "
         "and §12.4's case against the method rests on exactly this number "

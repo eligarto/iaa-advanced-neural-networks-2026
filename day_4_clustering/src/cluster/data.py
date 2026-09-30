@@ -28,7 +28,6 @@ from .clusters import Cluster
 from .config import Settings, astra_h_col
 from .schemas import ABUNDANCE_SCHEMA, ALLSTAR_SCHEMA
 
-
 _ASTRA_BASE = [
     "sdss_id", "sdss4_apogee_id", "gaia_dr3_source_id", "ra", "dec", "snr",
     "flag_bad", "spectrum_flags",
@@ -129,7 +128,7 @@ def _convert_astra(astra_df: pd.DataFrame, elements: list[str]) -> pd.DataFrame:
     gal = c.galactic
     lon = gal.l if gal is not None else None
     lat = gal.b if gal is not None else None
-    if lon is None or lat is None:  # pragma: no cover — never for finite ICRS
+    if lon is None or lat is None:  # pragma: no cover (never for finite ICRS)
         raise ValueError("galactic coordinate transform failed")
     out["GLON"] = np.asarray(lon.deg, dtype=float)
     out["GLAT"] = np.asarray(lat.deg, dtype=float)
@@ -176,7 +175,7 @@ def complete_case(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
 
     With ``settings.impute_missing``, rows keep at least
     ``settings.min_finite_elements`` finite abundances and the remaining NaN
-    are imputed later in :func:`make_matrix` — this keeps metal-poor
+    are imputed later in :func:`make_matrix`. This keeps metal-poor
     globulars (M 15 / M 92) whose weak lines go undetected.
     """
     if settings.impute_missing:
@@ -344,14 +343,14 @@ def _store_prepared(key: str, directory: Path, prepared: PreparedData, meta: dic
     try:
         directory.mkdir(parents=True, exist_ok=True)
         frame = prepared.df.copy()
-        for i, element in enumerate(prepared.elements):
+        for i, _element in enumerate(prepared.elements):
             frame[f"__x{i:02d}"] = prepared.X[:, i]
         frame.to_parquet(directory / f"{key}.parquet", index=False)
         (directory / f"{key}.json").write_text(
             json.dumps({**meta, "elements": list(prepared.elements)}, indent=2, sort_keys=True, default=str)
         )
         print(f"💾 cached the prepared sample ({prepared.X.shape[0]} × {prepared.X.shape[1]}, key {key})")
-    except Exception as exc:  # read-only results/, full disk, parquet quirk — not fatal
+    except Exception as exc:  # read-only results/, full disk, parquet quirk, not fatal
         print(f"⚠ could not cache the prepared sample ({exc})")
 
 
@@ -396,7 +395,7 @@ def prepare(
         if cached is not None:
             print(
                 f"✓ prepared sample from cache ({cached.X.shape[0]} × {cached.X.shape[1]}, "
-                f"key {key}) — CLUSTER_NO_CACHE=1 recomputes"
+                f"key {key}): CLUSTER_NO_CACHE=1 recomputes"
             )
             return cached
 

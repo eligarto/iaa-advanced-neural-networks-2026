@@ -126,7 +126,7 @@ def test_uniform_provenance_mask_selects_one_release() -> None:
 def test_provenance_report_flags_the_confound() -> None:
     rng = np.random.default_rng(3)
     n = 160
-    # members mostly DR17, field entirely DR19 — the real repo's situation
+    # members mostly DR17, field entirely DR19: the real repo's situation
     cluster = np.array(["A"] * 80 + ["field"] * 80, dtype=object)
     source = np.array(["DR17"] * 72 + ["DR19"] * 8 + ["DR19"] * 80)
     X = rng.normal(size=(n, 6))

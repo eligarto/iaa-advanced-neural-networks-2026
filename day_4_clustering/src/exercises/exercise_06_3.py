@@ -1,4 +1,4 @@
-"""Chapter 6, exercise 3 — border points, visit order, and reproducibility.
+"""Chapter 6, exercise 3: border points, visit order, and reproducibility.
 
     Border points within epsilon of two core points of different clusters are
     assigned by visit order in the reference implementation. Find two such
@@ -100,7 +100,7 @@ def dbscan_visit(
     """DBSCAN exactly as Ester et al. (1996) state it, with an explicit order.
 
     A point first marked noise and later met inside a cluster's expansion is
-    reclaimed as a border point of *that* cluster — the "first come, first
+    reclaimed as a border point of *that* cluster: the "first come, first
     served" rule that makes the output order-dependent.
     """
     info = roles(X, eps, min_pts)
@@ -205,7 +205,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot():  # pragma: no cover — figure
+def plot():  # pragma: no cover (figure)
     """The three blobs and the two ambiguous bridge points."""
     import matplotlib.pyplot as plt
 
@@ -236,7 +236,7 @@ ANSWER: dict[str, object] = {
         "merge directly. Every blob point has 5-6 neighbours and is core; p "
         "and q have exactly 3 and are not. Verified by solve(): p is within "
         "eps of core points A3 and B0, q of B3 and C0. Each bridge is "
-        "therefore a border point of two different clusters simultaneously — "
+        "therefore a border point of two different clusters simultaneously: "
         "the configuration S 6.2 says the original paper "
         f"{cite('Ester:96')} leaves undefined."
     ),
@@ -245,7 +245,7 @@ ANSWER: dict[str, object] = {
         "p first and B's reaches q first, giving {A0..A4, p}, {B0..B4, q}, "
         "{C0..C4}. Visiting C first (C, B, A, then p, q), C's expansion takes "
         "q and B's takes p, giving {A0..A4}, {B0..B4, p}, {C0..C4, q}. Same "
-        "points, same eps, same minPts, same algorithm — two different "
+        "points, same eps, same minPts, same algorithm: two different "
         "partitions, confirmed by direct comparison in solve(). The adjusted "
         "Rand index between them is 0.646, so this is not a relabelling: two "
         "of the seventeen points genuinely sit in different clusters."
@@ -253,7 +253,7 @@ ANSWER: dict[str, object] = {
     "what scikit-learn actually does": (
         "scikit-learn "
         f"{cite('Pedregosa:11')} is deterministic for a fixed row order, "
-        "which is what makes this hazard easy to miss — run it twice and you "
+        "which is what makes this hazard easy to miss. Run it twice and you "
         "get the same answer, so it looks reproducible. Shuffle the rows 500 "
         "times and feed the same 17 points back in: solve() finds 4 distinct "
         "partitions. The two 'expected' ones (p with A and q with C, or p and "
@@ -264,7 +264,7 @@ ANSWER: dict[str, object] = {
     ),
     "why it matters for GPU and library comparisons": (
         "A GPU implementation does not do breadth-first search from one seed "
-        "point at a time — it processes many points in parallel and resolves "
+        "point at a time: it processes many points in parallel and resolves "
         "cluster identity by label propagation or union-find, so the "
         "'whichever expansion arrives first' rule is replaced by whichever "
         "thread block finished first, which is not even deterministic run to "
@@ -277,7 +277,7 @@ ANSWER: dict[str, object] = {
         "same clusters' is only meaningful if the row order was also fixed."
     ),
     "how much of the real result is at risk": (
-        "In this toy, 2 of 17 points (12%) are ambiguous — deliberately "
+        "In this toy, 2 of 17 points (12%) are ambiguous: deliberately "
         "engineered. On real data the fraction depends on how much of the "
         "sample sits at cluster edges, and for the DR19 matrix at the "
         "epsilon values of exercise 6.2 the clusters are mostly one giant "

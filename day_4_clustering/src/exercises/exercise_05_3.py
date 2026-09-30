@@ -1,4 +1,4 @@
-"""Chapter 5, exercise 3 — exact versus approximate nearest neighbours.
+"""Chapter 5, exercise 3: exact versus approximate nearest neighbours.
 
     ANN libraries advertise large speedups over exact kNN. Measure the
     disagreement rate between an approximate graph (UMAP's NN-descent) and an
@@ -22,7 +22,7 @@ import pandas as pd
 from exercises.citations import cite, reference_list
 from exercises.utils import SEEDS, member_field
 
-#: Graph size — the pipeline's UMAP/EVoC ``n_neighbors``.
+#: Graph size. The pipeline's UMAP/EVoC ``n_neighbors``.
 K = 15
 
 #: The exercise's subsample size.
@@ -41,7 +41,7 @@ def _subsample(n: int = N_SUBSAMPLE, seed: int = SEEDS[0]) -> tuple[np.ndarray, 
 
 
 def exact_graph(X: np.ndarray, k: int = K) -> tuple[np.ndarray, np.ndarray]:
-    """Brute-force exact kNN — indices and distances, self excluded."""
+    """Brute-force exact kNN: indices and distances, self excluded."""
     from sklearn.neighbors import NearestNeighbors
 
     nn = NearestNeighbors(n_neighbors=k + 1, algorithm="brute").fit(X)
@@ -52,13 +52,13 @@ def exact_graph(X: np.ndarray, k: int = K) -> tuple[np.ndarray, np.ndarray]:
 def approximate_graph(
     X: np.ndarray, k: int = K, seed: int = SEEDS[0],
 ) -> tuple[np.ndarray, np.ndarray]:
-    """NN-descent — the algorithm inside UMAP (pynndescent)."""
+    """NN-descent: the algorithm inside UMAP (pynndescent)."""
     from pynndescent import NNDescent
 
     index = NNDescent(X, n_neighbors=k + 1, metric="euclidean",
                       random_state=seed, n_jobs=1)
     graph = index.neighbor_graph
-    if graph is None:  # pragma: no cover — pynndescent always populates it
+    if graph is None:  # pragma: no cover (pynndescent always populates it)
         raise RuntimeError("NNDescent returned no neighbour graph")
     return np.asarray(graph[0])[:, 1:], np.asarray(graph[1])[:, 1:]
 
@@ -105,8 +105,10 @@ def scaling(sizes: tuple[int, ...] = SIZES, k: int = K) -> pd.DataFrame:
     from sklearn.neighbors import NearestNeighbors
 
     data = member_field()
-    NNDescent(data.X[:500], n_neighbors=k + 1, metric="euclidean",
-              random_state=0, n_jobs=1).neighbor_graph  # warm the JIT
+    # Warm pynndescent's numba JIT so the timings below measure the graph
+    # build, not compilation.
+    _ = NNDescent(data.X[:500], n_neighbors=k + 1, metric="euclidean",
+                  random_state=0, n_jobs=1).neighbor_graph
 
     rows = []
     for n in sizes:
@@ -122,7 +124,7 @@ def scaling(sizes: tuple[int, ...] = SIZES, k: int = K) -> pd.DataFrame:
         t_auto = time.perf_counter() - start
 
         start = time.perf_counter()
-        NNDescent(X, n_neighbors=k + 1, metric="euclidean", random_state=42,
+        _ = NNDescent(X, n_neighbors=k + 1, metric="euclidean", random_state=42,
                   n_jobs=1).neighbor_graph
         t_approx = time.perf_counter() - start
 
@@ -171,7 +173,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Wall-clock against n for exact and approximate construction."""
     import matplotlib.pyplot as plt
 
@@ -196,19 +198,19 @@ ANSWER: dict[str, object] = {
         "Barely wrong. The exact neighbour rule is the classical one "
         f"{cite('Cover:67')}; the question is only what an approximation to "
         "it costs. On a random 5 000-star subsample of the DR19 "
-        "member+field matrix with k=15, NN-descent — the approximate "
-        f"neighbour search UMAP {cite('McInnes:18')} builds its graph with — "
+        "member+field matrix with k=15, NN-descent: the approximate "
+        f"neighbour search UMAP {cite('McInnes:18')} builds its graph with. "
         "recovers 99.3% of the "
-        "exact neighbour sets — a set disagreement of 0.7%, stable across "
+        "exact neighbour sets: a set disagreement of 0.7%, stable across "
         "three seeds (0.0066, 0.0073, 0.0069). Per row, 92.6% of stars get an "
         "exactly correct neighbour set; the remaining 7% typically have one "
         "wrong entry out of fifteen. The positional disagreement is larger, "
         "3.1%, because a swap of two nearly-equidistant neighbours counts as "
-        "two positional errors and zero set errors — quote which one you mean."
+        "two positional errors and zero set errors: quote which one you mean."
     ),
     "how wrong the geometry is": (
         "Much less wrong than the index disagreement suggests. The total "
-        "length of a star's 15 edges is inflated by 2.9e-4 on average — "
+        "length of a star's 15 edges is inflated by 2.9e-4 on average: "
         "three parts in ten thousand. The mistakes NN-descent makes are "
         "substitutions between neighbours at almost identical distances, "
         "which is exactly what you would expect in 16 dimensions where, per "
@@ -218,7 +220,7 @@ ANSWER: dict[str, object] = {
     ),
     "does the clustering result change": (
         "Not measurably. kNN purity at k=10 on the same subsample is 0.1359 "
-        "from the exact graph and 0.1356 from the approximate one — a "
+        "from the exact graph and 0.1356 from the approximate one: a "
         "difference of 0.0003, three orders of magnitude below the "
         "seed-to-seed spread of any embedding in this workbook and far below "
         "the 0.20 swing S 2.3 gets from dropping one cluster. For the "
@@ -231,17 +233,17 @@ ANSWER: dict[str, object] = {
     "the speedup does not exist here": (
         "This is the surprise, and it is the point S 5.3 is making. Measured "
         "with the numba JIT already warm: at n=5 000, brute force takes "
-        "0.034 s and NN-descent 0.127 s — the approximation is about 3.7x "
+        "0.034 s and NN-descent 0.127 s. The approximation is about 3.7x "
         "*slower*. At n=25 000, the full FAST population, it is 0.49 s against "
         "0.78 s, still 1.6x slower. The absolute times move by tens of "
         "percent between runs on a shared machine, but the sign never does: "
         "exact wins at every size this workbook uses (scaling() returned "
         "speedup factors of 0.14, 0.27, 0.33 and 0.63 for n = 2 000 to "
-        "25 000 — all below 1.0). Cold, the first NNDescent call in a process "
+        "25 000: all below 1.0). Cold, the first NNDescent call in a process "
         "costs an extra ~12 s of JIT compilation, which at these sizes dwarfs "
         "the entire exact computation. Note also that sklearn's 'auto' "
         f"({cite('Pedregosa:11', bare=True)}) "
-        "chooses brute force itself at d=16 — the KD-tree/ball-tree "
+        "chooses brute force itself at d=16: the KD-tree/ball-tree "
         "degradation S 5.3 mentions is not hypothetical, the library has "
         "already given up on spatial indices for this dimension."
     ),
@@ -252,7 +254,7 @@ ANSWER: dict[str, object] = {
         "at d=16 is ~1e12 distance evaluations, and there the approximation "
         "is the difference between minutes and hours. The lesson is to "
         "measure the crossover for your own n and d rather than adopting the "
-        "approximation because a library advertises it — at n=5 000 you pay "
+        "approximation because a library advertises it: at n=5 000 you pay "
         "0.7% accuracy for a ~4x slowdown, which is a strictly worse deal "
         "than doing it exactly."
     ),
@@ -260,7 +262,7 @@ ANSWER: dict[str, object] = {
         "Single-threaded (n_jobs=1) on one machine, so the absolute times are "
         "not portable; the ratios and the accuracy numbers are the "
         "transferable part. UMAP does not expose the graph it builds "
-        "directly, so this uses pynndescent — the same NNDescent "
+        "directly, so this uses pynndescent: the same NNDescent "
         "implementation UMAP calls internally, with the same k, which is why "
         "the comparison is fair. The subsample is drawn from member+field, so "
         "it is 96% field stars: purity is correspondingly low (0.136) and "

@@ -1,4 +1,4 @@
-"""Chapter 12, exercise 4 — what does the persistence criterion pick?
+"""Chapter 12, exercise 4: what does the persistence criterion pick?
 
     The persistence criterion selects a clustering layer without user input.
     Construct a two-dimensional dataset with a dense uniform background and
@@ -10,8 +10,8 @@ the field and the clusters are not separated in the graph's geometry, the
 best-scoring layer is the one that splits the field most persistently". This
 module builds the smallest dataset that tests that sentence, reads every layer
 EVoC considered out of ``model.cluster_layers_`` and
-``model.persistence_scores_`` — the internals the chapter says the user cannot
-see — and scores each one against a ground truth only the experimenter has.
+``model.persistence_scores_``: the internals the chapter says the user cannot
+see, and scores each one against a ground truth only the experimenter has.
 The answer is neither of the exercise's first two options.
 """
 
@@ -33,7 +33,7 @@ N_CLUSTER: int = 30
 #: Standard deviation of the planted cluster, against unit-square background.
 CLUSTER_SIGMA: float = 0.012
 
-#: Seeds reported individually — the criterion's answer is stable across them,
+#: Seeds reported individually. The criterion's answer is stable across them,
 #: but the *score* of the layer it picks is not, so averaging would hide the
 #: spread that matters.
 SEEDS_USED: tuple[int, ...] = SEEDS
@@ -65,12 +65,13 @@ def fit_with_layers(
 
     ``node_embedding_dim=2`` is set because EVoC's default label-propagation
     initialisation takes a PCA with ``n_components = 4`` and a 2-D input has
-    only two — the library raises rather than degrading. Lowering the
+    only two: the library raises rather than degrading. Lowering the
     embedding dimension to the input's own rank is the minimum change needed
     to run the experiment at all; every other setting is the workbook default.
     """
-    from cluster.benchmark import _score_one
     from evoc import EVoC
+
+    from cluster.benchmark import _score_one
 
     cfg = settings()
     model = EVoC(node_embedding_dim=2, **cfg.evoc, random_state=seed)
@@ -150,7 +151,7 @@ def solve(seeds: tuple[int, ...] = SEEDS_USED) -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """The dataset, and every layer's persistence against its usefulness."""
     import matplotlib.pyplot as plt
 
@@ -207,11 +208,11 @@ ANSWER: dict[str, object] = {
         f"changed to run at all: ``node_embedding_dim=2``, because the default "
         f"label-propagation initialisation in EVoC {cite('EVoC')} "
         "takes a 4-component PCA and "
-        "a 2-D input has only two — the library raises. Everything else is "
+        "a 2-D input has only two: the library raises. Everything else is "
         "the workbook default. All seven seeds are reported individually."
     ),
     "what the criterion picks": (
-        "The *background*, in its fine-grained form — and the result is "
+        "The *background*, in its fine-grained form, and the result is "
         "unusually clean. Across all seven of the workbook's seeds EVoC "
         "returns layer 1, never layer 0 and never the coarser layers 2 or 3. "
         "That layer has 26-43 groups, its largest group holds 26-52 of 630 "
@@ -226,8 +227,8 @@ ANSWER: dict[str, object] = {
     "the layer that would have worked was never considered": (
         "This is the sharpest part of the answer. The *coarsest* layer (layer "
         "3 where present, layer 2 otherwise) is the one that recovers the "
-        "planted cluster properly — recall 0.60-1.00, i.e. it finds most or "
-        "all 30 stars — at precision 0.103-0.309, because it merges the "
+        "planted cluster properly: recall 0.60-1.00, i.e. it finds most or "
+        "all 30 stars: at precision 0.103-0.309, because it merges the "
         "cluster with a chunk of background. It is never returned: its "
         "persistence is 93-171 against the chosen fine layer's 182-203. And "
         "on seed 7, layer 0 isolates the cluster perfectly (precision 1.000, "
@@ -238,7 +239,7 @@ ANSWER: dict[str, object] = {
     ),
     "why persistence behaves this way": (
         "Persistence measures how long a cluster's basin survives as the "
-        "density threshold rises — contrast *within* the data, not whether the "
+        "density threshold rises: contrast *within* the data, not whether the "
         "structure is the one you wanted. That is the excess-of-mass idea "
         "HDBSCAN* uses to pick clusters out of a density hierarchy "
         f"{cite('Campello:13')}, applied here across a family of scales "
@@ -251,7 +252,7 @@ ANSWER: dict[str, object] = {
         "'best overlap is a best case' arithmetic applied inside the method: a "
         "score summed over structure favours whichever structure there is "
         "most of. It is also exactly §12.3's stated failure mode, reproduced "
-        "on a dataset where the answer is known — 'if the field and the "
+        "on a dataset where the answer is known: 'if the field and the "
         "clusters are not separated in the graph's geometry, the best-scoring "
         "layer is the one that splits the field most persistently'."
     ),
@@ -261,7 +262,7 @@ ANSWER: dict[str, object] = {
         "represents is the *finest scale at which the background is "
         "resolvable*: it is not trying to describe the field as one object "
         "(layer 0, persistence 0, one group) nor to summarise it coarsely. It "
-        "is a real, high-persistence partition of a real density tree — of the "
+        "is a real, high-persistence partition of a real density tree: of the "
         "noise. EVoC is answering its own question correctly; it is simply not "
         "the question the exercise asked, and nothing in its output "
         "distinguishes the two. Precision 0.578 looks respectable next to the "
@@ -270,14 +271,14 @@ ANSWER: dict[str, object] = {
     ),
     "the shape of the failure, and what to do": (
         "Two things make it invisible to the user. (1) There is no "
-        "min_cluster_size to blame and no parameter to re-tune — §12.3's "
+        "min_cluster_size to blame and no parameter to re-tune: §12.3's "
         "genuine advantage becomes a genuine difficulty here, because there is "
         "nothing to turn down. (2) The returned labels look entirely normal: "
         "finite, complete, with a few dozen groups and some noise. Three "
         "diagnostics fix that, all cheap. *Read the layers*: "
         "``model.cluster_layers_`` and ``model.persistence_scores_`` are "
         "reachable after every fit, and the table above was built from them in "
-        "a dozen lines — a chosen layer with a large dominant group and a "
+        "a dozen lines: a chosen layer with a large dominant group and a "
         "low-scoring fine layer is the signature. *Compare against the base "
         "rate*: report members-per-group divided by the sample's membership "
         "fraction, not the raw precision, which here is a respectable-looking "
@@ -293,7 +294,7 @@ ANSWER: dict[str, object] = {
         "25 000-star field sample, running the workbook's default EVoC "
         "configuration returns only a handful of groups holding thousands of "
         "stars each, whose membership fraction is inflated relative to the "
-        "base rate by a factor of a few rather than by orders of magnitude — "
+        "base rate by a factor of a few rather than by orders of magnitude: "
         "the groups are mostly field, exactly as the criterion above predicts. "
         "See exercise 12.3 for the measured purity distribution. The two "
         "experiments together are the honest case against the workbook's own "

@@ -1,4 +1,4 @@
-"""Chapter 7, exercise 2 — the stability score and what it rewards.
+"""Chapter 7, exercise 2: the stability score and what it rewards.
 
     Compute the stability score of Equation 5 for a two-branch tree in
     which one branch contains 100 points that survive two decades of lambda
@@ -146,7 +146,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot():  # pragma: no cover — figure
+def plot():  # pragma: no cover (figure)
     """Stability of both branches under both readings, side by side."""
     import matplotlib.pyplot as plt
 
@@ -169,10 +169,10 @@ def plot():  # pragma: no cover — figure
 ANSWER: dict[str, object] = {
     "the formula": (
         "S(C) = sum over x in C of (lambda_x - lambda_birth(C)), with lambda "
-        "= 1/d_mreach — the stability, or relative excess of mass, that "
+        "= 1/d_mreach: the stability, or relative excess of mass, that "
         f"HDBSCAN* selects branches by {cite('Campello:13')}. When every "
         "member of a branch falls out at the same "
-        "density — the clean case the question describes — this collapses to "
+        "density (the clean case the question describes) this collapses to "
         "n * (lambda_death - lambda_birth). Note what that means "
         "dimensionally: stability is points times inverse distance. It is "
         "*not* a lifetime, and it is not normalised by cluster size; a big "
@@ -187,22 +187,22 @@ ANSWER: dict[str, object] = {
         "answer to this exercise that does not state which reading it uses "
         "is incomplete."
     ),
-    "reading 1 — siblings, same lambda_birth": (
+    "reading 1: siblings, same lambda_birth": (
         "If both branches split off the same parent they share "
         "lambda_birth. Taking lambda_birth = 1: A dies at 10^2, so S(A) = "
         "100 * (100 - 1) = 9 900. B dies at 10^5, so S(B) = 10 * (100 000 - "
-        "1) = 999 990. B wins by a factor of 101.0 — and that factor is "
+        "1) = 999 990. B wins by a factor of 101.0, and that factor is "
         "independent of lambda_birth (checked at 0.1, 1 and 10: always "
         "101.01), because both stabilities scale linearly with it. The "
         "break-even is brutal: B would tie A with 0.099 points. A single "
         "point surviving five decades outscores a hundred points surviving "
         "two. HDBSCAN* prefers B, emphatically."
     ),
-    "reading 2 — both absorbed at the same lambda_death": (
+    "reading 2: both absorbed at the same lambda_death": (
         "If the two branches are eaten by the *same* rising density "
         "threshold they share lambda_death. Taking lambda_death = 100: A was "
         "born at 1, so S(A) = 100 * 99 = 9 900; B was born at 0.001, so S(B) "
-        "= 10 * 99.999 = 1 000. Now A wins, by a factor of 9.90 — and again "
+        "= 10 * 99.999 = 1 000. Now A wins, by a factor of 9.90, and again "
         "the factor is scale-free (identical at lambda_death = 1 000). The "
         "swing between the two readings is a factor of a thousand in the "
         "ratio, from B winning 101:1 to A winning 9.9:1."
@@ -210,7 +210,7 @@ ANSWER: dict[str, object] = {
     "which way does it really go in HDBSCAN": (
         "Reading 1 is the one that matches the algorithm's selection step, "
         "because stability is only ever *compared* between a parent and its "
-        "own children — branches that by construction share a birth level. "
+        "own children: branches that by construction share a birth level. "
         "So the effective answer is that HDBSCAN* strongly prefers the "
         "long-lived branch, and the 'survives five decades' branch wins even "
         "though it has a tenth of the points. That is the intended "
@@ -223,7 +223,7 @@ ANSWER: dict[str, object] = {
         "long-lived group of 10 over a diffuse group of 100 is exactly what "
         "you want for chemical tagging: NGC 2158 has 6 members in this "
         "sample and should not be outvoted by a loose 100-star field "
-        "overdensity. But the 1/d weighting is aggressive — because lambda "
+        "overdensity. But the 1/d weighting is aggressive, because lambda "
         "is an inverse distance, the last half-decade of a branch's life "
         "contributes more stability than all the rest put together, so the "
         "score is dominated by a cluster's densest core rather than by its "
@@ -242,7 +242,7 @@ ANSWER: dict[str, object] = {
         "min_cluster_size=10, and compares with the library. The hand "
         "computation gives raw sums in the hundreds to thousands while "
         "hdbscan's cluster_persistence_ reports a normalised lambda range "
-        "(0.125, 0.606, 0.638), so the magnitudes differ by construction — "
+        "(0.125, 0.606, 0.638), so the magnitudes differ by construction: "
         "the check is that both identify the same three branches as the "
         "selected clusters, and the diffuse blob scores lowest in both. If "
         "you quote a stability number, say whether it is the raw sum of "

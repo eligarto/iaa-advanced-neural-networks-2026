@@ -1,16 +1,16 @@
-"""Chapter 15, exercise 3 — contamination bias has a sign.
+"""Chapter 15, exercise 3: contamination bias has a sign.
 
     Construct a synthetic cluster with 10% young field stars added, fit it with
     the same machinery, and compare the recovered age with the truth. Repeat
     with old contaminants. Which is the larger effect, and why?
 
-The pair of tests — a clean cluster and a contaminated one drawn from the same
-seeds — is what makes this measurable at all: the *difference* between the two
+The pair of tests: a clean cluster and a contaminated one drawn from the same
+seeds: is what makes this measurable at all: the *difference* between the two
 fits is a paired statistic whose seed-to-seed scatter is far smaller than the
 scatter of either fit alone, so a 10% contamination is resolvable even though
 the fit's own systematic error is 20-30 times larger than the effect. The
-measured signs are the ones the physics predicts — young contaminants pull the
-age down, old ones push it up — and the measured sizes are small: at 10% the
+measured signs are the ones the physics predicts: young contaminants pull the
+age down, old ones push it up, and the measured sizes are small: at 10% the
 age moves by 0.02 Gyr on a 2 Gyr cluster, against a clean-fit systematic of
 0.24 Gyr at the same distance and extinction. Both halves of that sentence
 belong in a report, because the second is what tells you contamination is not
@@ -27,7 +27,7 @@ import pandas as pd
 from exercises.citations import cite, reference_list
 from exercises.utils import DataNotAvailable
 
-#: Synthetic cluster: the chapter's §15.3 case study shape — a young open
+#: Synthetic cluster: the chapter's §15.3 case study shape. A young open
 #: cluster at 2 Gyr, solar metallicity, dm = 11, Av = 0.15 (log-age 9.302).
 MET = 0.0168
 DM = 11.0
@@ -44,7 +44,7 @@ N_STARS = 400
 #: Age grid: 0.02 dex, five times finer than the PARSEC grid's own step, so the
 #: recovered mode is not quantised to a grid node.
 LOGA_GRID = np.arange(8.4, 10.101, 0.02)
-#: The contaminants, as (label, log age, name) — a young field population
+#: The contaminants, as (label, log age, name). A young field population
 #: (0.1 Gyr) and an old one (8 Gyr) put into the same cluster.
 CONTAMINANTS: tuple[tuple[str, float], ...] = (("young (0.1 Gyr)", 8.0), ("old (8 Gyr)", 9.903))
 #: Admixture fractions, by number of contaminant stars as a fraction of the
@@ -57,7 +57,7 @@ DEFAULT_SEEDS: tuple[int, ...] = tuple(range(1, 21))
 
 
 #: Cached ASteCA objects. Re-reading the 400-isochrone grid costs ~1 s, and
-#: the experiment performs a hundred fits, so it is built once per process —
+#: the experiment performs a hundred fits, so it is built once per process,
 #: inside solve(), never at import time.
 _ASSETS: list[Any] = []
 
@@ -70,7 +70,11 @@ def _assets() -> tuple[Any, Any]:
     import asteca
 
     from cluster.isochrone import (
-        _COLOR, _COLOR_EFFL, _MAG, _MAG_EFFL, ensure_isochrones,
+        _COLOR,
+        _COLOR_EFFL,
+        _MAG,
+        _MAG_EFFL,
+        ensure_isochrones,
     )
 
     try:
@@ -113,7 +117,7 @@ def synthetic_cluster(
 
     Returns an (n, 2) array of (G, BP-RP). The sampling loop draws from the
     isochrone until enough stars survive the magnitude cut, so a faint
-    contaminant population needs more draws than a bright one — which is the
+    contaminant population needs more draws than a bright one, which is the
     real selection effect the exercise is about.
     """
     synth = _synthetic("sampler", seed=seed)
@@ -194,8 +198,8 @@ def contamination_experiment(
     For each seed the clean cluster is drawn once and reused by every
     contaminant arm, so the columns ``delta_loga`` and ``delta_age`` are
     per-seed paired differences against that seed's own clean fit. ``n_sigma``
-    is the paired mean over the *standard error of that mean* — the paired s.d.
-    divided by the square root of the seed count — because that is the quantity
+    is the paired mean over the *standard error of that mean*: the paired s.d.
+    divided by the square root of the seed count, because that is the quantity
     that says whether a 10% admixture is detectable; ``paired_sd`` is the
     per-seed scatter, reported separately since the two answer different
     questions and quoting the wrong one is how a small effect gets dismissed.
@@ -271,7 +275,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Age shift against contamination fraction, for the two signs."""
     import matplotlib.pyplot as plt
 
@@ -291,7 +295,7 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
                label=f"clean fit's own bias ({clean_bias:+.2f} Gyr)")
     ax.set_xlabel("contaminant fraction")
     ax.set_ylabel("age shift vs the matched clean fit (Gyr)")
-    ax.set_title("Contamination bias has a sign — and a size")
+    ax.set_title("Contamination bias has a sign, and a size")
     ax.legend(frameon=False, fontsize=8)
     fig.tight_layout()
     return fig
@@ -301,7 +305,7 @@ ANSWER: dict[str, object] = {
     "what was run": (
         "A synthetic cluster on the PARSEC solar grid: 400 stars drawn from an "
         "isochrone at log age 9.302 (2.005 Gyr), Z = 0.0168, dm = 11.0, "
-        "Av = 0.15, with 0.08 dex of intrinsic age spread, cut at G < 17 — the "
+        "Av = 0.15, with 0.08 dex of intrinsic age spread, cut at G < 17: the "
         f"same machinery as the real fits (ASteCA {cite('Perren:15', bare=True)} "
         "generate/likelihood, posterior "
         "weights exp(-distance), the same five-metallicity grid). Each seed "
@@ -315,8 +319,8 @@ ANSWER: dict[str, object] = {
     "the sign, measured": (
         "Young contaminants pull the age down and old ones push it up, at every "
         "fraction tested, and both signs are stable across the 20 seeds. At "
-        "10%: young field stars give Δ(log age) = -0.0182 dex — 1.716 Gyr "
-        "against the matched clean fit's 1.789, a shift of -0.073 Gyr — while "
+        "10%: young field stars give Δ(log age) = -0.0182 dex. 1.716 Gyr "
+        "against the matched clean fit's 1.789, a shift of -0.073 Gyr, while "
         "old field stars give +0.0029 dex, i.e. +0.012 Gyr. Scored against the "
         "standard error of the paired mean (the right denominator: the per-seed "
         "scatter is 0.006-0.011 dex, but it shrinks by sqrt(20)), the young "
@@ -330,10 +334,10 @@ ANSWER: dict[str, object] = {
         "Young contaminants, and by a wide margin at the fraction the exercise "
         "asks about: the ratio of the young shift to the old shift is 6.1x at "
         "10%, 4.4x at 30% and 2.2x at 50%. The two arms behave differently with "
-        "fraction as well — the young effect saturates (-0.0182, -0.0236, "
+        "fraction as well: the young effect saturates (-0.0182, -0.0236, "
         "-0.0265 dex for 10/30/50%, approaching a limit) while the old effect "
         "grows roughly linearly (+0.0029, +0.0052, +0.0117). The reason is "
-        "where the two populations sit in the CMD — the geometry a synthetic-CMD "
+        "where the two populations sit in the CMD: the geometry a synthetic-CMD "
         f"fitter reads {cite('Perren:15')}: the 0.1 Gyr contaminants are "
         "bluer and brighter than a 2 Gyr cluster's own turnoff, so they extend "
         "the exact feature the age is read from, and once they have pushed the "
@@ -348,13 +352,13 @@ ANSWER: dict[str, object] = {
         "The clean fit is itself biased: 1.789 Gyr against the truth of 2.005, "
         "i.e. -0.216 Gyr, because the G < 17 limit truncates the lower main "
         "sequence while dm and Av are fixed at the truth. Ten per cent "
-        "contamination moves the young arm by 0.073 Gyr — a third of the fit's "
-        "own systematic error and 3.6% of the age itself — and the old arm by "
+        "contamination moves the young arm by 0.073 Gyr: a third of the fit's "
+        "own systematic error and 3.6% of the age itself, and the old arm by "
         "0.012 Gyr, about a half of one per cent. Two honest consequences: "
         "(i) a report that worries about 10% contamination while quoting a "
         "fitted age with no systematic-error budget is worrying about the "
         "wrong term, though by a factor of only three for a young cluster; "
-        "(ii) the paired design is what makes the small effect visible at all — "
+        "(ii) the paired design is what makes the small effect visible at all: "
         "comparing two runs with different seeds would have buried a 0.07 Gyr "
         "shift under 0.3 Gyr of seed scatter per arm."
     ),
@@ -382,7 +386,7 @@ ANSWER: dict[str, object] = {
         "lets the fit trade one parameter against the other, and the direction "
         "of the residual age error depends on which parameter is held. That is "
         "§15.2's degeneracy as a concrete number, and it is why this exercise "
-        "fixes dm — a contamination experiment that lets the distance float is "
+        "fixes dm: a contamination experiment that lets the distance float is "
         "measuring the degeneracy, not the contamination."
     ),
     "what would change the answer": (

@@ -1,4 +1,4 @@
-"""Chapter 11, exercise 3 — the min_dist sweep.
+"""Chapter 11, exercise 3: the min_dist sweep.
 
     min_dist changes the appearance of the map without changing the graph.
     Using a fixed embedding, vary min_dist over {0.0, 0.1, 0.5, 1.0} and
@@ -9,7 +9,7 @@
 The preface states a proposition the result can falsify: min_dist is "
 how tightly points may pack in the layout", and §11.3's margin note says it "
 changes the appearance of density, not the structure found". This module
-tests that by measuring three things — the graph, which must be invariant, the
+tests that by measuring three things: the graph, which must be invariant, the
 fitted curve parameters (a, b), which must move, and the downstream score,
 which is the open question. The answer is that the proposition is false as
 stated, and the failure is instructive.
@@ -28,7 +28,7 @@ MIN_DIST_VALUES: tuple[float, ...] = (0.0, 0.1, 0.5, 1.0)
 
 #: Seeds per value. min_dist changes the layout's stochastic path, so unlike
 #: the perplexity sweep of exercise 10.2 there is genuine seed variation here
-#: *and* row-order variation — this module uses seeds and says so.
+#: *and* row-order variation. This module uses seeds and says so.
 N_SEEDS: int = 4
 
 #: Neighbourhood size for the parameter-free companion score.
@@ -46,7 +46,7 @@ def graph_parameters(min_dist: float, spread: float = 1.0) -> tuple[float, float
 def check_graph_is_invariant(X: np.ndarray, k: int = 15) -> dict[str, float]:
     """The premise of the exercise: min_dist must not touch the graph.
 
-    ``fuzzy_simplicial_set`` — the whole high-dimensional half of UMAP — takes
+    ``fuzzy_simplicial_set`` (the whole high-dimensional half of UMAP) takes
     no min_dist argument. Two builds with the same seed and k are compared
     element-wise to confirm there is nothing hidden.
     """
@@ -109,7 +109,7 @@ def layout_on_fixed_graph(
     X: np.ndarray, min_dist: float, k: int = 15, seed: int = 42,
     n_epochs: int = 500, init: str = "spectral",
 ) -> np.ndarray:
-    """Lay out ONE graph under ONE (a, b) — the exercise's fixed-embedding test.
+    """Lay out ONE graph under ONE (a, b): the exercise's fixed-embedding test.
 
     The graph is built once from ``X`` and passed unchanged to
     ``simplicial_set_embedding``; only the low-dimensional kernel parameters a
@@ -202,7 +202,7 @@ def solve(
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Both scores against min_dist, with per-seed points."""
     import matplotlib.pyplot as plt
 
@@ -234,9 +234,9 @@ def plot(result: dict[str, object] | None = None):  # pragma: no cover — figur
 
 ANSWER: dict[str, object] = {
     "the premise, verified": (
-        "``fuzzy_simplicial_set`` — UMAP's entire high-dimensional half, which "
+        "``fuzzy_simplicial_set``: UMAP's entire high-dimensional half, which "
         "builds and symmetrises the fuzzy graph "
-        f"{cite('McInnes:18')} — does not take a min_dist "
+        f"{cite('McInnes:18')}. Does not take a min_dist "
         "argument at all, and two builds with the same seed and k are "
         "element-wise identical (20 472 edges, maximum absolute difference "
         "0.0). So the graph really is invariant: what min_dist changes is the "
@@ -256,7 +256,7 @@ ANSWER: dict[str, object] = {
         "      0.1    0.521 ± 0.016    0.372 ± 0.005    35.3    0.272\n"
         "      0.5    0.400 ± 0.080    0.347 ± 0.007    21.0    0.333\n"
         "      1.0    0.329 ± 0.065    0.316 ± 0.006    13.8    0.410\n\n"
-        "  (B) ONE graph, one seed, one initialisation, one epoch count —\n"
+        "  (B) ONE graph, one seed, one initialisation, one epoch count, \n"
         "      only (a, b) varies (simplicial_set_embedding):\n"
         "    min_dist  homogeneity      knn purity     groups  largest_frac\n"
         "      0.0    0.570 ± 0.005    0.372 ± 0.003    48.8    0.042\n"
@@ -269,7 +269,7 @@ ANSWER: dict[str, object] = {
         "from ~50 to ~13 (against 25 true clusters), and the largest-group "
         "fraction goes from 4% to 45-47%. The parameter-free companion agrees "
         "in direction and also under fixed-graph conditions: kNN purity falls "
-        "monotonically 0.372 -> 0.317. So this is not a clusterer artefact — "
+        "monotonically 0.372 -> 0.317. So this is not a clusterer artefact: "
         "the *layout itself* gets worse at keeping chemical neighbours "
         "together as min_dist grows."
     ),
@@ -279,7 +279,7 @@ ANSWER: dict[str, object] = {
         "more than most of the method-to-method gaps the workbook quotes: the "
         "0.570 -> 0.300 range spans the entire distance between the abundances "
         "arm and the masked-AE arm "
-        f"({cite('He:22', bare=True)} for the masked-autoencoder recipe) — "
+        f"({cite('He:22', bare=True)} for the masked-autoencoder recipe). "
         "and experiment (B) establishes that the "
         "effect survives every control a sceptic would ask for, because the "
         "graph, the seed, the initialisation and the epochs were all held "
@@ -296,9 +296,9 @@ ANSWER: dict[str, object] = {
     ),
     "the nuance in UMAP's favour": (
         "One part of the claim survives. For min_dist = 0.0 and 0.1 the "
-        "neighbourhoods in the *map* are nearly the same — kNN purity 0.379 "
+        "neighbourhoods in the *map* are nearly the same: kNN purity 0.379 "
         "against 0.372, and under the fixed-graph protocol 0.372 against "
-        "0.368, both inside the seed spread — and yet the group counts are 50 "
+        "0.368, both inside the seed spread, and yet the group counts are 50 "
         "and 35. So for small values, min_dist is indeed mostly changing how "
         "tightly the same structure is packed, and the downstream clusterer is "
         "what turns that into a different answer. The strong version of the "
@@ -310,15 +310,15 @@ ANSWER: dict[str, object] = {
     ),
     "does that undercut UMAP maps as evidence": (
         "It undercuts them as *standalone* evidence and leaves them fine as "
-        "illustration — the distinction §10.1 already draws for the t-SNE "
+        "illustration: the distinction §10.1 already draws for the t-SNE "
         "caveats. Three consequences. (1) A UMAP figure must name min_dist "
         "and n_neighbors, because 'a UMAP of the data' now denotes four "
         "visibly different analyses. (2) A clustering result computed on a "
         "UMAP map must be reported with the map's parameters *and* a "
         "parameter-free score, since the tuned score is what moves; here the "
         "kNN purity column is what tells you the sweep is degrading rather "
-        "than rearranging. (3) The tempting move — pick min_dist = 0.0 because "
-        "it gives the highest homogeneity — is §9.3's failure mode 4, tuning "
+        "than rearranging. (3) The tempting move. Pick min_dist = 0.0 because "
+        "it gives the highest homogeneity: is §9.3's failure mode 4, tuning "
         "on the score you then publish, and here it is unusually easy to spot "
         "because the group count it buys (about 50 for 25 clusters) is "
         "obviously a fragmentation."
@@ -326,7 +326,7 @@ ANSWER: dict[str, object] = {
     "what I would actually do": (
         "Keep the pipeline default min_dist = 0.1. It sits at the knee: "
         "homogeneity 0.521 ± 0.016, kNN purity 0.372, 35 groups, largest-group "
-        "fraction 0.272 — inside "
+        "fraction 0.272: inside "
         "the non-degenerate band. And note that the *selection* itself needs "
         "the §9.4 protocol, not a single seed: the ±0.065 spread at "
         "min_dist = 1.0 is larger than the gap between min_dist = 0.0 and 0.1, "

@@ -64,7 +64,7 @@ _NAME = re.compile(r"^exercise_(\d{2})_(\d+)$")
 
 
 def module_name(chapter: int, number: int) -> str:
-    """``(4, 2) -> 'exercise_04_2'`` — the workbook's own numbering."""
+    """``(4, 2) -> 'exercise_04_2'``: the workbook's own numbering."""
     return f"exercise_{chapter:02d}_{number}"
 
 

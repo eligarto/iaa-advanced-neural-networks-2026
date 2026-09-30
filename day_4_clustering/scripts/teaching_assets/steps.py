@@ -425,13 +425,13 @@ def _db_points(ax, X, core, border, noise, labels=None, size=90, legend_counts=F
         handles = [
             Line2D([], [], marker="o", color="none", markerfacecolor=DB_CLUSTER_C[0],
                    markeredgecolor="none", markersize=10,
-                   label=f"core — ≥ minPts inside  ({core.sum()})"),
+                   label=f"core: ≥ minPts inside  ({core.sum()})"),
             Line2D([], [], marker="^", color="none", markerfacecolor="white",
                    markeredgecolor=DB_BORDER_C, markeredgewidth=2, markersize=10,
-                   label=f"border — inside a core's  ({border.sum()})"),
+                   label=f"border: inside a core's  ({border.sum()})"),
             Line2D([], [], marker="x", color=DB_NEUTRAL, linestyle="none",
                    markeredgewidth=2, markersize=9,
-                   label=f"noise — inside none  ({noise.sum()})"),
+                   label=f"noise: inside none  ({noise.sum()})"),
         ]
         ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1.005),
                   ncol=3, fontsize=10.5, frameon=False, handletextpad=0.4,
@@ -493,7 +493,7 @@ def make_dbscan_steps():
     for i in np.flatnonzero(core):
         _db_ball(ax, X[i], eps, DB_CLUSTER_C[0], fill=0.05, edge=0.32, lw=0.9)
     _db_points(ax, X, core, border, noise, legend_counts=True)
-    _db_note(ax, X[9], "fails the count itself, but sits inside\na core's ball — so it joins that cluster",
+    _db_note(ax, X[9], "fails the count itself, but sits inside\na core's ball, so it joins that cluster",
              (xlim[1] - 0.25, ylim[1] - 0.22), color=DB_BORDER_C, ha="right")
     _db_note(ax, X[15], "inside nobody's ball → noise",
              (xlim[0] + 0.25, ylim[0] + 0.42), color=DB_NEUTRAL, ha="left")
@@ -524,7 +524,7 @@ def make_dbscan_steps():
                     arrowprops=dict(arrowstyle="-|>", color=DB_BORDER_C, lw=1.4,
                                     shrinkA=7, shrinkB=9, mutation_scale=13))
     _db_points(ax, X, core, border, noise, labels=labels)
-    _db_note(ax, X[18], "its ball is empty —\nno arrow ever arrives",
+    _db_note(ax, X[18], "its ball is empty, \nno arrow ever arrives",
              (xlim[1] - 0.25, ylim[1] - 0.22), color=DB_NEUTRAL, ha="right")
     _db_note(ax, X[9], "one arrowhead only: the core reaches it,\nit reaches nothing back",
              (xlim[0] + 0.25, ylim[1] - 0.22), color=DB_BORDER_C, ha="left")
@@ -579,7 +579,7 @@ def _dbscan_result(eps=0.20, min_pts=6):
 
 
 # --------------------------------------------------------------------------- #
-# HDBSCAN* — tree + density sweep (core distance & mutual reachability reused)
+# HDBSCAN*: tree + density sweep (core distance & mutual reachability reused)
 # --------------------------------------------------------------------------- #
 
 
@@ -618,7 +618,7 @@ def make_hdbscan_steps():
 
 
 # --------------------------------------------------------------------------- #
-# PLSCAN — density, persistence barcode, read the bars
+# PLSCAN: density, persistence barcode, read the bars
 # --------------------------------------------------------------------------- #
 
 
@@ -669,7 +669,7 @@ def make_plscan_steps():
 
 
 # --------------------------------------------------------------------------- #
-# t-SNE — high-D similarities, low-D similarities, descent
+# t-SNE: high-D similarities, low-D similarities, descent
 # --------------------------------------------------------------------------- #
 
 
@@ -720,7 +720,7 @@ def make_tsne_steps():
 
 
 # --------------------------------------------------------------------------- #
-# UMAP — kNN graph, fuzzy edges, layout
+# UMAP: kNN graph, fuzzy edges, layout
 # --------------------------------------------------------------------------- #
 
 

@@ -1,4 +1,4 @@
-"""Build the DR19 star list for the spectral re-embed — cluster-aware.
+"""Build the DR19 star list for the spectral re-embed: cluster-aware.
 
 Includes ALL cluster members (kinematic σ-clip, same labels the benchmark
 uses) plus a stratified field sample, so the spectral embeddings cover the
@@ -85,7 +85,7 @@ def main() -> None:
     keep &= np.isfinite(df["logg"].to_numpy(dtype=float))
     df = df[keep].reset_index(drop=True)
 
-    # label cluster members (kinematic σ-clip — the benchmark's own labels)
+    # label cluster members (kinematic σ-clip: the benchmark's own labels)
     df = label_clusters(
         df, CLUSTERS,
         seed_position_radius_deg=config.SEED_POSITION_RADIUS_DEG,
@@ -108,7 +108,10 @@ def main() -> None:
     # [X/H] -> [X/Fe]
     out = {"APOGEE_ID": df["apogee_id"].astype(str)}
     for target, xh in TARGETS.items():
-        out[target] = df[xh].to_numpy(dtype=float) - fe_h[df.index] if target != "FE_H" else df["fe_h"].to_numpy(dtype=float)
+        out[target] = (
+            df["fe_h"].to_numpy(dtype=float) if target == "FE_H"
+            else df[xh].to_numpy(dtype=float) - fe_h[df.index]
+        )
     out["TEFF"] = df["teff"].to_numpy(dtype=float)
     out["LOGG"] = df["logg"].to_numpy(dtype=float)
     out["telescope"] = df["telescope"].astype(str)

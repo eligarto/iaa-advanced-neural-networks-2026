@@ -26,7 +26,7 @@ def small_settings() -> Settings:
 
 @pytest.fixture
 def separable() -> tuple[np.ndarray, np.ndarray]:
-    """Three well-separated blobs — every clusterer should find them."""
+    """Three well-separated blobs. Every clusterer should find them."""
     rng = np.random.default_rng(0)
     # 8 dims: EVoC runs an internal PCA that needs n_features > n_components.
     X = np.vstack([

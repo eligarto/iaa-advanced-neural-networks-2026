@@ -7,21 +7,21 @@ the blocks it could not see.
 
 Figures written (into the deck's asset folder):
 
-1. ``mae_arch.png``          — the architecture, drawn to scale from the real
+1. ``mae_arch.png``: the architecture, drawn to scale from the real
                                layer shapes (8575 → 5 conv blocks → 256-d z →
                                transposed-conv decoder → 8575).
-2. ``mae_step1_mask.png``    — a real spectrum with contiguous blocks hidden.
-3. ``mae_step2_encode.png``  — the conv stack squeezing length while growing
+2. ``mae_step1_mask.png``: a real spectrum with contiguous blocks hidden.
+3. ``mae_step2_encode.png``: the conv stack squeezing length while growing
                                channels, annotated with the true tensor shapes.
-4. ``mae_step3_recon.png``   — the model's ACTUAL reconstruction inside the
+4. ``mae_step3_recon.png``: the model's ACTUAL reconstruction inside the
                                masked windows, with the MSE it is scored on.
-5. ``mae_step4_latent.png``  — what the 256-d latent does downstream: real
+5. ``mae_step4_latent.png``: what the 256-d latent does downstream: real
                                member embeddings, PCA-2D, coloured by cluster.
-6. ``mae_why_blocks.png``    — why contiguous blocks and not random pixels:
+6. ``mae_why_blocks.png``: why contiguous blocks and not random pixels:
                                linear interpolation nails random holes and fails
                                on a block, which is the whole design argument.
 
-Run (repo root) — needs torch, install the extra once:
+Run (repo root): needs torch, install the extra once:
     uv sync --extra torch
     uv run python scripts/make_masked_ae_figures.py
 """
@@ -175,7 +175,7 @@ def fig_architecture() -> None:
     block(in_x, in_w, 7.6, BLUE, 0.85, "spectrum", f"1 x {N_PIX}")
     band(in_x, in_x + in_w, 11.2, "masked input", BLUE)
 
-    # Encoder — height shrinks with sequence length, width grows with channels.
+    # Encoder: height shrinks with sequence length, width grows with channels.
     enc_x0 = 6.4
     x0 = enc_x0
     max_len = lengths[0]
@@ -184,7 +184,7 @@ def fig_architecture() -> None:
         w = 2.0 + 2.2 * (i / max(1, len(lengths) - 1))
         block(x0, w, h, INDIGO, 0.55 + 0.09 * i, f"conv {C}", f"{C}x{L}", row=i)
         x0 += w + 1.3
-    band(enc_x0, x0 - 1.3, 9.3, "encoder — Conv1d stride 2 + BN + PReLU", INDIGO)
+    band(enc_x0, x0 - 1.3, 9.3, "encoder: Conv1d stride 2 + BN + PReLU", INDIGO)
 
     # Latent
     lat_x, lat_w = x0 + 1.6, 3.2
@@ -197,7 +197,7 @@ def fig_architecture() -> None:
     ax.text(lat_x + lat_w / 2, 2.35, "this is what\nwe cluster", ha="center", va="top",
             fontsize=8.4, color=AMBER, style="italic", fontweight="bold")
 
-    # Decoder — mirror image.
+    # Decoder: mirror image.
     dec_x0 = lat_x + lat_w + 2.4
     x0 = dec_x0
     for i, (L, C) in enumerate(zip(reversed(lengths), reversed(channels), strict=True)):
@@ -205,22 +205,22 @@ def fig_architecture() -> None:
         w = 4.2 - 2.2 * (i / max(1, len(lengths) - 1))
         block(x0, w, h, GREEN, 0.30 + 0.07 * i, f"deconv {C}", f"{C}x{L}", row=i + 1)
         x0 += w + 1.3
-    band(dec_x0, x0 - 1.3, 9.3, "decoder — ConvTranspose1d", GREEN)
+    band(dec_x0, x0 - 1.3, 9.3, "decoder: ConvTranspose1d", GREEN)
 
     # Output
     out_x, out_w = x0 + 0.6, 3.4
     block(out_x, out_w, 7.6, ROSE, 0.80, "recon", f"1 x {N_PIX}")
     band(out_x, out_x + out_w, 11.2, "predicted", ROSE)
 
-    # The loss arrow — only over the hidden pixels, which is the whole point.
+    # The loss arrow: only over the hidden pixels, which is the whole point.
     ax.add_patch(FancyArrowPatch((in_x + in_w / 2, -0.75), (out_x + out_w / 2, -0.75),
                                  arrowstyle="<->", color=ROSE, linewidth=1.5,
                                  mutation_scale=13, zorder=5))
     ax.text((in_x + in_w / 2 + out_x + out_w / 2) / 2, -1.05,
-            "loss = MSE on the HIDDEN pixels only  —  no abundance label anywhere",
+            "loss = MSE on the HIDDEN pixels only, no abundance label anywhere",
             ha="center", va="top", fontsize=9.6, color=ROSE, fontweight="bold")
 
-    ax.set_title(f"Masked spectral autoencoder — {n_params / 1e6:.1f}M parameters, "
+    ax.set_title(f"Masked spectral autoencoder: {n_params / 1e6:.1f}M parameters, "
                  f"8575 pixels in, 256 numbers out",
                  fontsize=12.5, pad=16, color=INK)
     _save(fig, "mae_arch.png")
@@ -280,7 +280,7 @@ def fig_steps(flux: np.ndarray) -> float:
             seen = True
     ax.set_xlabel("pixel (wavelength bin)")
     ax.set_ylabel("standardised flux")
-    ax.set_title("Step 1 — hide contiguous wavelength blocks (~50% of the spectrum)",
+    ax.set_title("Step 1: hide contiguous wavelength blocks (~50% of the spectrum)",
                  fontsize=12, pad=10)
     ax.legend(frameon=False, fontsize=9, loc="lower right")
     ax.text(0.01, 0.97, "the model never sees the shaded pixels",
@@ -309,7 +309,7 @@ def fig_steps(flux: np.ndarray) -> float:
     for x, L, c in zip(xpos, lens, chans, strict=True):
         ax.text(float(x), L * 1.18, f"{c} ch\n{L} long", ha="center", fontsize=8.2, color=INK)
     ax.set_ylim(top=max(lens) * 4)
-    ax.set_title("Step 2 — each stride-2 conv halves the length and widens the channels",
+    ax.set_title("Step 2: each stride-2 conv halves the length and widens the channels",
                  fontsize=12, pad=10)
     ax.text(0.99, 0.94, "then global-average pool + one linear layer -> z (256-d)",
             transform=ax.transAxes, fontsize=9.2, color=AMBER, ha="right",
@@ -348,7 +348,7 @@ def fig_steps(flux: np.ndarray) -> float:
             seen = True
     ax.set_xlabel("pixel (wavelength bin)")
     ax.set_ylabel("standardised flux")
-    ax.set_title("Step 3 — reconstruct the hidden blocks from the 256-d latent alone",
+    ax.set_title("Step 3: reconstruct the hidden blocks from the 256-d latent alone",
                  fontsize=12, pad=10)
     ax.legend(frameon=False, fontsize=9, loc="lower right")
     ax.text(0.01, 0.97, f"MSE on hidden pixels = {mse_hidden:.3f}   (this is the entire loss)",
@@ -358,7 +358,7 @@ def fig_steps(flux: np.ndarray) -> float:
 
 
 def fig_why_blocks(flux: np.ndarray) -> tuple[float, float]:
-    """Why blocks, not random pixels — the design argument, made empirical."""
+    """Why blocks, not random pixels: the design argument, made empirical."""
     rng = np.random.default_rng(3)
     wlo, whi = _clean_window(flux, width=500)
     lo, hi = wlo, whi
@@ -380,8 +380,8 @@ def fig_why_blocks(flux: np.ndarray) -> tuple[float, float]:
 
     fig, axes = plt.subplots(1, 2, figsize=(11.6, 3.8), sharey=True)
     for ax, mk, interp, err, title in [
-        (axes[0], rand_mask, interp_rand, err_rand, "random pixels — too easy"),
-        (axes[1], blk_mask, interp_blk, err_blk, "one contiguous block — hard"),
+        (axes[0], rand_mask, interp_rand, err_rand, "random pixels: too easy"),
+        (axes[1], blk_mask, interp_blk, err_blk, "one contiguous block: hard"),
     ]:
         ax.plot(idx, seg, color=BLUE, linewidth=0.9, label="true flux", zorder=2)
         ax.plot(idx[mk], interp[mk], ".", color=ROSE, markersize=2.6,
@@ -394,7 +394,7 @@ def fig_why_blocks(flux: np.ndarray) -> tuple[float, float]:
                  fontsize=12.5, y=1.12)
     ratio = err_blk / err_rand if err_rand else float("nan")
     fig.text(0.5, -0.09,
-             f"Interpolating a block is {ratio:.0f}x worse — so filling it "
+             f"Interpolating a block is {ratio:.0f}x worse, so filling it "
              f"requires the line physics, not the neighbouring pixels.",
              ha="center", fontsize=9.6, color=INK, style="italic")
     _save(fig, "mae_why_blocks.png")
@@ -402,7 +402,7 @@ def fig_why_blocks(flux: np.ndarray) -> tuple[float, float]:
 
 
 def fig_latent_downstream() -> None:
-    """What the latent buys downstream — real members, real clusters.
+    """What the latent buys downstream: real members, real clusters.
 
     Uses the project's own ``spectral_prepared`` entry point rather than a
     hand-rolled merge, so the population here is exactly the population the
@@ -447,7 +447,7 @@ def fig_latent_downstream() -> None:
     for s in ax.spines.values():
         s.set_visible(False)
     ax.legend(frameon=False, fontsize=9, loc="best")
-    ax.set_title("Step 4 — the 256-d latent, projected to 2-D:\n"
+    ax.set_title("Step 4: the 256-d latent, projected to 2-D:\n"
                  "clusters the model was never told about",
                  fontsize=12, pad=10)
     _save(fig, "mae_step4_latent.png")

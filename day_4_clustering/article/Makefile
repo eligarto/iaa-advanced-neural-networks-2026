@@ -1,4 +1,4 @@
-# Companion workbook — build rules
+# Companion workbook: build rules
 #
 #   make            vendor the deck figures, then build workbook.pdf
 #   make figures    vendor figures only (deck PNGs, GIF filmstrips, QR codes)

@@ -1,4 +1,4 @@
-"""Chapter 7, exercise 1 — is mutual reachability a metric?
+"""Chapter 7, exercise 1: is mutual reachability a metric?
 
     For the four points a, b, c, d of a square grid, compute d_mreach with
     k=2 and verify that it is a valid metric. Which of the metric axioms does
@@ -11,7 +11,7 @@ than the expected one: with the usual d(x,x) = 0 convention *both*
 constructions satisfy all four axioms, including the triangle inequality, on
 the square and on 300 random configurations. The axiom that breaks is the
 identity of indiscernibles, and it breaks only if you take the formula
-literally at x = y — which is why every implementation special-cases the
+literally at x = y, which is why every implementation special-cases the
 diagonal. What separates the two constructions is not an axiom; it is what
 they do to the single-linkage hierarchy, which this module measures too.
 """
@@ -51,7 +51,7 @@ def mutual_reachability(
 ) -> np.ndarray:
     """Equation 4: max{kappa_k(a), kappa_k(b), d(a,b)}.
 
-    ``zero_diagonal`` applies the convention every implementation uses — the
+    ``zero_diagonal`` applies the convention every implementation uses: the
     formula is only defined for distinct points, and d(x, x) is set to 0 by
     hand. Set it False to see what the literal formula does.
     """
@@ -81,8 +81,8 @@ def check_axioms(matrix: np.ndarray, tol: float = 1e-12) -> dict[str, object]:
     """Test the four metric axioms exhaustively on a distance matrix."""
     n = len(matrix)
     violations = [
-        (i, j, l) for i, j, l in itertools.product(range(n), repeat=3)
-        if matrix[i, l] > matrix[i, j] + matrix[j, l] + tol
+        (i, j, m) for i, j, m in itertools.product(range(n), repeat=3)
+        if matrix[i, m] > matrix[i, j] + matrix[j, m] + tol
     ]
     off_diagonal_zeros = [
         (i, j) for i in range(n) for j in range(n)
@@ -124,8 +124,8 @@ def random_triangle_test(
             (mutual_reachability(points, k), "mreach"),
             (floored_distance(points), "floored"),
         ):
-            for i, j, l in itertools.product(range(n), repeat=3):
-                slack = float(matrix[i, j] + matrix[j, l] - matrix[i, l])
+            for i, j, m in itertools.product(range(n), repeat=3):
+                slack = float(matrix[i, j] + matrix[j, m] - matrix[i, m])
                 if which == "mreach":
                     worst_mreach = min(worst_mreach, slack)
                     bad_mreach += slack < -1e-9
@@ -142,7 +142,7 @@ def random_triangle_test(
 
 
 def linkage_heights(matrix: np.ndarray) -> list[float]:
-    """Single-linkage merge heights — the hierarchy the metric induces."""
+    """Single-linkage merge heights: the hierarchy the metric induces."""
     from scipy.cluster.hierarchy import linkage
     from scipy.spatial.distance import squareform
 
@@ -201,7 +201,7 @@ def solve(k: int = 2) -> dict[str, object]:
     }
 
 
-def plot():  # pragma: no cover — figure
+def plot():  # pragma: no cover (figure)
     """The square, its kappa_2 circles, and the three quantities of Eq. 4."""
     import matplotlib.pyplot as plt
 
@@ -233,7 +233,7 @@ ANSWER: dict[str, object] = {
         "is 1 for the edges (unchanged, since the floor equals the distance) "
         "and sqrt(2) for the diagonals (unchanged, since the distance already "
         "exceeds the floor). The mutual-reachability matrix is identical to "
-        "the Euclidean one off the diagonal — verified in solve(). The square "
+        "the Euclidean one off the diagonal: verified in solve(). The square "
         "is a degenerate example precisely because it is symmetric: every "
         "kappa is the same, so the floor never binds on anything."
     ),
@@ -243,7 +243,7 @@ ANSWER: dict[str, object] = {
         "matrix is verified symmetric. Identity: d_mreach(x,x) = 0 by the "
         "usual convention and d_mreach(x,y) > 0 for x != y whenever the "
         "points are distinct. Triangle inequality: checked exhaustively over "
-        "all 64 ordered triples on the square, zero violations — and over 300 "
+        "all 64 ordered triples on the square, zero violations, and over 300 "
         "random configurations in 1-4 dimensions with 5-11 points each, still "
         "zero violations, worst slack -8.9e-16 (floating-point noise). "
         "Mutual reachability is a metric."
@@ -252,13 +252,13 @@ ANSWER: dict[str, object] = {
         "The identity of indiscernibles, and only if you apply the formula "
         "literally at x = y. Taken at face value Equation 4 gives "
         "d_mreach(x,x) = max{kappa(x), kappa(x), 0} = kappa(x) > 0, so a "
-        "point is at positive distance from itself — solve() reports "
+        "point is at positive distance from itself: solve() reports "
         "d_xx_is_zero = False for the literal form and True once the diagonal "
         "is zeroed. This is a definitional wrinkle, not a mathematical "
         "problem: mutual reachability is introduced "
         f"{cite('Campello:13')} as a transform on pairs of *distinct* "
-        "points, and every implementation — the reference one "
-        f"{cite('McInnes:17')} included — sets the diagonal to zero. "
+        "points, and every implementation: the reference one "
+        f"{cite('McInnes:17')} included. Sets the diagonal to zero. "
         "Worth knowing because it is the one thing that will make a "
         "hand-written mutual-reachability matrix fail a metric assertion."
     ),
@@ -271,7 +271,7 @@ ANSWER: dict[str, object] = {
         "max{d(j,l),c}. Checked exhaustively on the square and on 300 random "
         "configurations: zero violations, worst slack -4.4e-16. Both "
         "constructions are metrics. Do not write down an axiom violation you "
-        "have not verified — this module exists partly as that lesson."
+        "have not verified: this module exists partly as that lesson."
     ),
     "what a global floor destroys instead": (
         "Information, not axioms. On a configuration where the core distances "
@@ -282,8 +282,8 @@ ANSWER: dict[str, object] = {
         "6, and it flattens 10 of the 20 ordered pairs onto exactly the same "
         "value. The consequence is visible in the hierarchy: single-linkage "
         "merge heights are [0.071, 2.0, 2.9] under Euclidean, [0.1, 2.9, "
-        "3.52] under mutual reachability — the tight triple still merges "
-        "first, at its own density scale — and a single height [2.925] under "
+        "3.52] under mutual reachability: the tight triple still merges "
+        "first, at its own density scale, and a single height [2.925] under "
         "the global floor, i.e. the entire dataset becomes one cluster at one "
         "level. The hierarchy has been erased."
     ),
@@ -296,7 +296,7 @@ ANSWER: dict[str, object] = {
         "property S 7.1 calls making dense regions 'self-similar across "
         "scales', and it is what lets the single MST of S 7.2 encode every "
         "density threshold at once "
-        f"— the construction {cite('Campello:13', parenthetical=False)} "
+        f", the construction {cite('Campello:13', parenthetical=False)} "
         "introduced precisely to replace DBSCAN's single epsilon with a "
         "hierarchy. Both formulas are metrics; only one of them preserves "
         "the hierarchy that HDBSCAN then reads."

@@ -1,13 +1,13 @@
-"""Chapter 13, exercise 4 — what you would need from the other authors.
+"""Chapter 13, exercise 4: what you would need from the other authors.
 
     §13.6 runs their pipeline on our stars but not ours on theirs. Their
     sample's reachable star list is not public in a form we can re-run, so
-    state what you would need from the other authors — and what a re-run on
+    state what you would need from the other authors, and what a re-run on
     their stars would change about the conclusion of Table 10.
 
 This is a reasoning exercise, so the answer is the argument. The supporting
 computation is the one that makes the argument concrete: the two samples are
-measured side by side on the quantities a re-run needs — stars per cluster,
+measured side by side on the quantities a re-run needs: stars per cluster,
 the internal abundance scatter that the published grid was tuned for, and the
 recovery fraction their configuration actually reaches on our stars. Those
 numbers decide whether the missing star list is a detail or the whole
@@ -25,7 +25,7 @@ from exercises.utils import DataNotAvailable, members, project_root, settings
 #: What the chapter is missing, as the artefacts a re-run needs.
 REQUESTS: tuple[tuple[str, str], ...] = (
     ("member star list with identifiers",
-     "the 175 red-clump stars with their 2MASS/APOGEE identifiers — without "
+     "the 175 red-clump stars with their 2MASS/APOGEE identifiers: without "
      "it no one can score our pipeline on their sample"),
     ("per-element abundances in dex, all 16",
      "already published in their tables, but the machine-readable version is "
@@ -45,7 +45,7 @@ REQUESTS: tuple[tuple[str, str], ...] = (
 )
 
 #: Their published metric triple, quoted AS PUBLISHED (this module did not
-#: recompute their run on their sample — the star list is unavailable).
+#: recompute their run on their sample. The star list is unavailable).
 PUBLISHED_THEIRS: dict[str, float] = {
     "h": 0.49, "c": 0.63, "V": 0.55, "RF40": 0.290, "RF70": 0.030,
 }
@@ -63,7 +63,7 @@ def our_scatter() -> pd.DataFrame:
 
     The robust scatter (1.4826 x MAD) of one element's abundance inside one
     cluster, the median over clusters with at least 8 rows. This is an *upper*
-    bound on the measurement precision — it also contains real star-to-star
+    bound on the measurement precision: it also contains real star-to-star
     chemical variation, which is the point of the comparison: the number the
     published configuration was tuned on is not directly available in our
     data, so the closest measurable analogue is reported with that caveat.
@@ -117,7 +117,9 @@ def published_comparison() -> pd.DataFrame:
     if not path.is_file():
         raise DataNotAvailable(
             f"{path} is not on disk; regenerate it with\n\n"
-            "    .venv/bin/python scripts/casamiquela_comparison.py\n",
+            "    uv run python scripts/casamiquela_comparison.py\n\n"
+            "It needs the DR19 catalogue (uv run cluster download) and takes "
+            "a while: it refits every method and seed.\n",
         )
     frame = pd.read_csv(path)
     return (
@@ -156,7 +158,7 @@ def solve() -> dict[str, object]:
     }
 
 
-def plot(result: dict[str, object] | None = None):  # pragma: no cover — figure
+def plot(result: dict[str, object] | None = None):  # pragma: no cover (figure)
     """Our per-element intra-cluster scatter against their published coherence."""
     import matplotlib.pyplot as plt
 
@@ -205,8 +207,8 @@ ANSWER: dict[str, object] = {
         "another row); theirs is 175 stars across 31 clusters, 5.6 stars per "
         "cluster, red-clump only and with no field stars. Our median "
         "intra-cluster scatter across the 16 elements is 0.059 dex against "
-        "their 0.03 — a factor of 2.0, exactly the precision gap §13.6 cites "
-        "as one of two inseparable differences — the precision at which that "
+        "their 0.03: a factor of 2.0, exactly the precision gap §13.6 cites "
+        "as one of two inseparable differences: the precision at which that "
         "sample was assembled is itself a load-bearing part of "
         f"{cite('Casamiquela:21')}. Note that the 0.059 is an "
         "upper bound (it includes genuine star-to-star chemical variation, "
@@ -226,7 +228,7 @@ ANSWER: dict[str, object] = {
         "shortfall on our stars is the abundance precision and the sample "
         "shape, not the embedding. If it recovers materially less, then the "
         "embed-then-cluster architecture is losing information their "
-        "cluster-the-abundances step keeps — which is the one conclusion "
+        "cluster-the-abundances step keeps, which is the one conclusion "
         "Table 10 explicitly declines to draw. The wider literature is split "
         f"on exactly this axis: {cite('Hogg:16')} recovers phase-space "
         "structures from abundances, while "
@@ -242,7 +244,7 @@ ANSWER: dict[str, object] = {
         "one conclusion is already safe in both directions: their best-case "
         "sample recovers 9 of 31 clusters at the 40% threshold and 1 at 70%, "
         "while adding field stars leaves one cluster above 40% and none at "
-        "70% — the same shape as our Task 2 field-retrieval result. A re-run "
+        "70%: the same shape as our Task 2 field-retrieval result. A re-run "
         "on their stars would sharpen the *size* of the chemical-tagging gap; "
         "it would not reverse its sign, and this workbook should not be read "
         "as claiming it would."
@@ -255,7 +257,7 @@ ANSWER: dict[str, object] = {
         "already in the workbook: their grid on our stars, our metrics on "
         "their metric triple, chance levels for both partition shapes, and a "
         "per-cluster recovery list. What remains open is exactly what §13.6 "
-        "says remains open — and it stays open until an author sends a list "
+        "says remains open, and it stays open until an author sends a list "
         "of identifiers, which is a cheaper request than a re-analysis."
     ),
     "references": reference_list("Casamiquela:21", "Hogg:16", "Spina:25"),
