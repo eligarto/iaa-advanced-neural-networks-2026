@@ -34,8 +34,8 @@ from pathlib import Path
 
 DECK_URL = "https://garciadias.github.io/#/presentations/iaa-so-chemical-tagging-2026"
 SCHOOL_URL = "https://www.granadacongresos.com/ai-ml"
-REPO_URL = "https://github.com/garciadias/iaa-advanced-neural-networks-2026-draft"
-LIBRARY_URL = "https://github.com/garciadias/iaa-advanced-neural-networks-2026-draft/tree/main/docs"
+REPO_URL = "https://github.com/iaa-so-training/iaa-advanced-neural-networks-2026"
+LIBRARY_URL = "https://github.com/iaa-so-training/iaa-advanced-neural-networks-2026/tree/main/day_4_clustering/docs"
 
 # Natural (declared) width, in points, that every vendored PNG is rewritten to
 # carry in its pHYs chunk. Must stay below the class's \textwidth (366 pt).
